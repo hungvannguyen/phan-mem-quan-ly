@@ -1,0 +1,55 @@
+.login {
+    @apply mx-auto my-[100px] max-w-7xl border border-black;
+
+    &-header {
+        @apply flex flex-col items-center bg-blue-400 py-4;
+
+        .title {
+            &_top {
+                @apply text-[18px] font-semibold uppercase;
+            }
+
+            &_bottom {
+                @apply text-[24px] font-bold uppercase;
+            }
+        }
+    }
+
+    &-body {
+        @apply flex flex-col items-center justify-center gap-[40px] bg-yellow-200 py-4;
+
+        .title {
+            @apply text-[18px] font-semibold uppercase;
+        }
+    }
+
+    &-form {
+        @apply flex flex-col justify-center gap-[40px] bg-red-400 px-[20px] pb-[10px] pt-[20px];
+    }
+
+    .form {
+        &-group {
+            @apply grid grid-cols-3 items-center justify-start gap-[20px];
+
+            label {
+                @apply col-span-1 text-[16px] font-semibold uppercase;
+            }
+
+            input {
+                @apply w-full p-2 outline-none;
+            }
+        }
+
+        &-check {
+            @apply flex gap-[10px];
+        }
+
+        &-submit {
+            @apply mt-[10px] flex justify-center;
+
+            button {
+                @apply bg-blue-500 px-[20px] py-[10px] text-white;
+            }
+        }
+    }
+}

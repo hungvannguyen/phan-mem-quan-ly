@@ -8,7 +8,7 @@
 
 	<meta name="viewport"
 					content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
-	@vite(['resources/css/app.css', 'resources/js/app.js'])
+	@vite(['resources/scss/style.scss', 'resources/js/app.js'])
 	@yield('head')
 </head>
 
