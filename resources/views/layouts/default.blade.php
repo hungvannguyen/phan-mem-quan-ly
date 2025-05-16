@@ -18,7 +18,7 @@
 @include('partials.navbar')
 
 <!-- Page wrapper-->
-<main class="page-wrapper">
+<main>
 
 	@yield('content')
 
