@@ -4,8 +4,7 @@
 
 	<div class="login">
 		<div class="header">
-			<span class="title_top">Học viện an ninh nhân dân</span>
-			<span class="title_bottom">Phòng quản lý đào tạo và bồi dưỡng nâng cao</span>
+		
 		</div>
 		<div class="login-body">
 			<div class="title">Hệ thống quản lý văn bằng, chứng chỉ</div>

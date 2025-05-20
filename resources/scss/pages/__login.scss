@@ -1,5 +1,5 @@
 .login {
-    @apply mx-auto my-[100px] max-w-7xl border border-black;
+    @apply mx-auto my-[100px] max-w-[1140px] border border-black;
 
     &-body {
         @apply flex flex-col items-center justify-center gap-[40px] bg-yellow-200 py-4;
