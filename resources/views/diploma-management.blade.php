@@ -64,7 +64,7 @@
 			</div>
 		</form>
 
-		<div class="overflow-x-auto border rounded-md p-2 bg-white mx-[20px]">
+		<div class="overflow-x-auto border rounded-md p-2 bg-white">
 			<table class="w-full table-auto border-collapse text-sm">
 				<thead class="bg-green-600 text-white text-center">
 				<tr>

@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.navbar {
+  @apply mx-auto max-w-[1140px] border border-black;
+}
+.navbar-menu {
+  @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-black;
+}
+
+.menu-item {
+  @apply flex h-full w-full items-center justify-center bg-red-500 px-5 py-3 last:bg-red-300;
+}
+.menu-item a {
+  @apply text-center text-[18px] font-bold uppercase;
+}
+
+.active {
+  @apply bg-red-800 text-white;
+}
+
+.login {
+  @apply mx-auto my-[100px] max-w-[1140px] border border-black;
+}
+.login-body {
+  @apply flex flex-col items-center justify-center gap-[40px] bg-yellow-200 py-4;
+}
+.login-body .title {
+  @apply text-[18px] font-semibold uppercase;
+}
+.login-form {
+  @apply flex flex-col justify-center gap-[40px] bg-red-400 px-[20px] pb-[10px] pt-[20px];
+}
+.login .form-group {
+  @apply grid grid-cols-2 items-center justify-start gap-[20px];
+}
+.login .form-group label {
+  @apply col-span-1 text-[16px] font-semibold uppercase;
+}
+.login .form-group input {
+  @apply w-full p-2 outline-none;
+}
+.login .form-check {
+  @apply flex gap-[10px];
+}
+.login .form-submit {
+  @apply mt-[10px] flex justify-center;
+}
+.login .form-submit button {
+  @apply bg-blue-500 px-[20px] py-[10px] text-white;
+}
+
+.diploma-management {
+  @apply mx-auto max-w-[1140px] bg-yellow-100;
+}
+.diploma-management .form-container {
+  @apply mx-auto grid grid-cols-3 justify-center gap-x-[40px] gap-y-[30px] px-[20px] py-[20px];
+}
+.diploma-management .form-group {
+  @apply flex items-center;
+}
+.diploma-management .form-group label {
+  @apply min-w-[100px] text-[16px] font-bold text-gray-700;
+}
+.diploma-management .form-group input {
+  @apply w-full px-4 py-3;
+}
+.diploma-management .form-group select {
+  @apply mx-4 px-4 py-2;
+}
+.diploma-management .action-container {
+  @apply flex items-center gap-[20px] px-[20px] py-[20px];
+}
+
+.header {
+  @apply min-h-[188px] w-full bg-contain bg-bottom bg-no-repeat;
+  background-image: url("https://hvannd.edu.vn/Content/images/banner.jpg");
+}
+
+.btn {
+  @apply px-6 py-2;
+}
+.btn-primary {
+  @apply bg-green-900 text-white;
+}
+
+.table {
+  @apply mx-[20px] bg-white;
+}
+.table table {
+  @apply table-fixed;
+}
+.table th,
+.table td {
+  @apply px-[10px] text-center;
+}
+
+/*# sourceMappingURL=style.css.map */

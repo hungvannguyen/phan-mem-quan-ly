@@ -4,22 +4,23 @@
 
 	<div class="login">
 		<div class="header">
-		
+
 		</div>
 		<div class="login-body">
 			<div class="title">Hệ thống quản lý văn bằng, chứng chỉ</div>
 
-			<form class="login-form">
+			<form action="/login" class="login-form" method="POST">
+				@csrf
 				<div class="form-group">
 					<label for="username">Tên đăng nhập</label>
 					<div class="col-span-2">
-						<input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập">
+						<input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="email">
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="password">Mật khẩu</label>
 					<div class="col-span-2">
-						<input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu">
+						<input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" name="password">
 					</div>
 				</div>
 

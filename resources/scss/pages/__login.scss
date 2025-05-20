@@ -15,7 +15,7 @@
 
     .form {
         &-group {
-            @apply grid grid-cols-3 items-center justify-start gap-[20px];
+            @apply grid grid-cols-2 items-center justify-start gap-[20px];
 
             label {
                 @apply col-span-1 text-[16px] font-semibold uppercase;
