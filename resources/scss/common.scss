@@ -1,0 +1,25 @@
+.header {
+    @apply min-h-[188px] w-full bg-contain bg-bottom bg-no-repeat;
+    background-image: url("https://hvannd.edu.vn/Content/images/banner.jpg");
+}
+
+.btn {
+    @apply px-6 py-2;
+
+    &-primary {
+        @apply bg-green-900 text-white;
+    }
+}
+
+.table {
+    @apply mx-[20px] bg-white;
+
+    table {
+        @apply table-fixed;
+    }
+
+    th,
+    td {
+        @apply px-[10px] text-center;
+    }
+}

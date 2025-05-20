@@ -1,0 +1,31 @@
+.diploma-management {
+    @apply mx-auto max-w-[1140px] bg-yellow-100;
+
+    .form {
+        &-container {
+            @apply mx-auto grid grid-cols-3 justify-center gap-x-[40px] gap-y-[30px] px-[20px] py-[20px];
+        }
+
+        &-group {
+            @apply flex items-center;
+
+            label {
+                @apply min-w-[100px] text-[16px] font-bold text-gray-700;
+            }
+
+            input {
+                @apply w-full px-4 py-3;
+            }
+
+            select {
+                @apply mx-4 px-4 py-2;
+            }
+        }
+    }
+
+    .action {
+        &-container {
+            @apply flex items-center gap-[20px] px-[20px] py-[20px];
+        }
+    }
+}

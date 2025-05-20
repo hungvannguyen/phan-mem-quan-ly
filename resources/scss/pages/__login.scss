@@ -1,20 +1,6 @@
 .login {
     @apply mx-auto my-[100px] max-w-7xl border border-black;
 
-    &-header {
-        @apply flex flex-col items-center bg-blue-400 py-4;
-
-        .title {
-            &_top {
-                @apply text-[18px] font-semibold uppercase;
-            }
-
-            &_bottom {
-                @apply text-[24px] font-bold uppercase;
-            }
-        }
-    }
-
     &-body {
         @apply flex flex-col items-center justify-center gap-[40px] bg-yellow-200 py-4;
 

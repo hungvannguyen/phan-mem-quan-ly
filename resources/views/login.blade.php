@@ -3,7 +3,7 @@
 @section('content')
 
 	<div class="login">
-		<div class="login-header">
+		<div class="header">
 			<span class="title_top">Học viện an ninh nhân dân</span>
 			<span class="title_bottom">Phòng quản lý đào tạo và bồi dưỡng nâng cao</span>
 		</div>

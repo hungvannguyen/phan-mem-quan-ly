@@ -10,7 +10,6 @@
 					content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
 	<!-- <link rel="icon" href=""> -->
 	@vite(['resources/scss/style.css', 'resources/js/app.js'])
-	@include('partials.css')
 	@yield('head')
 </head>
 
@@ -18,11 +17,9 @@
 @include('partials.navbar')
 
 <!-- Page wrapper-->
-<main>
 
-	@yield('content')
+@yield('content')
 
-</main>
 @include('partials.footer')
 
 @yield('foot')

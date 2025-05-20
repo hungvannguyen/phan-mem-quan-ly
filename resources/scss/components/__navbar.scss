@@ -1,0 +1,21 @@
+.navbar {
+    @apply mx-auto max-w-[1140px] border border-black;
+
+    &-menu {
+        @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-black;
+    }
+}
+
+.menu {
+    &-item {
+        @apply flex h-full w-full items-center justify-center bg-red-500 px-5 py-3 last:bg-red-300;
+
+        a {
+            @apply text-center text-[18px] font-bold uppercase;
+        }
+    }
+}
+
+.active {
+    @apply bg-red-800 text-white;
+}
