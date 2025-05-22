@@ -51,16 +51,14 @@
 						</div>
 					</div>
 				</div>
-			</form>
 
-			<div class="action-container">
-				<button class="btn btn-secondary">Thêm mới</button>
-				<button class="btn btn-secondary">Sửa</button>
-				<button class="btn btn-secondary">Xoá</button>
-				<button class="btn btn-secondary">In xác nhận</button>
-				<button class="btn btn-secondary">In xác minh</button>
-				<button class="btn btn-secondary">Xuất dữ liệu</button>
-			</div>
+				<div class="action-container">
+					<button class="btn btn-secondary">Thêm mới</button>
+					<button class="btn btn-secondary">In xác nhận</button>
+					<button class="btn btn-secondary">In xác minh</button>
+					<button class="btn btn-secondary">Xuất dữ liệu</button>
+				</div>
+			</form>
 		</div>
 
 		<div class="table-section">
@@ -79,9 +77,7 @@
 						<th class="w-28">Số hiệu</th>
 						<th class="w-28">Số vào sổ</th>
 						<th class="w-32">Tình trạng</th>
-						<th class="w-28">Chỉnh sửa</th>
-						<th class="w-28">Cấp lại</th>
-						<th class="w-28">Chi tiết</th>
+						<th class="w-28">Hành động</th>
 					</tr>
 					</thead>
 					<tbody>
@@ -99,11 +95,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -121,11 +113,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -143,11 +131,7 @@
 						<td>Đang học</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -165,11 +149,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -187,11 +167,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -209,11 +185,7 @@
 						<td>Đang học</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -231,11 +203,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -253,11 +221,7 @@
 						<td>Đang học</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -275,11 +239,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>
@@ -297,11 +257,7 @@
 						<td>Đã tốt nghiệp</td>
 						<td>
 							<button class="btn btn-table">Sửa</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Cấp lại</button>
-						</td>
-						<td>
 							<button class="btn btn-table">Chi tiết</button>
 						</td>
 					</tr>

@@ -1,23 +1,29 @@
 <div class="navbar">
-	<div class="header">
-		<img src="https://hvannd.edu.vn/Content/images/banner.jpg" alt="Header Image">
-	</div>
+	@include('components.header')
 
 	<nav class="navbar-menu">
-		<div class="menu-item active">
-			<a>Quản lý phôi</a>
-		</div>
-		<div class="menu-item">
-			<a>Quản lý văn bằng</a>
-		</div>
-		<div class="menu-item">
-			<a>Quản lý chứng chỉ</a>
-		</div>
-		<div class="menu-item">
-			<a>Cài đặt</a>
-		</div>
-		<div class="menu-item">
-			<a>Hệ thống quản lý văn bằng chứng chỉ</a>
-		</div>
+		<a href="{{ route('embryo-management') }}"
+						class="menu-item {{ request()->routeIs('embryo-management') ? 'active' : '' }}">
+			Quản lý phôi
+		</a>
+
+		<a href="{{ route('diploma-management') }}"
+						class="menu-item {{ request()->routeIs('diploma-management') ? 'active' : '' }}">
+			Quản lý văn bằng
+		</a>
+
+		<a href="{{ route('certificate-management') }}"
+						class="menu-item {{ request()->routeIs('certificate-management') ? 'active' : '' }}">
+			Quản lý chứng chỉ
+		</a>
+
+		<a href="{{ route('settings') }}" class="menu-item {{ request()->routeIs('settings') ? 'active' : '' }}">
+			Cài đặt
+		</a>
+
+		<a href="{{ route('about') }}" class="menu-item {{ request()->routeIs('about') ? 'active' : '' }}">
+			Hệ thống quản lý văn bằng chứng chỉ
+		</a>
 	</nav>
+
 </div>

@@ -1,14 +1,14 @@
 @extends('layouts.blank')
 
 @section('content')
-	<div class="login">
-		<div class="header">
-			<img src="https://hvannd.edu.vn/Content/images/banner.jpg" alt="Header Image">
-		</div>
-		<div class="login-body">
+	<div class="auth-login">
+
+		@include('components.header')
+
+		<div class="auth-login-body">
 			<div class="title">Hệ thống quản lý văn bằng, chứng chỉ</div>
 
-			<form action="/login" class="login-form" method="POST">
+			<form action="/login" class="auth-login-form" method="POST">
 				@csrf
 				<div class="form-group">
 					<label for="username">Tên đăng nhập:</label>

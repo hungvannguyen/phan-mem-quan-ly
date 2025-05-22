@@ -42,14 +42,12 @@
 				<div class="form-search-row">
 					<button type="submit" class="btn btn-primary btn-search">Tìm kiếm</button>
 				</div>
-			</form>
 
-			<div class="action-container">
-				<button class="btn btn-secondary">Thêm mới</button>
-				<button class="btn btn-secondary">Sửa</button>
-				<button class="btn btn-secondary">Xoá</button>
-				<button class="btn btn-secondary">Xuất dữ liệu</button>
-			</div>
+				<div class="action-container">
+					<button class="btn btn-secondary">Thêm mới</button>
+					<button class="btn btn-secondary">Xuất dữ liệu</button>
+				</div>
+			</form>
 		</div>
 
 		<div class="table-section">
