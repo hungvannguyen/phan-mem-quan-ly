@@ -1,6 +1,9 @@
 .header {
-    @apply min-h-[188px] w-full bg-contain bg-bottom bg-no-repeat;
-    background-image: url("https://hvannd.edu.vn/Content/images/banner.jpg");
+    @apply min-h-[98px] w-full;
+
+    img {
+        @apply h-full w-full object-cover;
+    }
 }
 
 .btn {

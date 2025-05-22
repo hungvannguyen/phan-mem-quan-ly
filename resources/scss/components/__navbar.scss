@@ -1,21 +1,33 @@
 .navbar {
-    @apply mx-auto max-w-[1140px] border border-black;
+    @apply mx-auto my-[20px] max-w-[1140px] overflow-hidden rounded-md border border-gray-300 shadow-md;
 
     &-menu {
-        @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-black;
+        @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-gray-300 bg-gray-100;
     }
 }
 
 .menu {
     &-item {
-        @apply flex h-full w-full items-center justify-center bg-red-500 px-5 py-3 last:bg-red-300;
+        @apply flex h-full w-full items-center justify-center px-5 py-4 transition-colors duration-200 ease-in-out;
+        background-color: #f0f0f0;
+
+        &:hover {
+            @apply bg-gray-200;
+        }
 
         a {
-            @apply text-center text-[18px] font-bold uppercase;
+            @apply text-center text-[16px] font-medium uppercase text-gray-700;
         }
     }
 }
 
 .active {
-    @apply bg-red-800 text-white;
+    @apply bg-blue-500;
+    a {
+        @apply text-white;
+    }
+
+    &:hover {
+        @apply bg-blue-600;
+    }
 }

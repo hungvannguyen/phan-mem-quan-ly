@@ -1,40 +1,40 @@
 .login {
-    @apply mx-auto my-[100px] max-w-[1140px] border border-black;
+    @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border border-gray-300 shadow-md;
 
     &-body {
-        @apply flex flex-col items-center justify-center gap-[40px] bg-yellow-200 py-4;
+        @apply flex flex-col items-stretch justify-center bg-gray-100 p-6;
 
         .title {
-            @apply text-[18px] font-semibold uppercase;
+            @apply mb-4 text-center text-xl font-semibold uppercase;
         }
     }
 
     &-form {
-        @apply flex flex-col justify-center gap-[40px] bg-red-400 px-[20px] pb-[10px] pt-[20px];
+        @apply flex flex-col gap-4 p-[20px];
     }
 
     .form {
         &-group {
-            @apply grid grid-cols-2 items-center justify-start gap-[20px];
+            @apply mb-[15px] flex items-center gap-3;
 
             label {
-                @apply col-span-1 text-[16px] font-semibold uppercase;
+                @apply w-1/3 text-sm font-semibold uppercase;
             }
 
             input {
-                @apply w-full p-2 outline-none;
+                @apply w-full rounded-md border border-gray-300 p-3 outline-none;
             }
         }
 
         &-check {
-            @apply flex gap-[10px];
+            @apply flex items-center gap-2;
         }
 
         &-submit {
-            @apply mt-[10px] flex justify-center;
+            @apply mt-6 flex justify-center;
 
             button {
-                @apply bg-blue-500 px-[20px] py-[10px] text-white;
+                @apply w-full rounded-md bg-blue-500 px-6 py-3 font-bold text-white hover:bg-blue-700;
             }
         }
     }

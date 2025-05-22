@@ -1,5 +1,7 @@
 <div class="navbar">
-	<div class="header"></div>
+	<div class="header">
+		<img src="https://hvannd.edu.vn/Content/images/banner.jpg" alt="Header Image">
+	</div>
 
 	<nav class="navbar-menu">
 		<div class="menu-item active">
