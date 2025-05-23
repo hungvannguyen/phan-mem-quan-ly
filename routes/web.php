@@ -32,6 +32,10 @@ Route::get('/about', function () {
 	return view('about');
 })->middleware('auth')->name('about');
 
-Route::get('/404', function () {
-	return view('404');
-})->name('404');
+Route::get('/error', function () {
+	return view('error');
+})->name('error');
+
+Route::get('/test-error', function () {
+	abort(404);
+});
