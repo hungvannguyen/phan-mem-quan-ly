@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\DamageReason;
+use App\Models\Student;
+use App\Models\Training;
 use App\Models\User;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -22,5 +25,16 @@ class DatabaseSeeder extends Seeder
 				'password' => bcrypt('password'),
 				'is_admin' => 1,
 		]);
+
+		$training = Training::factory(10)->create();
+
+		Student::factory(50)->create(
+				[
+						'training_id' => $training->random()->id,
+				]
+		);
+
+		DamageReason::factory(4)->create();
+
 	}
 }

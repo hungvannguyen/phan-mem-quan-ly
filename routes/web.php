@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DiplomaManagementController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -12,9 +13,8 @@ Route::get('/login', function () {
 	return view('login');
 })->middleware(RedirectIfAuthenticated::class)->name('login');
 
-Route::get('/diploma-management', function () {
-	return view('diploma-management');
-})->middleware('auth')->name('diploma-management');
+Route::get('/diploma-management',
+		[DiplomaManagementController::class, 'index'])->middleware('auth')->name('diploma-management');
 
 Route::get('/embryo-management', function () {
 	return view('embryo-management');
@@ -39,3 +39,6 @@ Route::get('/error', function () {
 Route::get('/test-error', function () {
 	abort(404);
 });
+
+Route::post("students/create",
+		[DiplomaManagementController::class, 'create'])->middleware('auth')->name('students.create');

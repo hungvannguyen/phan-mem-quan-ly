@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>{{ env('APP_NAME') }}</title>
 
 	<meta name="viewport"
@@ -11,7 +12,7 @@
 	<!-- <link rel="icon" href=""> -->
 	<script src="https://cdn.tailwindcss.com"></script>
 	@vite(['resources/scss/style.css', 'resources/js/app.js'])
-	@yield('head')
+	@yield('partials.head')
 </head>
 
 <body>
@@ -22,8 +23,6 @@
 @yield('content')
 
 @include('partials.footer')
-
-@yield('foot')
+@include('partials.foot')
 </body>
-
 </html>

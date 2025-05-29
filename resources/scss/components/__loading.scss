@@ -1,0 +1,21 @@
+// SCSS cho phần loading overlay
+.loading-overlay {
+    // Các class cho thẻ <tr>
+    @apply absolute inset-0 flex h-full w-full items-center justify-center bg-white;
+
+    // Các class cho thẻ <td> bên trong loading-overlay
+    td {
+        @apply border-none py-4 text-center;
+        // border-none được thay bằng border-0 trong Tailwind
+    }
+
+    // Các class cho spinner (nếu bạn muốn nhóm chúng vào đây)
+    .spinner {
+        @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent align-middle;
+    }
+
+    // Các class cho text "Đang tải dữ liệu..."
+    .loading-text {
+        @apply ml-2;
+    }
+}
