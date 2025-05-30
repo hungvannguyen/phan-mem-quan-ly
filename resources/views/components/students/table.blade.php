@@ -26,17 +26,17 @@
 		<tr>
 			<td>{{$student->id}}</td>
 			<td>{{$student->name}}</td>
-			<td>{{$student->date_of_birth}}</td>
+			<td>{{$student->date_of_birth->format('d-m-Y')}}</td>
 			<td>{{$student->place_of_birth}}</td>
 			<td>{{$student->gender->label()}}</td>
 			<td>{{$student->nation}}</td>
 			<td>{{$student->nationality}}</td>
-			<td>CNTT</td>
+			<td>{{$student->training->name}}</td>
 			<td>123456</td>
 			<td>{{$student->number_in_the_book}}</td>
 			<td>{{$student->status->label()}}</td>
 			<td>
-				<button class="btn btn-table">Sửa</button>
+				<a href="{{route('student', $student->id)}}" class="btn btn-table">Sửa</a>
 				<button class="btn btn-table">Cấp lại</button>
 				<button class="btn btn-table">Chi tiết</button>
 			</td>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DiplomaManagementController;
+use App\Http\Controllers\EmbryoManagementController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -16,9 +17,8 @@ Route::get('/login', function () {
 Route::get('/diploma-management',
 		[DiplomaManagementController::class, 'index'])->middleware('auth')->name('diploma-management');
 
-Route::get('/embryo-management', function () {
-	return view('embryo-management');
-})->middleware('auth')->name('embryo-management');
+Route::get('/embryo-management',
+		[EmbryoManagementController::class, 'index'])->middleware('auth')->name('embryo-management');
 
 Route::get('/certificate-management', function () {
 	return view('certificate-management');
@@ -40,5 +40,14 @@ Route::get('/test-error', function () {
 	abort(404);
 });
 
-Route::post("students/create",
-		[DiplomaManagementController::class, 'create'])->middleware('auth')->name('students.create');
+Route::get("student/create",
+		[DiplomaManagementController::class, 'create'])->middleware('auth')->name('student.create');
+
+Route::post("student/create",
+		[DiplomaManagementController::class, 'save'])->middleware('auth')->name('student.save');
+
+Route::get("student/{student}",
+		[DiplomaManagementController::class, 'student'])->middleware('auth')->name('student');
+
+Route::post("student/update/{student}",
+		[DiplomaManagementController::class, 'update'])->middleware('auth')->name('student.update');

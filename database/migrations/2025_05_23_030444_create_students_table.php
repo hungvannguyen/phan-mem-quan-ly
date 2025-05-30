@@ -19,7 +19,7 @@ return new class extends Migration {
 			$table->tinyInteger('gender');
 			$table->string('nation');
 			$table->string('nationality');
-			$table->string('number_in_the_book');
+			$table->string('number_in_the_book')->unique();
 			$table->tinyInteger('status')->default(0);
 			$table->timestamps();
 		});

@@ -36,10 +36,8 @@ class Student extends Model
 			'status' => StudentStatus::class,
 	];
 
-	protected function dateOfBirth(): Attribute
+	public function training()
 	{
-		return Attribute::make(
-				get: fn($value) => Carbon::parse($value)->format('d-m-Y'),
-		);
+		return $this->belongsTo(Training::class);
 	}
 }

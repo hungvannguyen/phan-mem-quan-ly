@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Training;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DiplomaManagementController extends Controller
 {
@@ -24,30 +26,31 @@ class DiplomaManagementController extends Controller
 		]);
 	}
 
-	public function create(Request $request)
+	public function create()
 	{
-		$validated = $request->validate([
-				'name' => 'required|string|max:255',
-				'training_id' => 'required|integer',
-				'date_of_birth' => 'required|date',
-				'place_of_birth' => 'required|string|max:255',
-				'gender' => 'required|integer',
-				'nation' => 'required|string|max:255',
-				'nationality' => 'required|string|max:255',
-				'number_in_the_book' => 'required|string|max:255',
-				'status' => 'required|integer',
-		]);
+		$trainings = Training::all();
 
-		$student = Student::create($validated);
-
-		if ($request->ajax()) {
-			return response()->json([
-					'message' => 'Thêm sinh viên thành công!',
-					'student' => $student,
-			]);
-		}
-
-		return back()->with('success', 'Thêm sinh viên thành công!');
+		return view('student-create', compact('trainings'));
 	}
 
+	public function save(StudentRequest $request)
+	{
+		Student::create($request->validated());
+		$students = Student::orderBy('created_at', 'desc')->paginate(10);
+		return view('diploma-management', compact('students'));
+	}
+
+	public function student(Student $student)
+	{
+		$trainings = Training::all();
+
+		return view('student-edit', compact('student', 'trainings'));
+	}
+
+	public function update(StudentRequest $request, Student $student)
+	{
+		$student->update($request->validated());
+		$students = Student::orderBy('created_at', 'desc')->paginate(10);
+		return view('diploma-management', compact('student', 'students'));
+	}
 }

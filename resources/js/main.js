@@ -19,3 +19,32 @@ $(document).on("click", ".pagination a", function (event) {
         },
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const submitBtn = document.getElementById("submitBtn");
+    const requiredFields = form.querySelectorAll(".required");
+
+    function validateField(field) {
+        if (field.type === "date") {
+            return field.valueAsDate !== null;
+        }
+        return field.value.trim() !== "";
+    }
+
+    function validateForm() {
+        let isValid = true;
+        requiredFields.forEach((field) => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+        submitBtn.disabled = !isValid;
+    }
+
+    requiredFields.forEach((field) => {
+        field.addEventListener("input", validateForm);
+    });
+
+    validateForm();
+});

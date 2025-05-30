@@ -54,7 +54,7 @@
 			</form>
 
 			<div class="action-container">
-				<button class="btn btn-secondary">Thêm mới</button>
+				<a href="{{route('student.create')}}" class="btn btn-secondary">Thêm mới</a>
 				<button class="btn btn-secondary">In xác nhận</button>
 				<button class="btn btn-secondary">In xác minh</button>
 				<button class="btn btn-secondary">Xuất dữ liệu</button>
@@ -66,18 +66,4 @@
 			</div>
 		</div>
 	</main>
-
-	<div id="addStudentModal" class="modal" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-		@include('components.students.modal')
-	</div>
-
-	<script>
-      function openModal() {
-          document.getElementById('addStudentModal').classList.remove('hidden');
-      }
-
-      function closeModal() {
-          document.getElementById('addStudentModal').classList.add('hidden');
-      }
-	</script>
 @endsection
