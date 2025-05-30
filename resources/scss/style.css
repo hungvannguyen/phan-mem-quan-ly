@@ -220,7 +220,7 @@
   @apply hover:bg-gray-50;
 }
 .data-table tbody td {
-  @apply whitespace-nowrap border border-gray-200 px-4 py-2;
+  @apply whitespace-nowrap border border-gray-200 px-4 py-2 text-center;
 }
 
 .section-title {
@@ -232,6 +232,10 @@
 
 .pagination {
   @apply mt-6;
+}
+
+.text-danger {
+  @apply text-red-500 text-xs mt-2;
 }
 
 /*# sourceMappingURL=style.css.map */

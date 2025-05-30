@@ -51,96 +51,9 @@
 		</div>
 
 		<div class="table-section">
-			<h3 class="section-subtitle">Danh sách Lô Phôi</h3>
-			<div class="table-wrapper">
-				<table class="data-table">
-					<thead>
-					<tr>
-						<th class="w-10">ID</th>
-						<th class="w-40">Mã lô</th>
-						<th class="w-32">Ngày nhập</th>
-						<th class="w-32">SL Ban đầu</th>
-						<th class="w-32">SL Còn lại</th>
-						<th class="w-28">SL Lỗi</th>
-						<th class="w-64">Ghi chú</th>
-						<th class="w-40">Hành động</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>P001</td>
-						<td>DOTPHOI_2025_01</td>
-						<td>2025-01-15</td>
-						<td>1000</td>
-						<td>950</td>
-						<td>50</td>
-						<td>Lô phôi nhập từ nhà cung cấp A.</td>
-						<td>
-							<button class="btn btn-table">Sửa</button>
-							<button class="btn btn-table">Chi tiết</button>
-							<button class="btn btn-table">Xóa</button>
-						</td>
-					</tr>
-					<tr>
-						<td>P002</td>
-						<td>DOTPHOI_2025_02</td>
-						<td>2025-02-20</td>
-						<td>500</td>
-						<td>480</td>
-						<td>20</td>
-						<td>Lô phôi nhập từ nhà cung cấp B.</td>
-						<td>
-							<button class="btn btn-table">Sửa</button>
-							<button class="btn btn-table">Chi tiết</button>
-							<button class="btn btn-table">Xóa</button>
-						</td>
-					</tr>
-					<tr>
-						<td>P003</td>
-						<td>DOTPHOI_2025_03</td>
-						<td>2025-03-10</td>
-						<td>1200</td>
-						<td>1180</td>
-						<td>20</td>
-						<td>Lô phôi nhập từ nhà cung cấp A, đợt 2.</td>
-						<td>
-							<button class="btn btn-table">Sửa</button>
-							<button class="btn btn-table">Chi tiết</button>
-							<button class="btn btn-table">Xóa</button>
-						</td>
-					</tr>
-					<tr>
-						<td>P004</td>
-						<td>DOTPHOI_2025_04</td>
-						<td>2025-04-05</td>
-						<td>800</td>
-						<td>790</td>
-						<td>10</td>
-						<td>Kiểm tra chất lượng trước khi nhập.</td>
-						<td>
-							<button class="btn btn-table">Sửa</button>
-							<button class="btn btn-table">Chi tiết</button>
-							<button class="btn btn-table">Xóa</button>
-						</td>
-					</tr>
-					<tr>
-						<td>P005</td>
-						<td>DOTPHOI_2025_05</td>
-						<td>2025-05-01</td>
-						<td>700</td>
-						<td>670</td>
-						<td>30</td>
-						<td>Có một số phôi bị rách nhẹ.</td>
-						<td>
-							<button class="btn btn-table">Sửa</button>
-							<button class="btn btn-table">Chi tiết</button>
-							<button class="btn btn-table">Xóa</button>
-						</td>
-					</tr>
-					</tbody>
-				</table>
+			<div class="table-wrapper" id="table-data">
+				@include('components.embryos.table')
 			</div>
-
 			<h3 class="section-subtitle mt-8">Lý do lỗi Phôi</h3>
 			<div class="table-wrapper">
 				<table class="data-table">

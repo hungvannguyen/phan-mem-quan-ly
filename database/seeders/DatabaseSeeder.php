@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\DamageReason;
+use App\Models\DiplomaBatche;
 use App\Models\Student;
 use App\Models\Training;
 use App\Models\User;
@@ -33,6 +34,8 @@ class DatabaseSeeder extends Seeder
 						'training_id' => $training->random()->id,
 				]
 		);
+
+		DiplomaBatche::factory(10)->create();
 
 		DamageReason::factory(4)->create();
 

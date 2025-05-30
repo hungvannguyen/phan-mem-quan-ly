@@ -1,104 +1,108 @@
 .header {
-    @apply min-h-[98px] w-full;
+  @apply min-h-[98px] w-full;
 
-    img {
-        @apply h-full w-full object-cover;
-    }
+  img {
+    @apply h-full w-full object-cover;
+  }
 }
 
 .form {
-    &-section {
-        @apply mb-6 rounded-md bg-white p-6 shadow-md;
+  &-section {
+    @apply mb-6 rounded-md bg-white p-6 shadow-md;
+  }
+
+  .form-grid {
+    @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  &-group {
+    @apply flex flex-col;
+
+    label {
+      @apply mb-2 text-sm font-semibold text-gray-700;
     }
 
-    .form-grid {
-        @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
+    input,
+    textarea,
+    select {
+      @apply w-full rounded-md border border-gray-300 px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500;
     }
 
-    &-group {
-        @apply flex flex-col;
-
-        label {
-            @apply mb-2 text-sm font-semibold text-gray-700;
-        }
-
-        input,
-        textarea,
-        select {
-            @apply w-full rounded-md border border-gray-300 px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500;
-        }
-
-        textarea {
-            @apply resize-y;
-        }
+    textarea {
+      @apply resize-y;
     }
+  }
 
-    &-search-row {
-        @apply mb-6 flex flex-col items-center gap-4 md:flex-row;
-    }
+  &-search-row {
+    @apply mb-6 flex flex-col items-center gap-4 md:flex-row;
+  }
 }
 
 .action-container {
-    @apply mt-6 flex flex-wrap justify-center gap-3 border-t border-gray-200 py-4 md:justify-start;
+  @apply mt-6 flex flex-wrap justify-center gap-3 border-t border-gray-200 py-4 md:justify-start;
 }
 
 .btn {
-    @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
+  @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
 
-    &-primary {
-        @apply bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
-    }
+  &-primary {
+    @apply bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+  }
 
-    &-secondary {
-        @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
-    }
+  &-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+  }
 
-    &-table {
-        @apply rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600;
-    }
+  &-table {
+    @apply rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600;
+  }
 }
 
 .table {
-    &-section {
-        @apply rounded-md bg-white p-6 shadow-md;
-    }
+  &-section {
+    @apply rounded-md bg-white p-6 shadow-md;
+  }
 
-    &-wrapper {
-        @apply overflow-x-auto;
-    }
+  &-wrapper {
+    @apply overflow-x-auto;
+  }
 }
 
 .data-table {
-    @apply w-full border-collapse text-sm;
+  @apply w-full border-collapse text-sm;
 
-    thead {
-        @apply bg-blue-600 text-white;
-        th {
-            @apply whitespace-nowrap border border-blue-700 px-4 py-2 text-center;
-        }
+  thead {
+    @apply bg-blue-600 text-white;
+    th {
+      @apply whitespace-nowrap border border-blue-700 px-4 py-2 text-center;
+    }
+  }
+
+  tbody {
+    tr {
+      @apply hover:bg-gray-50;
     }
 
-    tbody {
-        tr {
-            @apply hover:bg-gray-50;
-        }
-
-        td {
-            @apply whitespace-nowrap border border-gray-200 px-4 py-2;
-        }
+    td {
+      @apply whitespace-nowrap border border-gray-200 px-4 py-2 text-center;
     }
+  }
 }
 
 .section {
-    &-title {
-        @apply mb-6 text-center text-2xl font-bold text-gray-800;
-    }
+  &-title {
+    @apply mb-6 text-center text-2xl font-bold text-gray-800;
+  }
 
-    &-subtitle {
-        @apply mb-4 text-xl font-semibold text-gray-700;
-    }
+  &-subtitle {
+    @apply mb-4 text-xl font-semibold text-gray-700;
+  }
 }
 
 .pagination {
-    @apply mt-6;
+  @apply mt-6;
+}
+
+.text-danger {
+  @apply text-red-500 text-xs mt-2;
 }
