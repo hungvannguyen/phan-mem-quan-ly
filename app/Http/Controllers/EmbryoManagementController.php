@@ -26,5 +26,24 @@ class EmbryoManagementController extends Controller
 		return view('embryo-create');
 	}
 
-	public function embryo() {}
+	public function save(Request $request)
+	{
+		DiplomaBatche::create($request->validated());
+		$diplomaBatches = DiplomaBatche::orderBy('created_at', 'desc')->pagination(10);
+
+		return view('embryo-management',
+				compact('diplomaBatches'));
+	}
+
+	public function embryo(DiplomaBatche $diplomaBatche) {}
+
+	public function update(Request $request, DiplomaBatche $diplomaBatche)
+	{
+		$diplomaBatche->update($request->validated());
+
+		$diplomaBatches = DiplomaBatche::orderBy('created_at', 'desc')->pagination(10);
+
+		return view('embryo-management',
+				compact('diplomaBatches'));
+	}
 }
