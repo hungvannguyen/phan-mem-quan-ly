@@ -168,6 +168,9 @@
 .form .form-grid.--grid-4 {
   @apply grid-cols-4;
 }
+.form .form-grid.--grid-5 {
+  @apply grid-cols-5;
+}
 .form-group {
   @apply flex flex-col;
 }
@@ -198,6 +201,9 @@
 }
 .btn-secondary {
   @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+}
+.btn-remove {
+  @apply bg-red-500 text-white flex justify-center my-4 mx-auto;
 }
 .btn-table {
   @apply rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600;

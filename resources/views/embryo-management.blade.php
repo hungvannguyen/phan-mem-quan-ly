@@ -39,39 +39,46 @@
 						<input type="date" id="dob" name="date_of_birth">
 					</div>
 				</div>
+
 				<div id="form-container">
-					<div class="form-grid --grid-4">
-						<div class="form-group">
-							<label for="batch-code">Số lượng</label>
-							<input type="text" id="batch-code" name="batch-code" placeholder="Ví dụ: DOTPHOI_2025_01" required>
-						</div>
-
-						<div class="form-group">
-							<label for="import-date">Từ Serial</label>
-							<input type="text" id="import-date" name="import-date" required>
-						</div>
-
-						<div class="form-group">
-							<label for="initial-quantity">Đến Serial</label>
-							<input type="number" id="initial-quantity" name="initial-quantity" placeholder="Nhập số lượng" required
-											min="0">
-						</div>
-
-						<div class="form-group form-group-select">
-							<label for="diploma-select">Loại phôi, văn bằng, chứng chỉ</label>
-							<div class="form-select">
-								<select id="diploma-select" name="diploma-select">
-									<option value="1">Văn bằng 2</option>
-									<option value="2">Chứng chỉ</option>
-									<option value="3">Chứng nhận</option>
-									<option value="4">Giấy chứng nhận</option>
-									<option value="5">Giấy chứng nhận tốt nghiệp</option>
-								</select>
+					<div class="form-wrapper">
+						<div class="form-grid --grid-4">
+							<!-- Các trường nhập liệu -->
+							<div class="form-group">
+								<label for="batch-code">Số lượng</label>
+								<input type="text" id="batch-code" name="batch-code" placeholder="Ví dụ: DOTPHOI_2025_01" required>
+							</div>
+							<div class="form-group">
+								<label for="import-date">Từ Serial</label>
+								<input type="text" id="import-date" name="import-date" required>
+							</div>
+							<div class="form-group">
+								<label for="initial-quantity">Đến Serial</label>
+								<input type="number" id="initial-quantity" name="initial-quantity" placeholder="Nhập số lượng" required min="0">
+							</div>
+							<div class="form-group form-group-select">
+								<label for="diploma-select">Loại phôi, văn bằng, chứng chỉ</label>
+								<div class="form-select">
+									<select id="diploma-select" name="diploma-select">
+										<option value="1">Văn bằng 2</option>
+										<option value="2">Chứng chỉ</option>
+										<option value="3">Chứng nhận</option>
+										<option value="4">Giấy chứng nhận</option>
+										<option value="5">Giấy chứng nhận tốt nghiệp</option>
+									</select>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<button type="button" class="add-btn" onclick="addForm()">+ Thêm form</button>
+
+				<div>
+				<button type="button" class="btn btn-primary" onclick="addForm()">+ Thêm form</button>
+
+					<button type="button" class="btn btn-primary" >Lưu</button>
+
+					<button type="button" class="btn btn-primary" >Xuất biên bản</button>
+				</div>
 			</form>
 		</div>
 
@@ -148,39 +155,40 @@
 	<script>
     function addForm() {
       const container = document.getElementById("form-container");
-      const firstForm = container.querySelector(".form-grid");
-      const newForm = firstForm.cloneNode(true);
+      const baseFormWrapper = container.querySelector(".form-wrapper");
+      const newFormWrapper = baseFormWrapper.cloneNode(true);
 
-      // Reset các giá trị trong input và select
-      newForm.querySelectorAll("input, select").forEach(el => {
+      // Xóa giá trị trong các trường input và select
+      newFormWrapper.querySelectorAll("input, select").forEach(el => {
         el.value = "";
       });
 
       // Thêm nút xoá nếu chưa có
-      if (!newForm.querySelector(".remove-btn")) {
+      if (!newFormWrapper.querySelector(".btn-remove")) {
         const removeBtn = document.createElement("button");
-        removeBtn.textContent = "X";
-        removeBtn.className = "remove-btn";
-        removeBtn.onclick = function() {
+        removeBtn.textContent = "Xoá";
+        removeBtn.className = "btn btn-remove";
+        removeBtn.type = "button";
+        removeBtn.onclick = function () {
           removeForm(this);
         };
-        newForm.appendChild(removeBtn);
+        newFormWrapper.appendChild(removeBtn);
       }
 
-      container.appendChild(newForm);
+      container.appendChild(newFormWrapper);
     }
 
     function removeForm(button) {
-      const form = button.closest(".form-grid");
+      const formWrapper = button.closest(".form-wrapper");
       const container = document.getElementById("form-container");
 
-      // Đảm bảo không xoá form đầu tiên
-      if (container.children.length > 1) {
-        form.remove();
+      // Đảm bảo không xoá form-base
+      const formWrappers = container.querySelectorAll(".form-wrapper");
+      if (formWrappers.length > 1) {
+        formWrapper.remove();
       } else {
-        alert("Phải có ít nhất một form.");
+        alert("Phải có ít nhất một biểu mẫu.");
       }
     }
-
 	</script>
 @endsection
