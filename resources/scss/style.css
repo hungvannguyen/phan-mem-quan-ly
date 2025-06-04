@@ -165,6 +165,9 @@
 .form .form-grid {
   @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
 }
+.form .form-grid.--grid-4 {
+  @apply grid-cols-4;
+}
 .form-group {
   @apply flex flex-col;
 }

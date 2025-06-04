@@ -4,11 +4,13 @@
 		<thead>
 		<tr>
 			<th class="w-10">ID</th>
-			<th class="w-32">Ngày nhập</th>
-			<th class="w-32">SL Ban đầu</th>
-			<th class="w-32">SL Còn lại</th>
-			<th class="w-28">SL Lỗi</th>
-			<th class="w-64">Ghi chú</th>
+			<th class="w-32">Loại phôi</th>
+			<th class="w-32">Năm cấp</th>
+			<th class="w-32">Khoá</th>
+			<th class="w-28">Quyết định công nhận</th>
+			<th class="w-28">Ngày quyết định</th>
+			<th class="w-28">Số lượng</th>
+			<th class="w-28">Lý do cấp</th>
 			<th class="w-40">Hành động</th>
 		</tr>
 		</thead>

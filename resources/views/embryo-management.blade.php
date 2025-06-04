@@ -3,50 +3,99 @@
 @section('content')
 	<main class="embryo-management">
 		<div class="form-section">
-			<h2 class="section-title">Quản lý Phôi Văn bằng</h2>
+			<h2 class="section-title">Xuất phôi</h2>
 			<form class="form">
 				<div class="form-grid">
+					<div class="form-group form-group-select">
+						<label for="diploma-select">Loại phôi, văn bằng, chứng chỉ</label>
+						<div class="form-select">
+							<select id="diploma-select" name="diploma-select">
+								<option value="1">Văn bằng 2</option>
+								<option value="2">Chứng chỉ</option>
+								<option value="3">Chứng nhận</option>
+								<option value="4">Giấy chứng nhận</option>
+								<option value="5">Giấy chứng nhận tốt nghiệp</option>
+							</select>
+						</div>
+					</div>
 					<div class="form-group">
-						<label for="batch-code">Mã lô</label>
+						<label for="batch-code">Năm</label>
 						<input type="text" id="batch-code" name="batch-code" placeholder="Ví dụ: DOTPHOI_2025_01" required>
 					</div>
 
 					<div class="form-group">
-						<label for="import-date">Ngày nhập</label>
-						<input type="date" id="import-date" name="import-date" required>
+						<label for="import-date">Khoá</label>
+						<input type="text" id="import-date" name="import-date" required>
 					</div>
 
 					<div class="form-group">
-						<label for="initial-quantity">Số lượng ban đầu</label>
+						<label for="initial-quantity">Quyết định công nhận tốt nhiệp số</label>
 						<input type="number" id="initial-quantity" name="initial-quantity" placeholder="Nhập số lượng" required
 										min="0">
 					</div>
 
 					<div class="form-group">
-						<label for="remaining-quantity">Số lượng còn lại</label>
-						<input type="number" id="remaining-quantity" name="remaining-quantity" placeholder="Số lượng còn lại"
-										readonly>
+						<label for="error-quantity">Ngày ban hành</label>
+						<input type="date" id="dob" name="date_of_birth">
+					</div>
+				</div>
+				<div id="form-container">
+					<div class="form-grid --grid-4">
+						<div class="form-group">
+							<label for="batch-code">Số lượng</label>
+							<input type="text" id="batch-code" name="batch-code" placeholder="Ví dụ: DOTPHOI_2025_01" required>
+						</div>
+
+						<div class="form-group">
+							<label for="import-date">Từ Serial</label>
+							<input type="text" id="import-date" name="import-date" required>
+						</div>
+
+						<div class="form-group">
+							<label for="initial-quantity">Đến Serial</label>
+							<input type="number" id="initial-quantity" name="initial-quantity" placeholder="Nhập số lượng" required
+											min="0">
+						</div>
+
+						<div class="form-group form-group-select">
+							<label for="diploma-select">Loại phôi, văn bằng, chứng chỉ</label>
+							<div class="form-select">
+								<select id="diploma-select" name="diploma-select">
+									<option value="1">Văn bằng 2</option>
+									<option value="2">Chứng chỉ</option>
+									<option value="3">Chứng nhận</option>
+									<option value="4">Giấy chứng nhận</option>
+									<option value="5">Giấy chứng nhận tốt nghiệp</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<button type="button" class="add-btn" onclick="addForm()">+ Thêm form</button>
+			</form>
+		</div>
+
+		<div class="form-section">
+			<h2 class="section-title">Hồi phôi</h2>
+			<form class="form">
+				<div class="form-grid">
+					<div class="form-group">
+						<label for="batch-code">Serial thu hồi</label>
+						<input type="text" id="batch-code" name="batch-code" placeholder="Ví dụ: DOTPHOI_2025_01" required>
 					</div>
 
 					<div class="form-group">
-						<label for="error-quantity">Số lượng lỗi</label>
-						<input type="number" id="error-quantity" name="error-quantity" placeholder="Số lượng lỗi" readonly>
+						<label for="import-date">Lý do hồi</label>
+						<input type="text" id="import-date" name="import-date" required>
 					</div>
 
-					<div class="form-group form-group-full">
-						<label for="notes">Ghi chú</label>
-						<textarea id="notes" name="notes" rows="3" placeholder="Ghi chú thêm về đợt nhập"></textarea>
+					<div class="form-group">
+						<label for="initial-quantity">Serial phôi thay thế</label>
+						<input type="number" id="initial-quantity" name="initial-quantity" placeholder="Nhập số lượng" required
+										min="0">
 					</div>
 				</div>
-
-				<div class="form-search-row">
-					<button type="submit" class="btn btn-primary btn-search">Tìm kiếm</button>
-				</div>
-
-				<div class="action-container">
-					<button class="btn btn-secondary">Thêm mới</button>
-					<button class="btn btn-secondary">Xuất dữ liệu</button>
-				</div>
+				<button type="submit" class="btn btn-primary btn-search">Lưu</button>
 			</form>
 		</div>
 
@@ -95,4 +144,43 @@
 			</div>
 		</div>
 	</main>
+
+	<script>
+    function addForm() {
+      const container = document.getElementById("form-container");
+      const firstForm = container.querySelector(".form-grid");
+      const newForm = firstForm.cloneNode(true);
+
+      // Reset các giá trị trong input và select
+      newForm.querySelectorAll("input, select").forEach(el => {
+        el.value = "";
+      });
+
+      // Thêm nút xoá nếu chưa có
+      if (!newForm.querySelector(".remove-btn")) {
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "X";
+        removeBtn.className = "remove-btn";
+        removeBtn.onclick = function() {
+          removeForm(this);
+        };
+        newForm.appendChild(removeBtn);
+      }
+
+      container.appendChild(newForm);
+    }
+
+    function removeForm(button) {
+      const form = button.closest(".form-grid");
+      const container = document.getElementById("form-container");
+
+      // Đảm bảo không xoá form đầu tiên
+      if (container.children.length > 1) {
+        form.remove();
+      } else {
+        alert("Phải có ít nhất một form.");
+      }
+    }
+
+	</script>
 @endsection
