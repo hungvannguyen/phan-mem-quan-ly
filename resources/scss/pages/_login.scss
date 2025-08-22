@@ -1,8 +1,8 @@
 .auth-login {
-    @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border border-gray-300 shadow-md;
+    @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 
     &-body {
-        @apply flex flex-col items-stretch justify-center bg-gray-100 p-6;
+        @apply flex flex-col items-stretch justify-center bg-[var(--color-secondary)] p-6;
 
         .title {
             @apply mb-4 text-center text-xl font-semibold uppercase;
@@ -22,7 +22,7 @@
             }
 
             input {
-                @apply w-full rounded-md border border-gray-300 p-3 outline-none;
+                @apply w-full rounded-md border-[var(--color-border-light)] p-3 outline-none;
             }
         }
 
@@ -34,7 +34,7 @@
             @apply mt-6 flex justify-center;
 
             button {
-                @apply w-full rounded-md bg-blue-500 px-6 py-3 font-bold text-white hover:bg-blue-700;
+                @apply w-full rounded-md bg-[var(--color-primary)] px-6 py-3 font-bold text-white hover:bg-[var(--color-primary-dark)];
             }
         }
     }

@@ -1,48 +1,83 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  --color-secondary: #f3f4f6;
+  --color-secondary-light: #e5e7eb;
+  --color-secondary-medium: #d1d5db;
+  --color-secondary-dark: #374151;
+  --color-secondary-darker: #1f2937;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-border-light: #d1d5db;
+  --color-border-medium: #9ca3af;
+  --color-border-primary: #3b82f6;
+  --color-bg-main: #f9fafb;
+  --color-bg-card: #ffffff;
+  --color-bg-overlay: rgba(75, 85, 99, 0.75);
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-white: #ffffff;
+  --color-text-danger: #ef4444;
+  --color-focus-blue: #3b82f6;
+  --color-focus-indigo: #6366f1;
+}
+
+@layer utilities {
+  .bg-select-chevron {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5em 1.5em;
+  }
+}
 .navbar {
-  @apply mx-auto my-[20px] max-w-[1140px] overflow-hidden rounded-md border border-gray-300 shadow-md;
+  @apply mx-auto my-[20px] max-w-[1140px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
 .navbar-menu {
-  @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-gray-300 bg-gray-100;
+  @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
 }
 
 .menu-item {
-  @apply flex h-full w-full cursor-pointer items-center justify-center px-5 py-4 text-center text-[16px] font-semibold uppercase text-gray-700 transition-colors duration-200 ease-in-out;
-}
-.menu-item:hover {
-  @apply bg-gray-200;
+  @apply flex h-full w-full cursor-pointer items-center justify-center px-5 py-4 text-center text-[16px] font-semibold uppercase text-[var(--color-text-secondary)] transition-colors duration-200 ease-in-out hover:bg-[var(--color-secondary-light)];
 }
 
 .active {
-  @apply bg-blue-500 text-white;
-}
-.active:hover {
-  @apply bg-blue-600;
+  @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)];
 }
 
 .not-found {
-  @apply flex h-screen flex-col items-center justify-center bg-gray-100;
+  @apply flex h-screen flex-col items-center justify-center bg-[var(--color-secondary)];
 }
 .not-found-code {
-  @apply mb-4 text-9xl font-bold text-blue-600;
+  @apply mb-4 text-9xl font-bold text-[var(--color-primary-hover)];
 }
 .not-found-message {
-  @apply mb-8 text-2xl text-gray-700;
+  @apply mb-8 text-2xl text-[var(--color-text-secondary)];
 }
 .not-found-button {
-  @apply rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none;
+  @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
 }
 
 .loading-overlay {
-  @apply absolute inset-0 flex h-full w-full items-center justify-center bg-white;
+  @apply absolute inset-0 flex h-full w-full items-center justify-center bg-[var(--color-bg-card)];
 }
 .loading-overlay td {
   @apply border-none py-4 text-center;
 }
 .loading-overlay .spinner {
-  @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-t-transparent align-middle;
+  @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-t-transparent align-middle;
 }
 .loading-overlay .loading-text {
   @apply ml-2;
@@ -55,13 +90,13 @@
   @apply flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0;
 }
 .modal__overlay {
-  @apply fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity;
+  @apply fixed inset-0 bg-[var(--color-bg-overlay)] transition-opacity;
 }
 .modal__container {
-  @apply relative inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle;
+  @apply relative inline-block transform overflow-hidden rounded-lg bg-[var(--color-bg-card)] text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle;
 }
 .modal__content {
-  @apply bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4;
+  @apply bg-[var(--color-bg-card)] px-4 pb-4 pt-5 sm:p-6 sm:pb-4;
 }
 .modal__header {
   @apply sm:flex sm:items-start;
@@ -70,7 +105,7 @@
   @apply mx-auto my-4;
 }
 .modal__title {
-  @apply text-center text-[30px] font-medium leading-6 text-gray-900;
+  @apply text-center text-[30px] font-medium leading-6 text-[var(--color-text-primary)];
 }
 .modal__body {
   @apply mt-2;
@@ -82,20 +117,20 @@
   @apply mb-4 sm:mb-0;
 }
 .modal__footer {
-  @apply bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
+  @apply bg-[var(--color-bg-main)] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
 }
 .modal__footer--action-primary {
-  @apply inline-flex w-full justify-center rounded-md border border-transparent bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto;
+  @apply inline-flex w-full justify-center rounded-md border border-transparent bg-[var(--color-primary)] px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-blue)] focus:ring-offset-2 sm:ml-3 sm:w-auto;
 }
 .modal__footer--action-secondary {
-  @apply mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
+  @apply mt-3 inline-flex w-full justify-center rounded-md border-[var(--color-border-light)] bg-[var(--color-bg-card)] px-4 py-2 text-base font-medium text-[var(--color-text-secondary)] shadow-sm hover:bg-[var(--color-bg-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-indigo)] focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
 }
 
 .auth-login {
-  @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border border-gray-300 shadow-md;
+  @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
 .auth-login-body {
-  @apply flex flex-col items-stretch justify-center bg-gray-100 p-6;
+  @apply flex flex-col items-stretch justify-center bg-[var(--color-secondary)] p-6;
 }
 .auth-login-body .title {
   @apply mb-4 text-center text-xl font-semibold uppercase;
@@ -110,7 +145,7 @@
   @apply w-1/3 text-sm font-semibold uppercase;
 }
 .auth-login .form-group input {
-  @apply w-full rounded-md border border-gray-300 p-3 outline-none;
+  @apply w-full rounded-md border-[var(--color-border-light)] p-3 outline-none;
 }
 .auth-login .form-check {
   @apply flex items-center gap-2;
@@ -119,14 +154,14 @@
   @apply mt-6 flex justify-center;
 }
 .auth-login .form-submit button {
-  @apply w-full rounded-md bg-blue-500 px-6 py-3 font-bold text-white hover:bg-blue-700;
+  @apply w-full rounded-md bg-[var(--color-primary)] px-6 py-3 font-bold text-white hover:bg-[var(--color-primary-dark)];
 }
 
 .diploma-management {
-  @apply mx-auto max-w-[1140px] bg-gray-100 px-4 py-6;
+  @apply mx-auto max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
 }
 .diploma-management .form-group select {
-  @apply min-w-[400px] appearance-none bg-white pr-8;
+  @apply min-w-[400px] appearance-none bg-[var(--color-bg-card)] pr-8;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
@@ -146,7 +181,7 @@
 }
 
 .embryo-management {
-  @apply mx-auto mt-10 max-w-[1140px] bg-gray-100 px-4 py-6;
+  @apply mx-auto mt-10 max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
 }
 .embryo-management .form-group-full {
   @apply col-span-1 md:col-span-2 lg:col-span-3;
@@ -160,7 +195,7 @@
 }
 
 .form-section {
-  @apply mb-6 rounded-md bg-white p-6 shadow-md;
+  @apply mb-6 rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
 .form .form-grid {
   @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
@@ -175,12 +210,12 @@
   @apply flex flex-col;
 }
 .form-group label {
-  @apply mb-2 text-sm font-semibold text-gray-700;
+  @apply mb-2 text-sm font-semibold text-[var(--color-text-secondary)];
 }
 .form-group input,
 .form-group textarea,
 .form-group select {
-  @apply w-full rounded-md border border-gray-300 px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500;
+  @apply w-full rounded-md border-[var(--color-border-light)] px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
 }
 .form-group textarea {
   @apply resize-y;
@@ -190,27 +225,27 @@
 }
 
 .action-container {
-  @apply mt-6 flex flex-wrap justify-center gap-3 border-t border-gray-200 py-4 md:justify-start;
+  @apply mt-6 flex flex-wrap justify-center gap-3 border-t-[var(--color-border-light)] py-4 md:justify-start;
 }
 
 .btn {
   @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
 }
 .btn-primary {
-  @apply bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+  @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-opacity-50;
 }
 .btn-secondary {
-  @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+  @apply bg-[var(--color-secondary-light)] text-gray-800 hover:bg-[var(--color-secondary-medium)] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
 }
 .btn-remove {
-  @apply bg-red-500 text-white flex justify-center my-4 mx-auto;
+  @apply bg-[var(--color-danger)] text-white flex justify-center my-4 mx-auto;
 }
 .btn-table {
-  @apply rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600;
+  @apply rounded bg-[var(--color-primary)] px-2 py-1 text-xs text-white hover:bg-[var(--color-primary-hover)];
 }
 
 .table-section {
-  @apply rounded-md bg-white p-6 shadow-md;
+  @apply rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
 .table-wrapper {
   @apply overflow-x-auto;
@@ -220,23 +255,23 @@
   @apply w-full border-collapse text-sm;
 }
 .data-table thead {
-  @apply bg-blue-600 text-white;
+  @apply bg-[var(--color-primary-hover)] text-white;
 }
 .data-table thead th {
-  @apply whitespace-nowrap border border-blue-700 px-4 py-2 text-center;
+  @apply whitespace-nowrap border-[var(--color-primary-dark)] px-4 py-2 text-center;
 }
-.data-table tbody tr {
-  @apply hover:bg-gray-50;
+.data-table tbody tr:hover {
+  @apply bg-[var(--color-bg-main)];
 }
 .data-table tbody td {
-  @apply whitespace-nowrap border border-gray-200 px-4 py-2 text-center;
+  @apply whitespace-nowrap border-[var(--color-border-light)] px-4 py-2 text-center;
 }
 
 .section-title {
-  @apply mb-6 text-center text-2xl font-bold text-gray-800;
+  @apply mb-6 text-center text-2xl font-bold text-[var(--color-text-primary)];
 }
 .section-subtitle {
-  @apply mb-4 text-xl font-semibold text-gray-700;
+  @apply mb-4 text-xl font-semibold text-[var(--color-text-secondary)];
 }
 
 .pagination {
@@ -244,7 +279,5 @@
 }
 
 .text-danger {
-  @apply text-red-500 text-xs mt-2;
-}
-
-/*# sourceMappingURL=style.css.map */
+  @apply text-xs mt-2 text-[var(--color-text-danger)];
+}/*# sourceMappingURL=style.css.map */

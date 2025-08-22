@@ -1,10 +1,10 @@
 .diploma-management {
-    @apply mx-auto max-w-[1140px] bg-gray-100 px-4 py-6;
+    @apply mx-auto max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
 
     .form {
         &-group {
             select {
-                @apply min-w-[400px] appearance-none bg-white pr-8;
+                @apply min-w-[400px] appearance-none bg-[var(--color-bg-card)] pr-8;
                 background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
                 background-repeat: no-repeat;
                 background-position: right 0.75rem center;

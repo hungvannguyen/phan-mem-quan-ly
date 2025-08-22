@@ -1,15 +1,15 @@
 .not-found {
-    @apply flex h-screen flex-col items-center justify-center bg-gray-100;
+    @apply flex h-screen flex-col items-center justify-center bg-[var(--color-secondary)];
 
     &-code {
-        @apply mb-4 text-9xl font-bold text-blue-600;
+        @apply mb-4 text-9xl font-bold text-[var(--color-primary-hover)];
     }
 
     &-message {
-        @apply mb-8 text-2xl text-gray-700;
+        @apply mb-8 text-2xl text-[var(--color-text-secondary)];
     }
 
     &-button {
-        @apply rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none;
+        @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
     }
 }
