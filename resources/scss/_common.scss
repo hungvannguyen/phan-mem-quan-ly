@@ -121,9 +121,3 @@
 .text-danger {
     @apply text-xs mt-2 text-[var(--color-text-danger)];
 }
-
-input,
-textarea,
-select {
-    @apply w-full rounded-md border border-[var(--color-border-light)];
-}

@@ -1,47 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root {
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-light: #dbeafe;
-  --color-secondary: #f3f4f6;
-  --color-secondary-light: #e5e7eb;
-  --color-secondary-medium: #d1d5db;
-  --color-secondary-dark: #374151;
-  --color-secondary-darker: #1f2937;
-  --color-danger: #ef4444;
-  --color-danger-hover: #dc2626;
-  --color-success: #10b981;
-  --color-success-hover: #059669;
-  --color-warning: #f59e0b;
-  --color-warning-hover: #d97706;
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-border-light: #d1d5db;
-  --color-border-medium: #9ca3af;
-  --color-border-primary: #3b82f6;
-  --color-bg-main: #f9fafb;
-  --color-bg-card: #ffffff;
-  --color-bg-overlay: rgba(75, 85, 99, 0.75);
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
-  --color-text-white: #ffffff;
-  --color-text-danger: #ef4444;
-  --color-focus-blue: #3b82f6;
-  --color-focus-indigo: #6366f1;
-}
-
-@layer utilities {
-  .bg-select-chevron {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1.5em 1.5em;
-  }
-}
 .navbar {
   @apply mx-auto my-[20px] max-w-[1140px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
@@ -215,7 +174,7 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-  @apply w-full rounded-md border-[var(--color-border-light)] px-4 py-2 outline-none focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
+  @apply w-full rounded-md border border-[var(--color-border-light)] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
 }
 .form-group textarea {
   @apply resize-y;
@@ -280,4 +239,37 @@
 
 .text-danger {
   @apply text-xs mt-2 text-[var(--color-text-danger)];
-}/*# sourceMappingURL=style.css.map */
+}
+
+:root {
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #dbeafe;
+  --color-secondary: #f3f4f6;
+  --color-secondary-light: #e5e7eb;
+  --color-secondary-medium: #d1d5db;
+  --color-secondary-dark: #374151;
+  --color-secondary-darker: #1f2937;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-border-light: #d1d5db;
+  --color-border-medium: #9ca3af;
+  --color-border-primary: #3b82f6;
+  --color-bg-main: #f9fafb;
+  --color-bg-card: #ffffff;
+  --color-bg-overlay: rgba(75, 85, 99, 0.75);
+  --color-text-primary: #111827;
+  --color-text-secondary: #374151;
+  --color-text-muted: #6b7280;
+  --color-text-white: #ffffff;
+  --color-text-danger: #ef4444;
+  --color-focus-blue: #3b82f6;
+  --color-focus-indigo: #6366f1;
+}
