@@ -13,22 +13,12 @@ return new class extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->ulid('user_id')->primary();
             $table->string('username', 50)->unique();
-            $table->string('password_hash', 255);
+            $table->string('password', 255);
             $table->string('full_name', 100);
             $table->string('email', 100)->unique()->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-
-            // Preserved fields from original migration - commented for later processing
-            // $table->timestamp('email_verified_at')->nullable(); // Email verification functionality
-            // $table->rememberToken(); // Remember me token for login
-            // $table->tinyInteger('is_admin')->default(0); // Admin flag - replaced by role system
-
-            // Two-factor authentication fields from add_two_factor_columns migration
-            // $table->text('two_factor_secret')->nullable(); // 2FA secret key
-            // $table->text('two_factor_recovery_codes')->nullable(); // 2FA recovery codes
-            // $table->timestamp('two_factor_confirmed_at')->nullable(); // 2FA confirmation timestamp
         });
 
         // Keep password reset tokens table as it's Laravel standard functionality
