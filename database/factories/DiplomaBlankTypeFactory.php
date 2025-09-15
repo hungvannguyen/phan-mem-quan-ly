@@ -17,20 +17,10 @@ class DiplomaBlankTypeFactory extends Factory
      */
     public function definition(): array
     {
-        $types = [
-            ['name' => 'Bằng tốt nghiệp Đại học', 'prefix' => 'DH'],
-            ['name' => 'Bằng tốt nghiệp Cao đẳng', 'prefix' => 'CD'],
-            ['name' => 'Chứng chỉ Tin học', 'prefix' => 'TH'],
-            ['name' => 'Chứng chỉ Ngoại ngữ', 'prefix' => 'NN'],
-            ['name' => 'Bằng Thạc sĩ', 'prefix' => 'THS'],
-            ['name' => 'Chứng chỉ nghề', 'prefix' => 'CN'],
-        ];
-
-        $type = $this->faker->randomElement($types);
-
+        // Generate unique names to avoid conflicts when called multiple times
         return [
-            'type_name' => $type['name'],
-            'prefix' => $type['prefix'],
+            'type_name' => $this->faker->words(3, true) . ' ' . $this->faker->randomNumber(3),
+            'prefix' => $this->faker->regexify('[A-Z]{2,3}'),
         ];
     }
 

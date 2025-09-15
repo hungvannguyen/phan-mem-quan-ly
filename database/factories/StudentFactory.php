@@ -25,7 +25,7 @@ class StudentFactory extends Factory
             'full_name' => $this->faker->name(),
             'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-18 years')->format('Y-m-d'),
             'class_name' => $this->faker->regexify('[A-Z]{2}[0-9]{2}[A-Z]{1}'),
-            'major_id' => Major::factory(),
+            'major_id' => 1, // Default major_id, will be overridden in seeder
 
             // Commented preserved fields - uncomment when needed
             // 'place_of_birth' => $this->faker->city(),

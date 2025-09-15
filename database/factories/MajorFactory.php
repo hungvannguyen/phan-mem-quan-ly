@@ -17,28 +17,15 @@ class MajorFactory extends Factory
      */
     public function definition(): array
     {
-        $majors = [
-            ['name' => 'Công nghệ thông tin', 'code' => 'IT'],
-            ['name' => 'Kế toán', 'code' => 'ACC'],
-            ['name' => 'Quản trị kinh doanh', 'code' => 'BUS'],
-            ['name' => 'Ngôn ngữ Anh', 'code' => 'ENG'],
-            ['name' => 'Thiết kế đồ họa', 'code' => 'GD'],
-            ['name' => 'Marketing', 'code' => 'MKT'],
-            ['name' => 'Tài chính - Ngân hàng', 'code' => 'FIN'],
-            ['name' => 'Luật kinh doanh', 'code' => 'LAW'],
-        ];
-
-        $major = $this->faker->randomElement($majors);
-
+        // Generate unique combinations using faker to avoid conflicts
         return [
-            'major_name' => $major['name'],
-            'major_code' => $major['code'] . $this->faker->numberBetween(10, 99),
+            'major_name' => $this->faker->words(3, true) . ' ' . $this->faker->randomNumber(3),
+            'major_code' => $this->faker->regexify('[A-Z]{3}[0-9]{2}'),
 
             // Commented preserved field from Training - uncomment when needed
             // 'description' => $this->faker->paragraph(),
         ];
     }
-
     /**
      * Create a specific major.
      */

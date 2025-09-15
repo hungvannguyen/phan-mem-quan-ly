@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         // Create admin user
         $adminUser = User::factory()->create([
             'username' => 'admin',
-            'password_hash' => bcrypt('password'),
+            'password' => bcrypt('password'),
             'full_name' => 'Quản trị viên',
             'email' => 'admin@example.com',
             'is_active' => true,
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
         // Create diploma manager user
         $diplomaUser = User::factory()->create([
             'username' => 'diploma_manager',
-            'password_hash' => bcrypt('password'),
+            'password' => bcrypt('password'),
             'full_name' => 'Người quản lý văn bằng',
             'email' => 'diploma@example.com',
             'is_active' => true,
@@ -65,21 +65,44 @@ class DatabaseSeeder extends Seeder
         });
 
         // Create majors (replacing trainings)
-        $majors = Major::factory()->count(10)->create();
+        $majorData = [
+            ['major_name' => 'Công nghệ thông tin', 'major_code' => 'IT01'],
+            ['major_name' => 'Kế toán', 'major_code' => 'ACC01'],
+            ['major_name' => 'Quản trị kinh doanh', 'major_code' => 'BUS01'],
+            ['major_name' => 'Ngôn ngữ Anh', 'major_code' => 'ENG01'],
+            ['major_name' => 'Thiết kế đồ họa', 'major_code' => 'GD01'],
+            ['major_name' => 'Marketing', 'major_code' => 'MKT01'],
+            ['major_name' => 'Tài chính - Ngân hàng', 'major_code' => 'FIN01'],
+            ['major_name' => 'Luật kinh doanh', 'major_code' => 'LAW01'],
+            ['major_name' => 'Điều dưỡng', 'major_code' => 'NUR01'],
+            ['major_name' => 'Y học cổ truyền', 'major_code' => 'TCM01'],
+        ];
+
+        $majors = collect();
+        foreach ($majorData as $data) {
+            $major = Major::create($data);
+            $majors->push($major);
+        }
 
         // Create students
         Student::factory(50)->create()->each(function ($student) use ($majors) {
             $student->update(['major_id' => $majors->random()->major_id]);
         });
 
-        // Create diploma blank types
-        $universityType = DiplomaBlankType::factory()->university()->create();
-        $collegeType = DiplomaBlankType::factory()->college()->create();
-        DiplomaBlankType::factory()->create([
+        // Create diploma blank types directly to avoid duplicates
+        $universityType = DiplomaBlankType::create([
+            'type_name' => 'Bằng tốt nghiệp Đại học',
+            'prefix' => 'DH',
+        ]);
+        $collegeType = DiplomaBlankType::create([
+            'type_name' => 'Bằng tốt nghiệp Cao đẳng',
+            'prefix' => 'CD',
+        ]);
+        $itCertType = DiplomaBlankType::create([
             'type_name' => 'Chứng chỉ Tin học',
             'prefix' => 'TH',
         ]);
-        DiplomaBlankType::factory()->create([
+        $langCertType = DiplomaBlankType::create([
             'type_name' => 'Chứng chỉ Ngoại ngữ',
             'prefix' => 'NN',
         ]);
@@ -92,9 +115,9 @@ class DatabaseSeeder extends Seeder
             ->count(100)
             ->available()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType) {
+            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id])->random()
+                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
                 ]);
             });
         $diplomaBlanks = $diplomaBlanks->merge($availableBlanks);
@@ -104,9 +127,9 @@ class DatabaseSeeder extends Seeder
             ->count(30)
             ->issued()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType) {
+            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id])->random()
+                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
                 ]);
             });
         $diplomaBlanks = $diplomaBlanks->merge($issuedBlanks);
@@ -116,9 +139,9 @@ class DatabaseSeeder extends Seeder
             ->count(10)
             ->damaged()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType) {
+            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id])->random()
+                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
                 ]);
             });
 

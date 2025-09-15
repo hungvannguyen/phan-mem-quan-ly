@@ -28,7 +28,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'username',
-        'password_hash',
+        'password',
         'full_name',
         'email',
         'is_active',
@@ -40,7 +40,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password_hash',
+        'password',
         'remember_token',
     ];
 
@@ -55,7 +55,7 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
-            'password_hash' => 'hashed',
+            'password' => 'hashed',
         ];
     }
 
@@ -66,7 +66,7 @@ class User extends Authenticatable
      */
     public function getAuthPassword()
     {
-        return $this->password_hash;
+        return $this->password;
     }
 
     /**

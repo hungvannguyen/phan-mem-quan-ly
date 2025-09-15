@@ -20,7 +20,7 @@ class DiplomaBlankFactory extends Factory
     {
         return [
             'serial_number' => $this->faker->unique()->regexify('[A-Z]{2}[0-9]{8}'),
-            'type_id' => DiplomaBlankType::factory(),
+            'type_id' => 1, // Default to first type, should be overridden in seeder
             'status' => $this->faker->randomElement([
                 DiplomaBlank::STATUS_IN_STOCK,
                 DiplomaBlank::STATUS_ISSUED,
