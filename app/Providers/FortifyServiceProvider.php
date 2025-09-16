@@ -33,8 +33,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // We're using custom authentication controller, so we don't need Fortify's login view
+        // But we still keep other Fortify features available
+
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $throttleKey = Str::transliterate(Str::lower($request->input('login')) . '|' . $request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });
