@@ -2,13 +2,13 @@
     @apply mx-auto my-[20px] container max-w-7xl overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 
     &-menu {
-        @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
+        @apply grid w-full grid-cols-6 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
     }
 }
 
 .menu {
     &-item {
-        @apply flex h-full w-full cursor-pointer items-center justify-center px-5 py-4 text-center text-[16px] font-semibold uppercase text-[var(--color-text-secondary)] transition-colors duration-200 ease-in-out hover:bg-[var(--color-secondary-light)];
+        @apply flex h-full w-full cursor-pointer items-center justify-center px-2 py-4 text-center text-[16px] font-semibold uppercase text-[var(--color-text-secondary)] transition-colors duration-200 ease-in-out hover:bg-[var(--color-secondary-light)];
     }
 }
 
