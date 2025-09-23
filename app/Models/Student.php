@@ -30,13 +30,12 @@ class Student extends Model
         'date_of_birth',
         'class_name',
         'major_id',
-        // Commented preserved fields - uncomment when needed
-        // 'place_of_birth',
-        // 'gender',
-        // 'nation',
-        // 'nationality',
-        // 'number_in_the_book',
-        // 'status',
+        'place_of_birth',
+        'gender',
+        'nation',
+        'nationality',
+        'number_in_the_book',
+        'status',
     ];
 
     /**
@@ -51,13 +50,12 @@ class Student extends Model
             'date_of_birth' => 'date',
             'class_name' => 'string',
             'student_code' => 'string',
-            // Commented preserved casts - uncomment when needed
-            // 'place_of_birth' => 'string',
-            // 'gender' => StudentGender::class,
-            // 'nation' => 'string',
-            // 'nationality' => 'string',
-            // 'number_in_the_book' => 'string',
-            // 'status' => StudentStatus::class,
+            'place_of_birth' => 'string',
+            'gender' => StudentGender::class,
+            'nation' => 'string',
+            'nationality' => 'string',
+            'number_in_the_book' => 'string',
+            'status' => StudentStatus::class,
         ];
     }
 
@@ -75,6 +73,55 @@ class Student extends Model
     public function degrees()
     {
         return $this->hasMany(Degree::class, 'student_id', 'student_id');
+    }
+
+    /**
+     * Get the full name with gender prefix.
+     */
+    public function getFullNameWithGenderAttribute(): string
+    {
+        $prefix = $this->gender === StudentGender::Male ? 'Anh' : 'Chị';
+        return "{$prefix} {$this->full_name}";
+    }
+
+    /**
+     * Get the age of the student.
+     */
+    public function getAgeAttribute(): int
+    {
+        return \Carbon\Carbon::parse($this->date_of_birth)->diffInYears(now());
+    }
+
+    /**
+     * Check if the student has graduated.
+     */
+    public function hasGraduated(): bool
+    {
+        return $this->status === StudentStatus::Graduate;
+    }
+
+    /**
+     * Check if the student is currently studying.
+     */
+    public function isStudying(): bool
+    {
+        return $this->status === StudentStatus::Studying;
+    }
+
+    /**
+     * Get the student's status label.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status->label();
+    }
+
+    /**
+     * Get the student's gender label.
+     */
+    public function getGenderLabelAttribute(): string
+    {
+        return $this->gender->label();
     }
 
     // Legacy relationship - keep commented for reference

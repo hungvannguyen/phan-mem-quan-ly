@@ -18,14 +18,12 @@ return new class extends Migration {
             $table->string('class_name', 50);
             $table->foreignId('major_id')->constrained('majors', 'major_id');
             $table->timestamps();
-
-            // Preserved fields from original students table - commented for later processing
-            // $table->string('place_of_birth'); // Place of birth information
-            // $table->tinyInteger('gender'); // Gender information (using enum in model)
-            // $table->string('nation'); // Nation information
-            // $table->string('nationality'); // Nationality information
-            // $table->string('number_in_the_book')->unique(); // Book registration number - might be moved to degrees table
-            // $table->tinyInteger('status')->default(0); // Student status (using enum in model)
+            $table->string('place_of_birth');
+            $table->tinyInteger('gender');
+            $table->string('nation');
+            $table->string('nationality');
+            $table->string('number_in_the_book')->unique();
+            $table->tinyInteger('status')->default(0);
         });
     }
 

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -86,7 +87,7 @@
 }
 
 .students-table-container {
-  @apply w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+  @apply w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200;
 }
 
 .students-data-table {
@@ -162,12 +163,38 @@
   @apply text-xs text-gray-500 font-mono;
 }
 
+.nation {
+  @apply text-sm text-gray-800 font-medium;
+}
+
+.nationality-info {
+  @apply flex items-center justify-center space-x-1;
+}
+
+.nationality {
+  @apply text-sm text-gray-800;
+}
+.nationality[title="Quốc tịch nước ngoài"] {
+  @apply text-blue-600 font-medium;
+}
+
+.book-number {
+  @apply text-center;
+}
+
+.book-number-text {
+  @apply text-sm font-mono font-semibold text-gray-900;
+}
+
 .degree-count {
   @apply flex items-center justify-center;
 }
 
 .badge {
   @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+.badge.badge-primary {
+  @apply bg-blue-100 text-blue-800;
 }
 .badge.badge-success {
   @apply bg-green-100 text-green-800;
@@ -177,6 +204,9 @@
 }
 .badge.badge-info {
   @apply bg-blue-100 text-blue-800;
+}
+.badge.badge-danger {
+  @apply bg-red-100 text-red-800;
 }
 
 .badge-success {
