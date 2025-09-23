@@ -57,12 +57,12 @@ Route::post(
 )->middleware('auth')->name('student.save');
 
 Route::get(
-    "student/{student}",
+    "student/{student:student_id}",
     [DiplomaManagementController::class, 'student']
 )->middleware('auth')->name('student');
 
 Route::post(
-    "student/update/{student}",
+    "student/update/{student:student_id}",
     [DiplomaManagementController::class, 'update']
 )->middleware('auth')->name('student.update');
 

@@ -1,50 +1,112 @@
-<table class="data-table">
-	<thead>
-	<tr>
-		<th class="w-10">#</th>
-		<th class="w-40">Họ và tên</th>
-		<th class="w-32">Ngày sinh</th>
-		<th class="w-32">Nơi sinh</th>
-		<th class="w-24">Giới tính</th>
-		<th class="w-24">Dân tộc</th>
-		<th class="w-32">Quốc tịch</th>
-		<th class="w-40">Ngành đào tạo</th>
-		<th class="w-28">Số hiệu</th>
-		<th class="w-28">Số vào sổ</th>
-		<th class="w-32">Tình trạng</th>
-		<th class="w-28">Hành động</th>
-	</tr>
-	</thead>
-	<tbody class="relative">
-	<tr id="loading" class="loading-overlay hidden">
-		<td>
-			<div class="spinner"></div>
-			<span class="loading-text">Đang tải dữ liệu...</span>
-		</td>
-	</tr>
-	@foreach( $students as $student)
-		<tr>
-			<td>{{$student->id}}</td>
-			<td>{{$student->name}}</td>
-			<td>{{$student->date_of_birth->format('d-m-Y')}}</td>
-			<td>{{$student->place_of_birth}}</td>
-			<td>{{$student->gender->label()}}</td>
-			<td>{{$student->nation}}</td>
-			<td>{{$student->nationality}}</td>
-			<td>{{$student->training->name}}</td>
-			<td>123456</td>
-			<td>{{$student->number_in_the_book}}</td>
-			<td>{{$student->status->label()}}</td>
-			<td>
-				<a href="{{route('student', $student->id)}}" class="btn btn-table">Sửa</a>
-				<button class="btn btn-table">Cấp lại</button>
-				<button class="btn btn-table">Chi tiết</button>
-			</td>
-		</tr>
-	@endforeach
-	</tbody>
-</table>
+<div class="students-table-container">
+    <table class="students-data-table">
+        <thead>
+            <tr class="table-header-row">
 
-<div class="pagination">
-	{{$students->links()}}
+                <th class="table-header-cell">Mã sinh viên</th>
+                <th class="table-header-cell">Họ và tên</th>
+                <th class="table-header-cell">Ngày sinh</th>
+                <th class="table-header-cell">Lớp</th>
+                <th class="table-header-cell">Ngành đào tạo</th>
+                <th class="table-header-cell">Số văn bằng</th>
+                <th class="table-header-cell">Trạng thái</th>
+                <th class="table-header-cell">Hành động</th>
+            </tr>
+        </thead>
+        <tbody class="table-body">
+            <tr id="loading" class="loading-overlay hidden">
+                <td colspan="9" class="loading-cell">
+                    <div class="spinner"></div>
+                    <span class="loading-text">Đang tải dữ liệu...</span>
+                </td>
+            </tr>
+            @forelse($students as $index => $student)
+                <tr class="table-row" data-student-id="{{ $student->student_id }}" onclick="toggleRowHighlight(this)">
+                    <td class="table-cell">
+                        <span class="student-code">{{ $student->student_code }}</span>
+                    </td>
+                    <td class="table-cell">
+                        <div class="student-info">
+                            <span class="student-name">{{ $student->full_name }}</span>
+                        </div>
+                    </td>
+                    <td class="table-cell">
+                        @if ($student->date_of_birth)
+                            <span class="date-birth">{{ $student->date_of_birth->format('d/m/Y') }}</span>
+                        @else
+                            <span class="text-muted">--</span>
+                        @endif
+                    </td>
+                    <td class="table-cell">
+                        <span class="class-name">{{ $student->class_name ?? '--' }}</span>
+                    </td>
+                    <td class="table-cell">
+                        @if ($student->major)
+                            <div class="major-info">
+                                <span class="major-name">{{ $student->major->major_name }}</span>
+                                <small class="major-code text-muted">({{ $student->major->major_code }})</small>
+                            </div>
+                        @else
+                            <span class="text-muted">Chưa xác định</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if ($student->degrees && $student->degrees->count() > 0)
+                            <div class="degree-count">
+                                <span class="badge badge-success">{{ $student->degrees->count() }}</span>
+                            </div>
+                        @else
+                            <span class="text-muted">Chưa cấp</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if ($student->degrees && $student->degrees->count() > 0)
+                            @php
+                                $latestDegree = $student->degrees->sortByDesc('created_at')->first();
+                            @endphp
+                            <span class="badge badge-success">Đã cấp</span>
+                        @else
+                            <span class="badge badge-warning">Chưa cấp</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ route('student', $student->student_id) }}" class="btn btn-table btn-sm"
+                                title="Chỉnh sửa thông tin">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            @if ($student->degrees && $student->degrees->count() > 0)
+                                <button class="btn btn-table btn-sm btn-info" title="Cấp lại văn bằng">
+                                    <i class="fas fa-redo"></i> Cấp lại
+                                </button>
+                            @else
+                                <button class="btn btn-table btn-sm btn-success" title="Cấp văn bằng">
+                                    <i class="fas fa-certificate"></i> Cấp VB
+                                </button>
+                            @endif
+                            <button class="btn btn-table btn-sm btn-primary" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="9" class="py-4 text-center">
+                        <div class="empty-state">
+                            <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Không tìm thấy sinh viên nào</p>
+                            <small class="text-muted">Hãy thử điều chỉnh bộ lọc tìm kiếm hoặc thêm sinh viên mới</small>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<!-- Custom Pagination Section -->
+<div class="students-pagination-wrapper">
+    <x-pagination.custom :paginator="$students" item-name="sinh viên" label="Students Pagination Navigation"
+        :per-page-options="[5, 10, 15, 25, 50]" />
 </div>

@@ -85,6 +85,363 @@
   @apply mt-3 inline-flex w-full justify-center rounded-md border-[var(--color-border-light)] bg-[var(--color-bg-card)] px-4 py-2 text-base font-medium text-[var(--color-text-secondary)] shadow-sm hover:bg-[var(--color-bg-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-indigo)] focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
 }
 
+.students-table-container {
+  @apply w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+}
+
+.students-data-table {
+  @apply w-full border-collapse;
+}
+.students-data-table .table-header-row {
+  @apply bg-gray-50 border-b-2 border-gray-200;
+}
+.students-data-table .table-header-cell {
+  @apply w-auto max-w-full px-4 py-4 text-left text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
+}
+.students-data-table .table-body {
+  @apply bg-white divide-y divide-gray-200;
+}
+.students-data-table .table-row {
+  @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
+}
+.students-data-table .table-row:last-child {
+  @apply border-b-0;
+}
+.students-data-table .table-row:hover {
+  @apply bg-blue-50 shadow-sm;
+}
+.students-data-table .table-row.selected {
+  @apply bg-blue-100 border-blue-200;
+}
+.students-data-table .table-cell {
+  @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
+}
+.students-data-table .table-cell:last-child {
+  @apply border-r-0;
+}
+.students-data-table .loading-cell {
+  @apply px-4 py-8 text-center text-gray-500;
+}
+.students-data-table .empty-cell {
+  @apply px-4 py-12 text-center;
+}
+
+.row-number {
+  @apply inline-flex items-center justify-center w-8 h-8 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full;
+}
+
+.student-code {
+  @apply font-semibold text-blue-600 font-mono text-sm;
+}
+
+.student-info {
+  @apply flex flex-col;
+}
+
+.student-name {
+  @apply font-medium text-gray-900;
+}
+
+.date-birth {
+  @apply text-gray-700 font-mono text-sm;
+}
+
+.class-name {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800;
+}
+
+.major-info {
+  @apply flex flex-col space-y-1;
+}
+
+.major-name {
+  @apply font-medium text-gray-900;
+}
+
+.major-code {
+  @apply text-xs text-gray-500 font-mono;
+}
+
+.degree-count {
+  @apply flex items-center justify-center;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+.badge.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+.badge.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+.badge.badge-info {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-success {
+  color: #065f46;
+  background-color: #d1fae5;
+}
+
+.badge-warning {
+  color: #92400e;
+  background-color: #fef3c7;
+}
+
+.badge-info {
+  color: #1e40af;
+  background-color: #dbeafe;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.btn-table {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-table:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.btn-table.btn-sm {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.6875rem;
+}
+
+.btn-table i {
+  font-size: 0.75rem;
+}
+
+/* Default button style */
+.btn-table {
+  color: #374151;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn-table:hover {
+  color: #1f2937;
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Success button */
+.btn-table.btn-success {
+  color: #065f46;
+  background-color: #d1fae5;
+  border-color: #a7f3d0;
+}
+
+.btn-table.btn-success:hover {
+  color: #064e3b;
+  background-color: #a7f3d0;
+  border-color: #6ee7b7;
+}
+
+/* Info button */
+.btn-table.btn-info {
+  color: #1e40af;
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.btn-table.btn-info:hover {
+  color: #1e3a8a;
+  background-color: #bfdbfe;
+  border-color: #60a5fa;
+}
+
+/* Primary button */
+.btn-table.btn-primary {
+  color: #1e3a8a;
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.btn-table.btn-primary:hover {
+  color: #1e40af;
+  background-color: #bfdbfe;
+  border-color: #60a5fa;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-state i {
+  margin-bottom: 1rem;
+  color: #9ca3af;
+}
+
+.text-muted {
+  color: #6b7280;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-table {
+    justify-content: center;
+    width: 100%;
+  }
+  .major-info {
+    font-size: 0.875rem;
+  }
+}
+.pagination-wrapper {
+  @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200 w-full;
+}
+
+.students-pagination-wrapper {
+  @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200;
+}
+
+.pagination-info {
+  @apply flex-shrink-0 order-2 lg:order-1;
+}
+
+.pagination-text {
+  @apply text-sm text-gray-700 font-medium;
+}
+
+.pagination-controls {
+  @apply flex-1 flex justify-center order-1 lg:order-2;
+}
+
+.custom-pagination {
+  @apply flex items-center;
+}
+
+.pagination-container {
+  @apply flex items-center gap-1 bg-white rounded-lg border border-gray-300 shadow-sm p-1;
+}
+
+.pagination-btn {
+  @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 text-sm font-medium transition-all duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1;
+}
+.pagination-btn.pagination-btn-active {
+  @apply text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 border-0;
+}
+.pagination-btn.pagination-btn-active:hover {
+  @apply transform scale-105;
+}
+.pagination-btn.pagination-btn-current {
+  @apply text-white bg-blue-600 shadow-sm cursor-default border-0 font-semibold;
+}
+.pagination-btn.pagination-btn-disabled {
+  @apply text-gray-400 bg-gray-100 cursor-not-allowed border-0;
+}
+.pagination-btn i {
+  @apply text-xs;
+}
+
+.pagination-dots {
+  @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 text-gray-400 text-sm;
+}
+
+.pagination-per-page {
+  @apply flex-shrink-0 order-3;
+}
+
+.per-page-selector {
+  @apply flex items-center gap-2;
+}
+
+.per-page-label {
+  @apply text-sm text-gray-700 font-medium whitespace-nowrap;
+}
+
+.per-page-select {
+  @apply px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+/* Responsive adjustments for pagination */
+@media (max-width: 768px) {
+  .pagination-wrapper,
+  .students-pagination-wrapper {
+    @apply flex-col gap-3 p-4;
+  }
+  .pagination-info {
+    @apply order-3 text-center;
+  }
+  .pagination-controls {
+    @apply order-1;
+  }
+  .pagination-per-page {
+    @apply order-2 flex justify-center;
+  }
+  .pagination-container {
+    @apply flex-wrap justify-center gap-1 p-2;
+  }
+  .pagination-btn {
+    @apply min-w-[2rem] h-8 text-xs;
+  }
+}
+.pagination-wrapper.pagination-dark {
+  @apply bg-gray-800 border-gray-700;
+}
+.pagination-wrapper.pagination-dark .pagination-text {
+  @apply text-gray-300;
+}
+.pagination-wrapper.pagination-dark .per-page-label {
+  @apply text-gray-300;
+}
+.pagination-wrapper.pagination-dark .pagination-container {
+  @apply bg-gray-700 border-gray-600;
+}
+.pagination-wrapper.pagination-dark .pagination-btn-active {
+  @apply text-gray-200 bg-gray-700 hover:bg-gray-600;
+}
+.pagination-wrapper.pagination-minimal {
+  @apply bg-transparent border-0 p-4;
+}
+.pagination-wrapper.pagination-minimal .pagination-container {
+  @apply bg-transparent border-0 shadow-none;
+}
+.pagination-wrapper.pagination-compact {
+  @apply p-3 gap-2;
+}
+.pagination-wrapper.pagination-compact .pagination-btn {
+  @apply min-w-[2rem] h-8 px-2 text-xs;
+}
+
 .auth-login {
   @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
@@ -117,26 +474,366 @@
 }
 
 .diploma-management {
-  @apply mx-auto max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
+  @apply mx-auto max-w-7xl bg-gray-100 min-h-screen;
 }
-.diploma-management .form-group select {
-  @apply min-w-[400px] appearance-none bg-[var(--color-bg-card)] pr-8;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
+
+.diploma-form-section {
+  @apply w-full max-w-none mx-auto p-6 space-y-8;
+}
+
+.diploma-page-header {
+  @apply mb-8 text-center lg:text-left;
+}
+
+.diploma-page-title {
+  @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.diploma-page-subtitle {
+  @apply text-base text-gray-600 leading-relaxed;
+}
+
+.diploma-search-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+}
+
+.diploma-search-form {
+  @apply space-y-6;
+}
+
+.search-form-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+@screen md {
+  .search-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@screen lg {
+  .search-form-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.form-field {
+  @apply flex flex-col space-y-2;
+}
+
+.field-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.field-input {
+  @apply w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+}
+.field-input:hover {
+  @apply border-gray-400;
+}
+.field-input:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+}
+
+.field-select {
+  @apply w-full px-3 py-2.5 border border-gray-300 rounded-md shadow-sm text-gray-900 bg-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
-  background-size: 1.5em 1.5em;
+  background-size: 1.25em 1.25em;
+  padding-right: 2.5rem;
 }
-.diploma-management .form-search-row .form-group-select {
-  @apply max-w-2xl flex-grow;
+.field-select:hover {
+  @apply border-gray-400;
 }
-.diploma-management .form-select {
-  @apply flex gap-4;
+.field-select:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
-.diploma-management .form-select .btn-search {
-  @apply w-full px-6 py-2.5;
+.field-select option {
+  @apply text-gray-900 bg-white py-2;
 }
-.diploma-management .data-table thead th[class*=w-] {
-  @apply text-left;
+
+.search-actions {
+  @apply flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200;
+}
+
+.btn-search {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02];
+}
+.btn-search i {
+  @apply text-sm;
+}
+
+.btn-reset {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-md shadow-sm border border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline;
+}
+.btn-reset:hover {
+  @apply no-underline text-gray-800;
+}
+.btn-reset i {
+  @apply text-sm;
+}
+
+.diploma-actions {
+  @apply flex flex-wrap gap-3 p-6 bg-gray-50 rounded-lg border border-gray-200;
+}
+
+.action-btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-semibold text-sm rounded-md shadow-sm border transition-all duration-200 transform hover:scale-[1.02] no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+.action-btn i {
+  @apply text-sm;
+}
+.action-btn:hover {
+  @apply no-underline;
+}
+
+.action-btn-primary {
+  @apply bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 hover:text-white focus:ring-green-500;
+}
+
+.action-btn-warning {
+  @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600 hover:border-yellow-600 hover:text-white focus:ring-yellow-400;
+}
+
+.action-btn-info {
+  @apply bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 hover:text-white focus:ring-blue-400;
+}
+
+.action-btn-success {
+  @apply bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 hover:text-white focus:ring-emerald-500;
+}
+
+@media (max-width: 640px) {
+  .search-form-grid {
+    @apply grid-cols-1 gap-4;
+  }
+  .search-actions {
+    @apply flex-col;
+  }
+  .search-actions .btn-search,
+  .search-actions .btn-reset {
+    @apply w-full justify-center;
+  }
+  .diploma-actions {
+    @apply flex-col;
+  }
+  .diploma-actions .action-btn {
+    @apply w-full justify-center;
+  }
+  .diploma-form-section {
+    @apply p-4 space-y-6;
+  }
+  .diploma-search-card {
+    @apply p-4;
+  }
+  .diploma-page-header {
+    @apply text-center;
+  }
+}
+.field-input:focus,
+.field-select:focus {
+  @apply transform scale-[1.01];
+  transition: all 0.2s ease-in-out;
+}
+
+.field-input:disabled,
+.field-select:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.field-input.error,
+.field-select.error {
+  @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.field-input.success,
+.field-select.success {
+  @apply border-green-300 text-green-900 focus:ring-green-500 focus:border-green-500;
+}
+
+.table-section {
+  @apply mt-8;
+}
+.table-section .table-wrapper {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+}
+
+.diploma-form-section {
+  @apply w-full max-w-none mx-auto p-6 space-y-8;
+}
+
+.diploma-page-header {
+  @apply mb-8;
+}
+
+.diploma-page-title {
+  @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.diploma-page-subtitle {
+  @apply text-base text-gray-600 leading-relaxed;
+}
+
+.diploma-search-card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+}
+
+.diploma-search-form {
+  @apply space-y-6;
+}
+
+.search-form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.form-field {
+  @apply flex flex-col space-y-2;
+}
+
+.field-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.field-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+.field-input:hover {
+  @apply border-gray-400;
+}
+.field-input:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+}
+
+.field-select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+.field-select:hover {
+  @apply border-gray-400;
+}
+.field-select:disabled {
+  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+}
+.field-select option {
+  @apply text-gray-900 bg-white;
+}
+
+.search-actions {
+  @apply flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-gray-200;
+}
+
+.btn-search {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105;
+}
+.btn-search i {
+  @apply text-sm;
+}
+
+.btn-reset {
+  @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-md shadow-sm border border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline;
+}
+.btn-reset:hover {
+  @apply no-underline text-gray-800;
+}
+.btn-reset i {
+  @apply text-sm;
+}
+
+.diploma-actions {
+  @apply flex flex-wrap gap-3 p-6 bg-gray-50 rounded-lg border border-gray-200;
+}
+
+.action-btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-medium text-sm rounded-md shadow-sm border transition-all duration-200 transform hover:scale-105 no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+.action-btn i {
+  @apply text-sm;
+}
+.action-btn:hover {
+  @apply no-underline;
+}
+
+.action-btn-primary {
+  @apply bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 hover:text-white focus:ring-green-500;
+}
+
+.action-btn-warning {
+  @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600 hover:border-yellow-600 hover:text-white focus:ring-yellow-400;
+}
+
+.action-btn-info {
+  @apply bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 hover:text-white focus:ring-blue-400;
+}
+
+.action-btn-success {
+  @apply bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 hover:text-white focus:ring-emerald-500;
+}
+
+@media (max-width: 768px) {
+  .search-form-grid {
+    @apply grid-cols-1 gap-4;
+  }
+  .search-actions {
+    @apply flex-col;
+  }
+  .search-actions .btn-search,
+  .search-actions .btn-reset {
+    @apply w-full justify-center;
+  }
+  .diploma-actions {
+    @apply flex-col;
+  }
+  .diploma-actions .action-btn {
+    @apply w-full justify-center;
+  }
+  .diploma-form-section {
+    @apply p-4 space-y-6;
+  }
+  .diploma-search-card {
+    @apply p-4;
+  }
+}
+@media (min-width: 1024px) {
+  .search-form-grid {
+    @apply grid-cols-3;
+  }
+  .form-field:nth-child(1) {
+    @apply lg:col-span-1;
+  }
+  .form-field:nth-child(2) {
+    @apply lg:col-span-1;
+  }
+  .form-field:nth-child(3) {
+    @apply lg:col-span-1;
+  }
+  .form-field:nth-child(4) {
+    @apply lg:col-span-1;
+  }
+  .form-field:nth-child(5) {
+    @apply lg:col-span-1;
+  }
+  .form-field:nth-child(6) {
+    @apply lg:col-span-1;
+  }
+}
+.field-input:focus,
+.field-select:focus {
+  @apply transform scale-105;
+  transition: all 0.2s ease-in-out;
+}
+
+.field-input:disabled,
+.field-select:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.field-input.error,
+.field-select.error {
+  @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
+}
+
+.field-input.success,
+.field-select.success {
+  @apply border-green-300 text-green-900 focus:ring-green-500 focus:border-green-500;
 }
 
 .embryo-management {
@@ -234,7 +931,7 @@
 }
 
 .pagination {
-  @apply mt-6;
+  @apply mx-[15px] my-[10px] mt-6;
 }
 
 .text-danger {
