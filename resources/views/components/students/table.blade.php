@@ -50,16 +50,16 @@
                             <span class="text-muted">Chưa xác định</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="table-cell">
                         @if ($student->degrees && $student->degrees->count() > 0)
                             <div class="degree-count">
                                 <span class="badge badge-success">{{ $student->degrees->count() }}</span>
                             </div>
                         @else
-                            <span class="text-muted">Chưa cấp</span>
+                            <span class="badge badge-warning">Chưa cấp</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="table-cell">
                         @if ($student->degrees && $student->degrees->count() > 0)
                             @php
                                 $latestDegree = $student->degrees->sortByDesc('created_at')->first();
@@ -69,7 +69,7 @@
                             <span class="badge badge-warning">Chưa cấp</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="table-cell">
                         <div class="action-buttons">
                             <a href="{{ route('student', $student->student_id) }}" class="btn btn-table btn-sm"
                                 title="Chỉnh sửa thông tin">
@@ -77,16 +77,13 @@
                             </a>
                             @if ($student->degrees && $student->degrees->count() > 0)
                                 <button class="btn btn-table btn-sm btn-info" title="Cấp lại văn bằng">
-                                    <i class="fas fa-redo"></i> Cấp lại
+                                    <i class="fas fa-redo"></i> Cấp lại Văn bằng
                                 </button>
                             @else
                                 <button class="btn btn-table btn-sm btn-success" title="Cấp văn bằng">
-                                    <i class="fas fa-certificate"></i> Cấp VB
+                                    <i class="fas fa-certificate"></i> Cấp Văn Bằng
                                 </button>
                             @endif
-                            <button class="btn btn-table btn-sm btn-primary" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i> Chi tiết
-                            </button>
                         </div>
                     </td>
                 </tr>

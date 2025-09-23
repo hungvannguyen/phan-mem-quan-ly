@@ -34,15 +34,8 @@ class StudentRequest extends FormRequest
             ],
             'full_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
-            'class_name' => 'required|string|max:100',
+            'class_name' => 'nullable|string|max:100',
             'major_id' => 'required|exists:majors,major_id',
-            // Các trường tạm thời bỏ comment có thể thêm sau
-            // 'place_of_birth' => 'nullable|string|max:255',
-            // 'gender' => 'nullable|integer',
-            // 'nation' => 'nullable|string|max:100',
-            // 'nationality' => 'nullable|string|max:100',
-            // 'number_in_the_book' => 'nullable|string|max:50',
-            // 'status' => 'nullable|integer',
         ];
     }
 
@@ -61,7 +54,6 @@ class StudentRequest extends FormRequest
             'date_of_birth.required' => 'Vui lòng nhập ngày sinh.',
             'date_of_birth.date' => 'Ngày sinh không hợp lệ.',
 
-            'class_name.required' => 'Vui lòng nhập tên lớp.',
             'class_name.string' => 'Tên lớp phải là một chuỗi ký tự.',
             'class_name.max' => 'Tên lớp không được vượt quá :max ký tự.',
 

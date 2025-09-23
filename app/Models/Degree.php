@@ -23,6 +23,7 @@ class Degree extends Model
      */
     protected $fillable = [
         'student_id',
+        'degree_type',
         'diploma_blank_id',
         'registration_number',
         'granting_date',
@@ -39,6 +40,7 @@ class Degree extends Model
     protected function casts(): array
     {
         return [
+            'degree_type' => 'string',
             'registration_number' => 'string',
             'granting_date' => 'date',
             'graduation_year' => 'integer',

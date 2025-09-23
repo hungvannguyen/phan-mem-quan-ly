@@ -14,32 +14,32 @@ class DiplomaManagementController extends Controller
     {
         $query = Student::with(['major', 'degrees']);
 
-        // Tìm kiếm theo tên
+        // Tìm kiếm theo tên - chỉ khi có input
         if ($request->filled('full_name')) {
             $query->where('full_name', 'like', '%' . $request->full_name . '%');
         }
 
-        // Tìm kiếm theo mã sinh viên
+        // Tìm kiếm theo mã sinh viên - chỉ khi có input
         if ($request->filled('student_code')) {
             $query->where('student_code', 'like', '%' . $request->student_code . '%');
         }
 
-        // Tìm kiếm theo lớp
+        // Tìm kiếm theo lớp - chỉ khi có input
         if ($request->filled('class_name')) {
             $query->where('class_name', 'like', '%' . $request->class_name . '%');
         }
 
-        // Tìm kiếm theo ngày sinh
+        // Tìm kiếm theo ngày sinh - chỉ khi có input
         if ($request->filled('date_of_birth')) {
             $query->whereDate('date_of_birth', $request->date_of_birth);
         }
 
-        // Tìm kiếm theo ngành
+        // Tìm kiếm theo ngành - chỉ khi có input
         if ($request->filled('major_id')) {
             $query->where('major_id', $request->major_id);
         }
 
-        // Lọc theo loại văn bằng (thông qua bảng degrees)
+        // Lọc theo loại văn bằng - chỉ khi có input
         if ($request->filled('degree_type')) {
             $query->whereHas('degrees', function ($q) use ($request) {
                 $q->where('degree_type', $request->degree_type);
@@ -79,9 +79,16 @@ class DiplomaManagementController extends Controller
 
     public function student(Student $student)
     {
+        // Load relationships
+        $student->load(['major', 'degrees']);
+
+        // Get all majors for dropdown
         $majors = Major::orderBy('major_name')->get();
 
-        return view('student-edit', compact('student', 'majors'));
+        // Get degrees issued to this student
+        $degrees = $student->degrees()->get();
+
+        return view('student-edit', compact('student', 'majors', 'degrees'));
     }
 
     public function update(StudentRequest $request, Student $student)
