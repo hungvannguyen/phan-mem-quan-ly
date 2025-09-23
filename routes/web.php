@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DiplomaBlankController;
 use App\Http\Controllers\DiplomaManagementController;
 use App\Http\Controllers\EmbryoManagementController;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -22,9 +23,39 @@ Route::get(
 )->middleware('auth')->name('diploma-management');
 
 Route::get(
-    '/embryo-management',
-    [EmbryoManagementController::class, 'index']
-)->middleware('auth')->name('embryo-management');
+    '/diploma-blank-management',
+    [DiplomaBlankController::class, 'index']
+)->middleware('auth')->name('diploma-blank-management');
+
+Route::get(
+    '/diploma-blank-management/import',
+    [DiplomaBlankController::class, 'showImportForm']
+)->middleware('auth')->name('diploma-blank.import');
+
+Route::post(
+    '/diploma-blank-management/import',
+    [DiplomaBlankController::class, 'storeImport']
+)->middleware('auth')->name('diploma-blank.import.store');
+
+Route::post(
+    '/diploma-blank-management/validate-range',
+    [DiplomaBlankController::class, 'validateRange']
+)->middleware('auth')->name('diploma-blank.validate-range');
+
+Route::get(
+    '/diploma-blanks/import',
+    [DiplomaBlankController::class, 'import']
+)->middleware('auth')->name('diploma-blanks.import');
+
+Route::post(
+    '/diploma-blanks/import',
+    [DiplomaBlankController::class, 'processImport']
+)->middleware('auth')->name('diploma-blanks.process-import');
+
+Route::post(
+    '/diploma-blanks/check-duplicates',
+    [DiplomaBlankController::class, 'checkDuplicates']
+)->middleware('auth')->name('diploma-blanks.check-duplicates');
 
 Route::get('/certificate-management', function () {
     return view('certificate-management');

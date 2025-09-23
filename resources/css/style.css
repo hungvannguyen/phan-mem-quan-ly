@@ -355,6 +355,518 @@
     font-size: 0.875rem;
   }
 }
+.diploma-blanks-table-container {
+  @apply w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+}
+
+.diploma-blanks-data-table {
+  @apply w-full border-collapse;
+}
+.diploma-blanks-data-table .table-header-row {
+  @apply bg-gray-50 border-b-2 border-gray-200;
+}
+.diploma-blanks-data-table .table-header-cell {
+  @apply w-auto max-w-full px-4 py-4 text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
+}
+.diploma-blanks-data-table .table-body {
+  @apply bg-white divide-y divide-gray-200;
+}
+.diploma-blanks-data-table .table-row {
+  @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
+}
+.diploma-blanks-data-table .table-row:last-child {
+  @apply border-b-0;
+}
+.diploma-blanks-data-table .table-row:hover {
+  @apply bg-blue-50 shadow-sm;
+}
+.diploma-blanks-data-table .table-row.selected {
+  @apply bg-blue-100 border-blue-200;
+}
+.diploma-blanks-data-table .table-cell {
+  @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
+}
+.diploma-blanks-data-table .table-cell:last-child {
+  @apply border-r-0;
+}
+.diploma-blanks-data-table .loading-cell {
+  @apply px-4 py-8 text-center text-gray-500;
+}
+.diploma-blanks-data-table .loading-cell .spinner {
+  @apply inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3;
+}
+.diploma-blanks-data-table .loading-cell .loading-text {
+  @apply text-sm font-medium;
+}
+
+.serial-number {
+  @apply font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded text-xs;
+}
+
+.type-info {
+  @apply flex flex-col space-y-1;
+}
+
+.type-name {
+  @apply font-medium text-gray-900;
+}
+
+.type-description {
+  @apply text-xs text-gray-500;
+}
+
+.import-date,
+.issue-date,
+.recall-date {
+  @apply text-sm text-gray-700 font-medium;
+}
+
+.issue-reason,
+.recall-reason {
+  @apply max-w-xs;
+}
+
+.reason-text {
+  @apply text-sm text-gray-700;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+.badge.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+.badge.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+.badge.badge-info {
+  @apply bg-blue-100 text-blue-800;
+}
+.badge.badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+.badge.badge-danger {
+  @apply bg-red-100 text-red-800;
+}
+
+.action-buttons {
+  @apply flex gap-1 flex-wrap justify-center;
+}
+
+.btn-table {
+  @apply px-2 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors duration-200;
+}
+.btn-table.btn-sm {
+  @apply px-2 py-1 text-xs;
+}
+.btn-table.btn-success {
+  @apply border-green-300 bg-green-50 text-green-700 hover:bg-green-100;
+}
+.btn-table.btn-warning {
+  @apply border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100;
+}
+.btn-table.btn-danger {
+  @apply border-red-300 bg-red-50 text-red-700 hover:bg-red-100;
+}
+.btn-table.btn-info {
+  @apply border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100;
+}
+.btn-table i {
+  @apply mr-1;
+}
+
+.empty-state {
+  @apply flex flex-col items-center justify-center py-12 px-4;
+}
+.empty-state i {
+  @apply text-gray-400 mb-4;
+}
+.empty-state p {
+  @apply text-lg font-medium text-gray-500 mb-2;
+}
+.empty-state small {
+  @apply text-gray-400;
+}
+
+.diploma-blanks-pagination-wrapper {
+  @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200;
+}
+
+@media (max-width: 768px) {
+  .diploma-blanks-table-container {
+    @apply overflow-x-auto;
+  }
+  .diploma-blanks-data-table {
+    @apply min-w-full;
+  }
+  .table-cell {
+    @apply px-2 py-2 text-xs;
+  }
+  .action-buttons {
+    @apply flex-col gap-1;
+  }
+  .btn-table {
+    @apply w-full text-center;
+  }
+}
+.diploma-import-form {
+  @apply space-y-8;
+}
+
+.header-with-nav {
+  @apply space-y-4;
+}
+
+.breadcrumb {
+  @apply flex items-center;
+}
+
+.breadcrumb-item {
+  @apply text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200;
+}
+.breadcrumb-item i {
+  @apply mr-2;
+}
+
+.form-section {
+  @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm;
+}
+
+.section-title {
+  @apply flex items-center text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200;
+}
+
+.step-number {
+  @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full mr-3;
+}
+
+.form-grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.field-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+.field-label.required::after {
+  content: " *";
+  @apply text-red-500;
+}
+
+.field-help {
+  @apply text-xs text-gray-500 mt-1 block;
+}
+
+.field-input,
+.field-select {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+.serial-group {
+  @apply space-y-6;
+}
+
+.serial-fields {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.serial-preview {
+  @apply bg-gray-50 border border-gray-200 rounded-lg p-4;
+}
+.serial-preview .field-label {
+  @apply text-sm font-medium text-gray-600 mb-2;
+}
+
+.preview-box {
+  @apply bg-white border border-gray-300 rounded-md px-3 py-2 min-h-[40px] flex items-center;
+}
+
+.preview-text {
+  @apply text-gray-400 italic text-sm;
+}
+
+.serial-complete {
+  @apply font-mono font-semibold text-gray-900 bg-blue-50 px-2 py-1 rounded text-sm;
+}
+
+.validation-summary {
+  @apply bg-blue-50 border border-blue-200 rounded-lg p-4;
+}
+.validation-summary h4 {
+  @apply text-blue-800 font-semibold mb-3 flex items-center;
+}
+.validation-summary h4 i {
+  @apply mr-2;
+}
+
+.validation-item {
+  @apply flex items-center space-x-3 py-2;
+}
+.validation-item i {
+  @apply text-sm;
+}
+.validation-item span {
+  @apply text-sm text-gray-700;
+}
+
+.form-actions {
+  @apply flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-cancel {
+  @apply px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center;
+}
+.btn-primary i,
+.btn-secondary i,
+.btn-cancel i {
+  @apply mr-2;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+.btn-primary:disabled {
+  @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-cancel {
+  @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.text-success {
+  @apply text-green-600;
+}
+
+.text-danger {
+  @apply text-red-600;
+}
+
+.text-muted {
+  @apply text-gray-400;
+}
+
+@media (max-width: 768px) {
+  .serial-fields {
+    @apply grid-cols-1;
+  }
+  .form-grid-2 {
+    @apply grid-cols-1;
+  }
+  .form-actions {
+    @apply flex-col;
+  }
+  .step-number {
+    @apply w-6 h-6 text-xs mr-2;
+  }
+}
+.diploma-blank-import {
+  @apply min-h-screen bg-gray-50 py-8;
+}
+
+.import-form-section {
+  @apply max-w-4xl mx-auto px-4;
+}
+
+.import-page-header {
+  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4;
+}
+
+.header-content {
+  @apply flex-1;
+}
+
+.import-page-title {
+  @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.import-page-subtitle {
+  @apply text-lg text-gray-600;
+}
+
+.header-actions {
+  @apply flex-shrink-0;
+}
+
+.btn-back {
+  @apply inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200;
+}
+.btn-back i {
+  @apply mr-2;
+}
+
+.import-form-card {
+  @apply bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden;
+}
+
+.diploma-import-form {
+  @apply p-8;
+}
+
+.form-section {
+  @apply mb-8 pb-8 border-b border-gray-200;
+}
+.form-section:last-child {
+  @apply border-b-0 mb-0 pb-0;
+}
+
+.section-header {
+  @apply mb-6;
+}
+
+.section-title {
+  @apply text-xl font-semibold text-gray-900 flex items-center mb-2;
+}
+
+.step-number {
+  @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full text-sm font-bold mr-3;
+}
+
+.section-help {
+  @apply flex items-start text-sm text-gray-600 bg-blue-50 p-3 rounded-lg;
+}
+.section-help i {
+  @apply text-blue-500 mr-2 mt-0.5;
+}
+
+.form-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.form-field {
+  @apply flex flex-col;
+}
+
+.field-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+.field-label.required::after {
+  @apply text-red-500 ml-1;
+  content: "*";
+}
+
+.field-input,
+.field-select {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+.field-input:focus,
+.field-select:focus {
+  @apply outline-none;
+}
+.field-input.error,
+.field-select.error {
+  @apply border-red-300 bg-red-50;
+}
+
+.field-error {
+  @apply text-red-600 text-sm mt-1 hidden;
+}
+
+.serial-section {
+  @apply mb-6 p-6 bg-gray-50 rounded-lg;
+}
+
+.serial-title {
+  @apply text-lg font-medium text-gray-900 mb-4;
+}
+
+.serial-input-group {
+  @apply grid grid-cols-3 gap-4 mb-4;
+}
+
+.serial-field {
+  @apply flex flex-col;
+}
+
+.serial-input {
+  @apply text-center font-mono;
+}
+
+.serial-preview {
+  @apply flex items-center justify-between p-3 bg-white rounded border border-gray-200;
+}
+
+.preview-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.preview-value {
+  @apply font-mono text-lg font-semibold text-blue-600;
+}
+
+.validation-info {
+  @apply mt-6 grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.validation-item {
+  @apply flex justify-between items-center p-3 bg-white rounded border border-gray-200;
+}
+
+.validation-label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.validation-value {
+  @apply font-semibold text-gray-900;
+}
+.validation-value.success {
+  @apply text-green-600;
+}
+.validation-value.error {
+  @apply text-red-600;
+}
+
+.form-actions {
+  @apply flex flex-col sm:flex-row gap-4 justify-end pt-8 mt-8 border-t border-gray-200;
+}
+
+.btn-validate {
+  @apply inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
+}
+.btn-validate i {
+  @apply mr-2;
+}
+
+.btn-submit {
+  @apply inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200;
+}
+.btn-submit:disabled {
+  @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+}
+.btn-submit i {
+  @apply mr-2;
+}
+
+.btn-cancel {
+  @apply inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200;
+}
+.btn-cancel i {
+  @apply mr-2;
+}
+
+@media (max-width: 768px) {
+  .import-form-section {
+    @apply px-2;
+  }
+  .diploma-import-form {
+    @apply p-4;
+  }
+  .serial-input-group {
+    @apply grid-cols-1;
+  }
+  .form-actions {
+    @apply flex-col;
+  }
+  .form-actions .btn-validate,
+  .form-actions .btn-submit,
+  .form-actions .btn-cancel {
+    @apply w-full justify-center;
+  }
+}
 .pagination-wrapper {
   @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200 w-full;
 }

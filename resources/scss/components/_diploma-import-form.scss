@@ -1,0 +1,171 @@
+// Diploma Blanks Import Form
+.diploma-import-form {
+    @apply space-y-8;
+}
+
+.header-with-nav {
+    @apply space-y-4;
+}
+
+.breadcrumb {
+    @apply flex items-center;
+}
+
+.breadcrumb-item {
+    @apply text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200;
+
+    i {
+        @apply mr-2;
+    }
+}
+
+.form-section {
+    @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm;
+}
+
+.section-title {
+    @apply flex items-center text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200;
+}
+
+.step-number {
+    @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full mr-3;
+}
+
+.form-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.field-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+
+    &.required::after {
+        content: ' *';
+        @apply text-red-500;
+    }
+}
+
+.field-help {
+    @apply text-xs text-gray-500 mt-1 block;
+}
+
+.field-input,
+.field-select {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+// Serial Groups
+.serial-group {
+    @apply space-y-6;
+}
+
+.serial-fields {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.serial-preview {
+    @apply bg-gray-50 border border-gray-200 rounded-lg p-4;
+
+    .field-label {
+        @apply text-sm font-medium text-gray-600 mb-2;
+    }
+}
+
+.preview-box {
+    @apply bg-white border border-gray-300 rounded-md px-3 py-2 min-h-[40px] flex items-center;
+}
+
+.preview-text {
+    @apply text-gray-400 italic text-sm;
+}
+
+.serial-complete {
+    @apply font-mono font-semibold text-gray-900 bg-blue-50 px-2 py-1 rounded text-sm;
+}
+
+// Validation Summary
+.validation-summary {
+    @apply bg-blue-50 border border-blue-200 rounded-lg p-4;
+
+    h4 {
+        @apply text-blue-800 font-semibold mb-3 flex items-center;
+
+        i {
+            @apply mr-2;
+        }
+    }
+}
+
+.validation-item {
+    @apply flex items-center space-x-3 py-2;
+
+    i {
+        @apply text-sm;
+    }
+
+    span {
+        @apply text-sm text-gray-700;
+    }
+}
+
+// Form Actions
+.form-actions {
+    @apply flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-cancel {
+    @apply px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center;
+
+    i {
+        @apply mr-2;
+    }
+}
+
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+
+    &:disabled {
+        @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+    }
+}
+
+.btn-secondary {
+    @apply bg-gray-600 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-cancel {
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+// Text colors for validation
+.text-success {
+    @apply text-green-600;
+}
+
+.text-danger {
+    @apply text-red-600;
+}
+
+.text-muted {
+    @apply text-gray-400;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .serial-fields {
+        @apply grid-cols-1;
+    }
+
+    .form-grid-2 {
+        @apply grid-cols-1;
+    }
+
+    .form-actions {
+        @apply flex-col;
+    }
+
+    .step-number {
+        @apply w-6 h-6 text-xs mr-2;
+    }
+}

@@ -1,0 +1,198 @@
+// Diploma Blanks Table Container
+.diploma-blanks-table-container {
+    @apply w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden;
+}
+
+// Table Styling
+.diploma-blanks-data-table {
+    @apply w-full border-collapse;
+
+    // Table Header
+    .table-header-row {
+        @apply bg-gray-50 border-b-2 border-gray-200;
+    }
+
+    .table-header-cell {
+        @apply w-auto max-w-full px-4 py-4 text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
+    }
+
+    // Table Body
+    .table-body {
+        @apply bg-white divide-y divide-gray-200;
+    }
+
+    .table-row {
+        @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
+
+        &:last-child {
+            @apply border-b-0;
+        }
+
+        &:hover {
+            @apply bg-blue-50 shadow-sm;
+        }
+
+        &.selected {
+            @apply bg-blue-100 border-blue-200;
+        }
+    }
+
+    .table-cell {
+        @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
+
+        &:last-child {
+            @apply border-r-0;
+        }
+    }
+
+    // Loading Cell
+    .loading-cell {
+        @apply px-4 py-8 text-center text-gray-500;
+
+        .spinner {
+            @apply inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3;
+        }
+
+        .loading-text {
+            @apply text-sm font-medium;
+        }
+    }
+}
+
+// Serial Number
+.serial-number {
+    @apply font-mono font-semibold text-gray-900 bg-gray-100 px-2 py-1 rounded text-xs;
+}
+
+// Type Info
+.type-info {
+    @apply flex flex-col space-y-1;
+}
+
+.type-name {
+    @apply font-medium text-gray-900;
+}
+
+.type-description {
+    @apply text-xs text-gray-500;
+}
+
+// Date styling
+.import-date,
+.issue-date,
+.recall-date {
+    @apply text-sm text-gray-700 font-medium;
+}
+
+// Reason styling
+.issue-reason,
+.recall-reason {
+    @apply max-w-xs;
+}
+
+.reason-text {
+    @apply text-sm text-gray-700;
+}
+
+// Badges
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+
+    &.badge-success {
+        @apply bg-green-100 text-green-800;
+    }
+
+    &.badge-warning {
+        @apply bg-yellow-100 text-yellow-800;
+    }
+
+    &.badge-info {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    &.badge-primary {
+        @apply bg-blue-100 text-blue-800;
+    }
+
+    &.badge-danger {
+        @apply bg-red-100 text-red-800;
+    }
+}
+
+// Action buttons
+.action-buttons {
+    @apply flex gap-1 flex-wrap justify-center;
+}
+
+.btn-table {
+    @apply px-2 py-1 text-xs rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors duration-200;
+
+    &.btn-sm {
+        @apply px-2 py-1 text-xs;
+    }
+
+    &.btn-success {
+        @apply border-green-300 bg-green-50 text-green-700 hover:bg-green-100;
+    }
+
+    &.btn-warning {
+        @apply border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100;
+    }
+
+    &.btn-danger {
+        @apply border-red-300 bg-red-50 text-red-700 hover:bg-red-100;
+    }
+
+    &.btn-info {
+        @apply border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100;
+    }
+
+    i {
+        @apply mr-1;
+    }
+}
+
+// Empty State
+.empty-state {
+    @apply flex flex-col items-center justify-center py-12 px-4;
+
+    i {
+        @apply text-gray-400 mb-4;
+    }
+
+    p {
+        @apply text-lg font-medium text-gray-500 mb-2;
+    }
+
+    small {
+        @apply text-gray-400;
+    }
+}
+
+// Pagination wrapper for diploma blanks
+.diploma-blanks-pagination-wrapper {
+    @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .diploma-blanks-table-container {
+        @apply overflow-x-auto;
+    }
+
+    .diploma-blanks-data-table {
+        @apply min-w-full;
+    }
+
+    .table-cell {
+        @apply px-2 py-2 text-xs;
+    }
+
+    .action-buttons {
+        @apply flex-col gap-1;
+    }
+
+    .btn-table {
+        @apply w-full text-center;
+    }
+}

@@ -2,9 +2,9 @@
     @include('components.header')
 
     <nav class="navbar-menu">
-        <a href="{{ route('embryo-management') }}"
-            class="menu-item {{ request()->routeIs('embryo-management') ? 'active' : '' }}">
-            Quản lý phôi
+        <a href="{{ route('diploma-blank-management') }}"
+            class="menu-item {{ request()->routeIs('diploma-blank-management') ? 'active' : '' }}">
+            Quản lý phôi văn bằng
         </a>
 
         <a href="{{ route('diploma-management') }}"

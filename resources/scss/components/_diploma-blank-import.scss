@@ -1,0 +1,226 @@
+// Diploma Blank Import Styles
+.diploma-blank-import {
+    @apply min-h-screen bg-gray-50 py-8;
+}
+
+.import-form-section {
+    @apply max-w-4xl mx-auto px-4;
+}
+
+// Page Header
+.import-page-header {
+    @apply flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4;
+}
+
+.header-content {
+    @apply flex-1;
+}
+
+.import-page-title {
+    @apply text-3xl font-bold text-gray-900 mb-2;
+}
+
+.import-page-subtitle {
+    @apply text-lg text-gray-600;
+}
+
+.header-actions {
+    @apply flex-shrink-0;
+}
+
+.btn-back {
+    @apply inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200;
+
+    i {
+        @apply mr-2;
+    }
+}
+
+// Import Form Card
+.import-form-card {
+    @apply bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden;
+}
+
+.diploma-import-form {
+    @apply p-8;
+}
+
+// Form Sections
+.form-section {
+    @apply mb-8 pb-8 border-b border-gray-200;
+
+    &:last-child {
+        @apply border-b-0 mb-0 pb-0;
+    }
+}
+
+.section-header {
+    @apply mb-6;
+}
+
+.section-title {
+    @apply text-xl font-semibold text-gray-900 flex items-center mb-2;
+}
+
+.step-number {
+    @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full text-sm font-bold mr-3;
+}
+
+.section-help {
+    @apply flex items-start text-sm text-gray-600 bg-blue-50 p-3 rounded-lg;
+
+    i {
+        @apply text-blue-500 mr-2 mt-0.5;
+    }
+}
+
+// Form Grid
+.form-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.form-field {
+    @apply flex flex-col;
+}
+
+.field-label {
+    @apply block text-sm font-medium text-gray-700 mb-2;
+
+    &.required::after {
+        @apply text-red-500 ml-1;
+        content: '*';
+    }
+}
+
+.field-input,
+.field-select {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+
+    &:focus {
+        @apply outline-none;
+    }
+
+    &.error {
+        @apply border-red-300 bg-red-50;
+    }
+}
+
+.field-error {
+    @apply text-red-600 text-sm mt-1 hidden;
+}
+
+// Serial Sections
+.serial-section {
+    @apply mb-6 p-6 bg-gray-50 rounded-lg;
+}
+
+.serial-title {
+    @apply text-lg font-medium text-gray-900 mb-4;
+}
+
+.serial-input-group {
+    @apply grid grid-cols-3 gap-4 mb-4;
+}
+
+.serial-field {
+    @apply flex flex-col;
+}
+
+.serial-input {
+    @apply text-center font-mono;
+}
+
+.serial-preview {
+    @apply flex items-center justify-between p-3 bg-white rounded border border-gray-200;
+}
+
+.preview-label {
+    @apply text-sm font-medium text-gray-700;
+}
+
+.preview-value {
+    @apply font-mono text-lg font-semibold text-blue-600;
+}
+
+// Validation Info
+.validation-info {
+    @apply mt-6 grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.validation-item {
+    @apply flex justify-between items-center p-3 bg-white rounded border border-gray-200;
+}
+
+.validation-label {
+    @apply text-sm font-medium text-gray-700;
+}
+
+.validation-value {
+    @apply font-semibold text-gray-900;
+
+    &.success {
+        @apply text-green-600;
+    }
+
+    &.error {
+        @apply text-red-600;
+    }
+}
+
+// Form Actions
+.form-actions {
+    @apply flex flex-col sm:flex-row gap-4 justify-end pt-8 mt-8 border-t border-gray-200;
+}
+
+.btn-validate {
+    @apply inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
+
+    i {
+        @apply mr-2;
+    }
+}
+
+.btn-submit {
+    @apply inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200;
+
+    &:disabled {
+        @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+    }
+
+    i {
+        @apply mr-2;
+    }
+}
+
+.btn-cancel {
+    @apply inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200;
+
+    i {
+        @apply mr-2;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .import-form-section {
+        @apply px-2;
+    }
+
+    .diploma-import-form {
+        @apply p-4;
+    }
+
+    .serial-input-group {
+        @apply grid-cols-1;
+    }
+
+    .form-actions {
+        @apply flex-col;
+
+        .btn-validate,
+        .btn-submit,
+        .btn-cancel {
+            @apply w-full justify-center;
+        }
+    }
+}
