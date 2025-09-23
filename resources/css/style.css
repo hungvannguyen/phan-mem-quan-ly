@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 .navbar {
-  @apply mx-auto my-[20px] max-w-[1140px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
+  @apply mx-auto my-[20px] container max-w-7xl overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
 .navbar-menu {
   @apply grid w-full grid-cols-5 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
