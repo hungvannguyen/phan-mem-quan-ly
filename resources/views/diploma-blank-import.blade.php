@@ -113,64 +113,57 @@
                             </div>
                         </div>
 
-                        <!-- From Serial -->
+                        <!-- Serial Range -->
                         <div class="serial-section">
-                            <h4 class="serial-title">Từ Serial</h4>
+                            <h4 class="serial-title">Cấu hình Serial Range</h4>
+
+                            <!-- Serial Structure -->
                             <div class="serial-input-group">
                                 <div class="serial-field">
-                                    <label for="from_prefix" class="field-label">Trường cố định 1</label>
-                                    <input type="text" id="from_prefix" name="from_prefix"
-                                        class="field-input serial-input" placeholder="VD: A."
-                                        value="{{ old('from_prefix') }}">
+                                    <label for="prefix" class="field-label">Trường cố định 1</label>
+                                    <input type="text" id="prefix" name="prefix" class="field-input serial-input"
+                                        placeholder="VD: A." value="{{ old('prefix') }}">
+                                    <div class="field-error" id="prefix_error"></div>
                                 </div>
+
+
                                 <div class="serial-field">
-                                    <label for="from_number" class="field-label required">Trường số chạy</label>
+                                    <label for="from_number" class="field-label required">Từ số</label>
                                     <input type="text" id="from_number" name="from_number"
                                         class="field-input serial-input" placeholder="VD: 00001"
                                         value="{{ old('from_number') }}" required>
+                                    <div class="field-error" id="from_number_error"></div>
                                 </div>
-                                <div class="serial-field">
-                                    <label for="from_suffix" class="field-label">Trường cố định 2</label>
-                                    <input type="text" id="from_suffix" name="from_suffix"
-                                        class="field-input serial-input" placeholder="VD: /X02CN"
-                                        value="{{ old('from_suffix') }}">
-                                </div>
-                            </div>
-                            <div class="serial-preview">
-                                <label class="preview-label">Serial preview:</label>
-                                <span class="preview-value" id="from_serial_preview">--</span>
-                            </div>
-                            <div class="field-error" id="from_serial_error"></div>
-                        </div>
 
-                        <!-- To Serial -->
-                        <div class="serial-section">
-                            <h4 class="serial-title">Đến Serial</h4>
-                            <div class="serial-input-group">
+
                                 <div class="serial-field">
-                                    <label for="to_prefix" class="field-label">Trường cố định 1</label>
-                                    <input type="text" id="to_prefix" name="to_prefix"
-                                        class="field-input serial-input" placeholder="VD: A."
-                                        value="{{ old('to_prefix') }}">
-                                </div>
-                                <div class="serial-field">
-                                    <label for="to_number" class="field-label required">Trường số chạy</label>
+                                    <label for="to_number" class="field-label required">Đến số</label>
                                     <input type="text" id="to_number" name="to_number"
                                         class="field-input serial-input" placeholder="VD: 00100"
                                         value="{{ old('to_number') }}" required>
+                                    <div class="field-error" id="to_number_error"></div>
                                 </div>
+
+
                                 <div class="serial-field">
-                                    <label for="to_suffix" class="field-label">Trường cố định 2</label>
-                                    <input type="text" id="to_suffix" name="to_suffix"
-                                        class="field-input serial-input" placeholder="VD: /X02CN"
-                                        value="{{ old('to_suffix') }}">
+                                    <label for="suffix" class="field-label">Trường cố định 2</label>
+                                    <input type="text" id="suffix" name="suffix" class="field-input serial-input"
+                                        placeholder="VD: /X02CN" value="{{ old('suffix') }}">
+                                    <div class="field-error" id="suffix_error"></div>
                                 </div>
                             </div>
+
+                            <!-- Serial Preview -->
                             <div class="serial-preview">
-                                <label class="preview-label">Serial preview:</label>
-                                <span class="preview-value" id="to_serial_preview">--</span>
+                                <label class="preview-label">Serial range preview:</label>
+                                <div class="preview-range">
+                                    <span class="preview-value" id="from_serial_preview">--</span>
+                                    <span class="range-arrow">→</span>
+                                    <span class="preview-value" id="to_serial_preview">--</span>
+                                </div>
                             </div>
-                            <div class="field-error" id="to_serial_error"></div>
+
+                            <div class="field-error" id="serial_error"></div>
                         </div>
 
                         <!-- Validation Info -->
@@ -199,6 +192,49 @@
         </div>
     </main>
 
+    <style>
+        .serial-range-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .serial-range-group .serial-field {
+            flex: 1;
+        }
+
+        .range-separator {
+            padding: 0 10px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .preview-range {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .range-arrow {
+            font-size: 18px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .preview-value {
+            font-family: monospace;
+            padding: 5px 10px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            min-width: 80px;
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
@@ -212,12 +248,10 @@
             const quantityInput = document.getElementById('quantity');
 
             // Serial inputs
-            const fromPrefix = document.getElementById('from_prefix');
+            const prefix = document.getElementById('prefix');
             const fromNumber = document.getElementById('from_number');
-            const fromSuffix = document.getElementById('from_suffix');
-            const toPrefix = document.getElementById('to_prefix');
             const toNumber = document.getElementById('to_number');
-            const toSuffix = document.getElementById('to_suffix');
+            const suffix = document.getElementById('suffix');
 
             // Preview elements
             const fromPreview = document.getElementById('from_serial_preview');
@@ -262,16 +296,23 @@
             }
 
             function clearAllErrors() {
-                const errorIds = ['type_id', 'document_reference', 'issue_date', 'quantity', 'from_serial',
-                    'to_serial'
+                const errorIds = ['type_id', 'document_reference', 'issue_date', 'quantity', 'serial',
+                    'prefix', 'from_number', 'to_number', 'suffix'
                 ];
                 errorIds.forEach(id => clearError(id));
+
+                // Also clear quantity validation error
+                const quantityValidationError = document.getElementById('quantity_validation_error');
+                if (quantityValidationError) {
+                    quantityValidationError.textContent = '';
+                    quantityValidationError.style.display = 'none';
+                }
             }
 
             // Update serial previews
             function updatePreviews() {
-                const fromSerial = (fromPrefix.value || '') + (fromNumber.value || '') + (fromSuffix.value || '');
-                const toSerial = (toPrefix.value || '') + (toNumber.value || '') + (toSuffix.value || '');
+                const fromSerial = (prefix.value || '') + (fromNumber.value || '') + (suffix.value || '');
+                const toSerial = (prefix.value || '') + (toNumber.value || '') + (suffix.value || '');
 
                 fromPreview.textContent = fromSerial || '--';
                 toPreview.textContent = toSerial || '--';
@@ -291,7 +332,7 @@
                             if (!isNaN(inputQty) && calculatedQty !== inputQty) {
                                 showError('quantity',
                                     `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                    );
+                                );
                             } else if (calculatedQty === inputQty) {
                                 clearError('quantity');
                             }
@@ -338,17 +379,14 @@
                     isValid = false;
                 }
 
-                // 3. Validate prefix matching
-                if (fromPrefix.value !== toPrefix.value) {
+                // 3. Validate that at least one prefix/suffix exists
+                const hasPrefix = prefix.value.trim();
+                const hasSuffix = suffix.value.trim();
+                if (!hasPrefix && !hasSuffix) {
                     isValid = false;
                 }
 
-                // 4. Validate suffix matching
-                if (fromSuffix.value !== toSuffix.value) {
-                    isValid = false;
-                }
-
-                // 5. Validate number range and quantity matching
+                // 4. Validate number range and quantity matching
                 if (fromNumber.value && toNumber.value) {
                     const fromNum = parseInt(fromNumber.value);
                     const toNum = parseInt(toNumber.value);
@@ -358,7 +396,7 @@
                     } else if (fromNum >= toNum) {
                         isValid = false;
                     } else {
-                        // 6. Validate quantity matching - MUST match calculated quantity
+                        // 5. Validate quantity matching - MUST match calculated quantity
                         const calculatedQty = toNum - fromNum + 1;
                         const inputQty = parseInt(quantityInput.value);
 
@@ -431,16 +469,16 @@
 
                     case 'from_number':
                         if (!field.value.trim()) {
-                            showError('from_serial', 'Vui lòng nhập trường số chạy của From Serial');
+                            showError('from_number', 'Vui lòng nhập số bắt đầu');
                         } else if (isNaN(parseInt(field.value))) {
-                            showError('from_serial', 'Trường số chạy phải là số hợp lệ');
+                            showError('from_number', 'Số bắt đầu phải là số hợp lệ');
                         } else if (toNumber.value) {
                             // Check range validation
                             const fromNum = parseInt(field.value);
                             const toNum = parseInt(toNumber.value);
 
                             if (fromNum >= toNum) {
-                                showError('from_serial', 'Số chạy của From Serial phải nhỏ hơn To Serial');
+                                showError('from_number', 'Số bắt đầu phải nhỏ hơn số kết thúc');
                             } else if (quantityInput.value) {
                                 // Check quantity matching when serial changes
                                 const calculatedQty = toNum - fromNum + 1;
@@ -449,7 +487,7 @@
                                 if (!isNaN(inputQty) && calculatedQty !== inputQty) {
                                     showError('quantity',
                                         `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                        );
+                                    );
                                 } else if (calculatedQty === inputQty) {
                                     clearError('quantity');
                                 }
@@ -459,9 +497,9 @@
 
                     case 'to_number':
                         if (!field.value.trim()) {
-                            showError('to_serial', 'Vui lòng nhập trường số chạy của To Serial');
+                            showError('to_number', 'Vui lòng nhập số kết thúc');
                         } else if (isNaN(parseInt(field.value))) {
-                            showError('to_serial', 'Trường số chạy phải là số hợp lệ');
+                            showError('to_number', 'Số kết thúc phải là số hợp lệ');
                         } else {
                             // Check range validation
                             if (fromNumber.value) {
@@ -469,7 +507,7 @@
                                 const toNum = parseInt(field.value);
 
                                 if (fromNum >= toNum) {
-                                    showError('to_serial', 'Số chạy của To Serial phải lớn hơn From Serial');
+                                    showError('to_number', 'Số kết thúc phải lớn hơn số bắt đầu');
                                 } else if (quantityInput.value) {
                                     // Check quantity matching when serial changes
                                     const calculatedQty = toNum - fromNum + 1;
@@ -478,33 +516,32 @@
                                     if (!isNaN(inputQty) && calculatedQty !== inputQty) {
                                         showError('quantity',
                                             `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                            );
+                                        );
                                     } else if (calculatedQty === inputQty) {
                                         clearError('quantity');
                                     }
                                 }
                             }
-
-                            // Check prefix/suffix matching
-                            if (fromPrefix.value !== toPrefix.value) {
-                                showError('to_serial',
-                                    'Trường cố định 1 của From Serial và To Serial phải khớp nhau');
-                            } else if (fromSuffix.value !== toSuffix.value) {
-                                showError('to_serial',
-                                    'Trường cố định 2 của From Serial và To Serial phải khớp nhau');
-                            }
                         }
                         break;
 
-                    case 'to_prefix':
-                        if (fromPrefix.value !== field.value) {
-                            showError('to_serial', 'Trường cố định 1 của From Serial và To Serial phải khớp nhau');
+                    case 'prefix':
+                        // Check if at least one prefix/suffix exists
+                        const hasPrefix = field.value.trim();
+                        const hasSuffix = suffix.value.trim();
+                        if (!hasPrefix && !hasSuffix) {
+                            showError('prefix',
+                                'Phải có ít nhất một trong hai: Trường cố định 1 hoặc Trường cố định 2');
                         }
                         break;
 
-                    case 'to_suffix':
-                        if (fromSuffix.value !== field.value) {
-                            showError('to_serial', 'Trường cố định 2 của From Serial và To Serial phải khớp nhau');
+                    case 'suffix':
+                        // Check if at least one prefix/suffix exists
+                        const hasPrefixS = prefix.value.trim();
+                        const hasSuffixS = field.value.trim();
+                        if (!hasPrefixS && !hasSuffixS) {
+                            showError('suffix',
+                                'Phải có ít nhất một trong hai: Trường cố định 1 hoặc Trường cố định 2');
                         }
                         break;
                 }
@@ -513,21 +550,12 @@
                 validateForm();
             }
 
-            // Auto-fill to_ fields when from_ fields change
-            function autoFillToFields() {
-                if (!toPrefix.value && fromPrefix.value) {
-                    toPrefix.value = fromPrefix.value;
-                }
-                if (!toSuffix.value && fromSuffix.value) {
-                    toSuffix.value = fromSuffix.value;
-                }
-                updatePreviews();
-                validateForm();
-            }
+            // Auto-fill functionality (không cần thiết nữa vì chỉ có một set trường cố định)
+            // function autoFillToFields() - Removed
 
             // Event listeners
-            const allInputs = [typeId, documentReference, issueDate, quantityInput, fromPrefix, fromNumber,
-                fromSuffix, toPrefix, toNumber, toSuffix
+            const allInputs = [typeId, documentReference, issueDate, quantityInput, prefix, fromNumber,
+                toNumber, suffix
             ];
 
             allInputs.forEach(input => {
@@ -542,10 +570,6 @@
                     validateFieldOnBlur(this);
                 });
             });
-
-            // Special event listeners for auto-fill
-            fromPrefix.addEventListener('input', autoFillToFields);
-            fromSuffix.addEventListener('input', autoFillToFields);
 
             // Form submit validation
             form.addEventListener('submit', function(e) {
