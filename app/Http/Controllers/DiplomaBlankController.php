@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DiplomaBlank;
 use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DiplomaBlankController extends Controller
 {
@@ -317,154 +318,10 @@ class DiplomaBlankController extends Controller
     }
 
     /**
-     * Validate serial range for import
-     */
-    public function validateRange(Request $request)
-    {
-        try {
-            $fromPrefix = $request->from_prefix ?? '';
-            $fromNumber = $request->from_number;
-            $fromSuffix = $request->from_suffix ?? '';
-            $toPrefix = $request->to_prefix ?? '';
-            $toNumber = $request->to_number;
-            $toSuffix = $request->to_suffix ?? '';
-            $quantity = (int) $request->quantity;
-
-            // Validate fixed fields match
-            if ($fromPrefix !== $toPrefix) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Trường cố định 1 của From Serial và To Serial không khớp'
-                ]);
-            }
-
-            if ($fromSuffix !== $toSuffix) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Trường cố định 2 của From Serial và To Serial không khớp'
-                ]);
-            }
-
-            // Validate numeric fields
-            $fromNum = (int) $fromNumber;
-            $toNum = (int) $toNumber;
-
-            if ($fromNum >= $toNum) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Số chạy của To Serial phải lớn hơn From Serial'
-                ]);
-            }
-
-            // Check quantity match
-            $calculatedQuantity = $toNum - $fromNum + 1;
-            if ($calculatedQuantity !== $quantity) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Số lượng không khớp. Tính từ serial: {$calculatedQuantity}, nhập vào: {$quantity}"
-                ]);
-            }
-
-            // Check for duplicate serials
-            $existingSerials = [];
-            for ($i = $fromNum; $i <= $toNum; $i++) {
-                $serialNumber = $fromPrefix . str_pad($i, strlen($fromNumber), '0', STR_PAD_LEFT) . $fromSuffix;
-
-                if (DiplomaBlank::where('serial_number', $serialNumber)->exists()) {
-                    $existingSerials[] = $serialNumber;
-                }
-            }
-
-            if (!empty($existingSerials)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Các serial sau đã tồn tại: ' . implode(', ', array_slice($existingSerials, 0, 5)) .
-                        (count($existingSerials) > 5 ? ' và ' . (count($existingSerials) - 5) . ' serial khác' : '')
-                ]);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Dữ liệu hợp lệ',
-                'calculated_quantity' => $calculatedQuantity
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lỗi xử lý: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
      * Store imported diploma blanks
      */
     public function storeImport(Request $request)
     {
-        $request->validate([
-            'type_id' => 'required|exists:diploma_blank_types,type_id',
-            'document_reference' => 'required|string|max:255',
-            'issue_date' => 'required|date',
-            'quantity' => 'required|integer|min:1|max:10000',
-            'from_prefix' => 'nullable|string|max:50',
-            'from_number' => 'required|string|max:50',
-            'from_suffix' => 'nullable|string|max:50',
-            'to_prefix' => 'nullable|string|max:50',
-            'to_number' => 'required|string|max:50',
-            'to_suffix' => 'nullable|string|max:50',
-        ]);
-
-        try {
-            $fromPrefix = $request->from_prefix ?? '';
-            $fromNumber = $request->from_number;
-            $fromSuffix = $request->from_suffix ?? '';
-            $toPrefix = $request->to_prefix ?? '';
-            $toNumber = $request->to_number;
-            $toSuffix = $request->to_suffix ?? '';
-
-            // Re-validate (security check)
-            if ($fromPrefix !== $toPrefix || $fromSuffix !== $toSuffix) {
-                return back()->withErrors(['error' => 'Trường cố định không khớp']);
-            }
-
-            $fromNum = (int) $fromNumber;
-            $toNum = (int) $toNumber;
-            $quantity = (int) $request->quantity;
-            $calculatedQuantity = $toNum - $fromNum + 1;
-
-            if ($calculatedQuantity !== $quantity) {
-                return back()->withErrors(['error' => 'Số lượng không khớp với khoảng serial']);
-            }
-
-            // Create blanks in batch
-            $blanks = [];
-            for ($i = $fromNum; $i <= $toNum; $i++) {
-                $serialNumber = $fromPrefix . str_pad($i, strlen($fromNumber), '0', STR_PAD_LEFT) . $fromSuffix;
-
-                $blanks[] = [
-                    'serial_number' => $serialNumber,
-                    'type_id' => $request->type_id,
-                    'status' => 'InStock',
-                    'import_date' => now(),
-                    'issue_date' => null,
-                    'recall_date' => null,
-                    'issue_reason' => $request->document_reference,
-                    'recall_reason' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            // Insert in chunks for better performance
-            $chunks = array_chunk($blanks, 100);
-            foreach ($chunks as $chunk) {
-                DiplomaBlank::insert($chunk);
-            }
-
-            return redirect()->route('diploma-blank-management')
-                ->with('success', "Đã nhập thành công {$quantity} phôi văn bằng từ {$fromPrefix}{$fromNumber}{$fromSuffix} đến {$toPrefix}{$toNumber}{$toSuffix}");
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Lỗi nhập dữ liệu: ' . $e->getMessage()]);
-        }
+        dd('ok');
     }
 }

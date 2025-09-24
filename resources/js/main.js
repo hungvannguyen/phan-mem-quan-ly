@@ -75,6 +75,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const requiredFields = form.querySelectorAll(".required");
 
     function validateField(field) {
+        if (!field || !field.value) {
+            return false;
+        }
         if (field.type === "date") {
             return field.valueAsDate !== null;
         }
