@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DiplomaBlankController;
+use App\Http\Controllers\DiplomaBlankImportController;
 use App\Http\Controllers\DiplomaManagementController;
 use App\Http\Controllers\EmbryoManagementController;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -24,8 +25,53 @@ Route::get(
 
 Route::get(
     '/diploma-blank-management',
-    [DiplomaBlankController::class, 'index']
+    [DiplomaBlankImportController::class, 'index']
 )->middleware('auth')->name('diploma-blank-management');
+
+Route::get(
+    '/diploma-blank-management/create',
+    [DiplomaBlankImportController::class, 'create']
+)->middleware('auth')->name('diploma-blank-import.create');
+
+Route::post(
+    '/diploma-blank-management/store',
+    [DiplomaBlankImportController::class, 'store']
+)->middleware('auth')->name('diploma-blank-import.store');
+
+Route::get(
+    '/diploma-blank-management/{import}',
+    [DiplomaBlankImportController::class, 'show']
+)->middleware('auth')->name('diploma-blank-import.show');
+
+Route::post(
+    '/diploma-blank-management/{import}/start',
+    [DiplomaBlankImportController::class, 'start']
+)->middleware('auth')->name('diploma-blank-import.start');
+
+Route::post(
+    '/diploma-blank-management/{import}/pause',
+    [DiplomaBlankImportController::class, 'pause']
+)->middleware('auth')->name('diploma-blank-import.pause');
+
+Route::post(
+    '/diploma-blank-management/{import}/retry',
+    [DiplomaBlankImportController::class, 'retry']
+)->middleware('auth')->name('diploma-blank-import.retry');
+
+Route::delete(
+    '/diploma-blank-management/{import}',
+    [DiplomaBlankImportController::class, 'destroy']
+)->middleware('auth')->name('diploma-blank-import.destroy');
+
+Route::get(
+    '/diploma-blank-management/api/statistics',
+    [DiplomaBlankImportController::class, 'statistics']
+)->middleware('auth')->name('diploma-blank-import.statistics');
+
+Route::post(
+    '/diploma-blank-management/sync',
+    [DiplomaBlankImportController::class, 'sync']
+)->middleware('auth')->name('diploma-blank-import.sync');
 
 Route::get(
     '/diploma-blank-management/import',

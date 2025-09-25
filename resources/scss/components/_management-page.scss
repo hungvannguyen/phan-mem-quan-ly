@@ -1,0 +1,138 @@
+// Management Page Styles - Generic and Reusable
+.management-page {
+    @apply min-h-screen p-4;
+
+    .form-section {
+        @apply max-w-[1500px] mx-auto space-y-6;
+
+        .page {
+            @apply text-center mb-8;
+
+            &-title {
+                @apply text-3xl font-bold text-gray-900 mb-2;
+            }
+
+            &-subtitle {
+                @apply text-lg text-gray-600 max-w-2xl mx-auto;
+            }
+        }
+
+        .search {
+            &-card {
+                @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
+            }
+
+            &-form {
+                @apply space-y-6;
+            }
+
+            &-actions {
+                @apply flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200;
+            }
+        }
+
+        .form {
+            &-grid {
+                @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+            }
+
+            &-field {
+                @apply space-y-2;
+            }
+        }
+
+        .field {
+            &-label {
+                @apply block text-sm font-semibold text-gray-700;
+            }
+
+            &-input {
+                @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
+
+                &::placeholder {
+                    @apply text-gray-400;
+                }
+
+                &:focus {
+                    @apply outline-none ring-2 ring-blue-500 border-transparent;
+                }
+
+                &.is-invalid {
+                    @apply border-red-300 ring-2 ring-red-200;
+                }
+            }
+
+            &-select {
+                @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
+
+                &:focus {
+                    @apply outline-none ring-2 ring-blue-500 border-transparent;
+                }
+
+                &.is-invalid {
+                    @apply border-red-300 ring-2 ring-red-200;
+                }
+            }
+        }
+
+        .invalid-feedback {
+            @apply text-sm text-red-600 mt-1;
+        }
+
+        .btn {
+            &-search {
+                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
+            }
+
+            &-reset {
+                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
+            }
+        }
+
+        .page {
+            &-actions {
+                @apply flex flex-wrap gap-3 justify-center md:justify-start;
+            }
+        }
+
+        .action {
+            &-btn {
+                @apply inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-all duration-200 shadow-sm no-underline border-0 cursor-pointer focus:ring-2 focus:ring-offset-2 focus:outline-none;
+
+                i {
+                    @apply text-sm;
+                }
+
+                &-primary {
+                    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+                }
+
+                &-warning {
+                    @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
+                }
+
+                &-info {
+                    @apply bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500;
+                }
+
+                &-success {
+                    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+                }
+
+                &-secondary {
+                    @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
+                }
+            }
+        }
+    }
+
+    .table {
+        &-section {
+            @apply max-w-[1500px] mx-auto;
+        }
+
+        &-wrapper {
+            @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('content')
-    <main class="diploma-management">
+    <main class="management-page">
         {{-- Hiển thị thông báo --}}
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -27,21 +27,22 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <div class="diploma-form-section">
+
+        <div class="form-section">
             <!-- Page Header -->
-            <div class="diploma-page-header">
-                <h1 class="diploma-page-title">Quản lý Phôi Văn bằng</h1>
-                <p class="diploma-page-subtitle">Tìm kiếm và quản lý thông tin phôi văn bằng trong hệ thống</p>
+            <div class="page-header">
+                <h1 class="page-title">Quản lý Nhập Phôi Văn bằng</h1>
+                <p class="page-subtitle">Tìm kiếm và quản lý lịch sử nhập phôi văn bằng vào hệ thống</p>
             </div>
 
             <!-- Search Form -->
-            <div class="diploma-search-card">
-                <form class="diploma-search-form" method="GET" action="{{ route('diploma-blank-management') }}">
-                    <div class="search-form-grid">
+            <div class="search-card">
+                <form class="search-form" method="GET" action="{{ route('diploma-blank-management') }}">
+                    <div class="form-grid">
                         <div class="form-field">
-                            <label for="serial_number" class="field-label">Số seri phôi</label>
-                            <input type="text" id="serial_number" name="serial_number" class="field-input"
-                                placeholder="Nhập số seri phôi" value="{{ request('serial_number') }}">
+                            <label for="document_reference" class="field-label">Số văn bản</label>
+                            <input type="text" id="document_reference" name="document_reference" class="field-input"
+                                placeholder="Nhập số văn bản" value="{{ request('document_reference') }}">
                         </div>
 
                         <div class="form-field">
@@ -60,20 +61,20 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="status" class="field-label">Trạng thái phôi</label>
+                            <label for="status" class="field-label">Trạng thái nhập</label>
                             <select id="status" name="status" class="field-select">
                                 <option value="">-- Tất cả trạng thái --</option>
-                                <option value="InStock" {{ request('status') == 'InStock' ? 'selected' : '' }}>
-                                    Trong kho
+                                <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>
+                                    Chờ xử lý
                                 </option>
-                                <option value="Issued" {{ request('status') == 'Issued' ? 'selected' : '' }}>
-                                    Đã cấp
+                                <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>
+                                    Đang xử lý
                                 </option>
-                                <option value="Damaged" {{ request('status') == 'Damaged' ? 'selected' : '' }}>
-                                    Hư hỏng
+                                <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>
+                                    Hoàn thành
                                 </option>
-                                <option value="Recalled" {{ request('status') == 'Recalled' ? 'selected' : '' }}>
-                                    Thu hồi
+                                <option value="3" {{ request('status') === '3' ? 'selected' : '' }}>
+                                    Lỗi
                                 </option>
                             </select>
                         </div>
@@ -91,7 +92,7 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="issue_date_from" class="field-label">Ngày cấp từ</label>
+                            <label for="issue_date_from" class="field-label">Ngày ban hành từ</label>
                             <input type="date" id="issue_date_from" name="issue_date_from" class="field-input"
                                 value="{{ request('issue_date_from') }}">
                         </div>
@@ -112,8 +113,8 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="diploma-actions">
-                <a href="{{ route('diploma-blank.import') }}" class="action-btn action-btn-primary">
+            <div class="page-actions">
+                <a href="{{ route('diploma-blank-import.create') }}" class="action-btn action-btn-primary">
                     <i class="fas fa-plus"></i>
                     Nhập phôi mới
                 </a>
@@ -123,21 +124,22 @@
                 </button>
                 <button type="button" class="action-btn action-btn-info">
                     <i class="fas fa-print"></i>
-                    In danh sách
+                    In lịch sử nhập
                 </button>
                 <button type="button" class="action-btn action-btn-success">
                     <i class="fas fa-file-excel"></i>
                     Xuất Excel
                 </button>
-                <button type="button" class="action-btn action-btn-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Báo cáo hư hỏng
+                <button type="button" class="action-btn action-btn-secondary">
+                    <i class="fas fa-sync"></i>
+                    Đồng bộ dữ liệu
                 </button>
             </div>
         </div>
+
         <div class="table-section">
             <div class="table-wrapper" id="table-data">
-                @include('components.diploma-blanks.table')
+                @include('components.diploma-blank-imports.table')
             </div>
         </div>
     </main>

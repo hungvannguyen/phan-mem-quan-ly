@@ -129,4 +129,34 @@
             </div>
         @endif
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const perPageSelect = document.getElementById('per-page-select');
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('per_page', this.value);
+                    url.searchParams.delete('page'); // Reset to first page when changing per_page
+                    window.location.href = url.toString();
+                });
+            }
+
+            // Handle pagination button clicks
+            const paginationBtns = document.querySelectorAll('.pagination-btn-active[data-url]');
+            paginationBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = new URL(this.dataset.url);
+                    // Preserve current per_page value
+                    const currentPerPage = new URLSearchParams(window.location.search).get(
+                        'per_page');
+                    if (currentPerPage) {
+                        url.searchParams.set('per_page', currentPerPage);
+                    }
+                    window.location.href = url.toString();
+                });
+            });
+        });
+    </script>
 @endif
