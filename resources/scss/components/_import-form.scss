@@ -1,0 +1,298 @@
+// Import Form Component - Generic and Reusable
+// Sử dụng @apply với Tailwind CSS classes
+
+.import {
+    &-page {
+        @apply min-h-screen bg-gray-50 p-4;
+    }
+}
+
+.form {
+    &-section {
+        @apply max-w-7xl mx-auto space-y-6;
+    }
+
+    &-card {
+        @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
+    }
+
+    &-step {
+        @apply space-y-6 p-6 border-b border-gray-200;
+
+        &:last-child {
+            @apply border-b-0;
+        }
+    }
+
+    &-grid {
+        @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    }
+
+    &-field {
+        @apply space-y-2;
+    }
+
+    &-actions {
+        @apply flex flex-col sm:flex-row gap-4 justify-center sm:justify-start p-6 bg-gray-50 border-t border-gray-200;
+    }
+}
+
+.page {
+    &-header {
+        @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-lg border border-gray-200 mb-6;
+    }
+
+    &-title {
+        @apply text-3xl font-bold text-gray-900 m-0;
+    }
+
+    &-subtitle {
+        @apply text-lg text-gray-600 mt-2;
+    }
+}
+
+.header {
+    &-content {
+        @apply flex-1;
+    }
+
+    &-actions {
+        @apply flex gap-2;
+    }
+}
+
+.step {
+    &-header {
+        @apply mb-6;
+    }
+
+    &-title {
+        @apply text-xl font-semibold text-gray-900 flex items-center gap-3 mb-2;
+    }
+
+    &-number {
+        @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold rounded-full text-sm;
+    }
+
+    &-help {
+        @apply flex items-start gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm;
+
+        i {
+            @apply text-blue-600 mt-0.5;
+        }
+    }
+}
+
+.data {
+    &-form {
+        @apply space-y-0;
+    }
+}
+
+.field {
+    &-label {
+        @apply block text-sm font-semibold text-gray-700 mb-1;
+
+        &.required {
+            &::after {
+                content: ' *';
+                @apply text-red-500;
+            }
+        }
+    }
+
+    &-input {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
+
+        &::placeholder {
+            @apply text-gray-400;
+        }
+
+        &:focus {
+            @apply outline-none ring-2 ring-blue-500 border-transparent;
+        }
+
+        &.is-invalid {
+            @apply border-red-300 ring-2 ring-red-200;
+        }
+    }
+
+    &-select {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
+
+        &:focus {
+            @apply outline-none ring-2 ring-blue-500 border-transparent;
+        }
+
+        &.is-invalid {
+            @apply border-red-300 ring-2 ring-red-200;
+        }
+    }
+
+    &-error {
+        @apply text-sm text-red-600 mt-1 hidden;
+
+        &.show {
+            @apply block;
+        }
+    }
+}
+
+.serial {
+    &-section {
+        @apply space-y-4;
+    }
+
+    &-title {
+        @apply text-lg font-semibold text-gray-800 mb-4;
+    }
+
+    &-input-group {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+    }
+
+    &-field {
+        @apply space-y-2;
+    }
+
+    &-input {
+        @apply font-mono;
+    }
+
+    &-preview {
+        @apply mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg;
+    }
+}
+
+.preview {
+    &-label {
+        @apply block text-sm font-semibold text-gray-700 mb-3;
+    }
+
+    &-range {
+        @apply flex items-center gap-4 mt-2;
+    }
+
+    &-value {
+        @apply font-mono px-3 py-2 bg-white border border-gray-300 rounded text-gray-800 min-w-20 text-center;
+    }
+}
+
+.range {
+    &-arrow {
+        @apply text-lg text-gray-500 font-bold;
+    }
+}
+
+.validation {
+    &-info {
+        @apply mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg;
+    }
+
+    &-item {
+        @apply flex justify-between items-center text-sm;
+    }
+
+    &-label {
+        @apply font-semibold text-gray-700;
+    }
+
+    &-value {
+        @apply font-mono text-gray-900 bg-white px-2 py-1 rounded border;
+    }
+}
+
+.btn {
+    &-back {
+        @apply inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline font-medium;
+
+        &:hover {
+            @apply no-underline text-gray-800;
+        }
+    }
+
+    &-submit {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
+
+        &:hover {
+            @apply bg-green-700;
+        }
+
+        &:disabled {
+            @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
+
+            &:hover {
+                @apply bg-gray-300;
+            }
+        }
+    }
+
+    &-cancel {
+        @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
+
+        &:hover {
+            @apply no-underline text-gray-800 bg-gray-200;
+        }
+    }
+}
+
+// Print styles
+@media print {
+    .import {
+        &-page {
+            @apply p-0 bg-white;
+        }
+    }
+
+    .header {
+        &-actions {
+            @apply hidden;
+        }
+    }
+
+    .form {
+        &-actions {
+            @apply hidden;
+        }
+    }
+
+    .btn {
+        &-back {
+            @apply hidden;
+        }
+    }
+}
+
+// Focus states and accessibility
+.field {
+
+    &-input:focus,
+    &-select:focus {
+        @apply ring-2 ring-blue-500 ring-opacity-50;
+    }
+}
+
+.btn {
+
+    &-submit:focus,
+    &-cancel:focus,
+    &-back:focus {
+        @apply outline-none ring-2 ring-offset-2;
+    }
+}
+
+// Animation utilities
+.fade-in {
+    @apply opacity-0;
+    animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        @apply opacity-0;
+    }
+
+    to {
+        @apply opacity-100;
+    }
+}

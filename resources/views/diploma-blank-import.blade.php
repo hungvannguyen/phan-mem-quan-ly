@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('content')
-    <main class="diploma-blank-import">
+    <main class="import-page">
         {{-- Hiển thị thông báo --}}
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -28,31 +28,29 @@
             </div>
         @endif
 
-        <div class="import-form-section">
+        <div class="form-section">
             <!-- Page Header -->
-            <div class="import-page-header">
+            <div class="page-header">
                 <div class="header-content">
-                    <h1 class="import-page-title">Nhập phôi văn bằng</h1>
-                    <p class="import-page-subtitle">Nhập thông tin phôi văn bằng được X02 cấp vào hệ thống</p>
+                    <h1 class="page-title">Nhập phôi văn bằng</h1>
+                    <p class="page-subtitle">Nhập thông tin phôi văn bằng được X02 cấp vào hệ thống</p>
                 </div>
                 <div class="header-actions">
                     <a href="{{ route('diploma-blank-management') }}" class="btn-back">
-                        <i class="fas fa-arrow-left"></i>
                         Quay lại
                     </a>
                 </div>
             </div>
 
             <!-- Import Form -->
-            <div class="import-form-card">
-                <form class="diploma-import-form" method="POST" action="{{ route('diploma-blank.import.store') }}"
-                    id="importForm">
+            <div class="form-card">
+                <form class="data-form" method="POST" action="{{ route('diploma-blank.import.store') }}" id="importForm">
                     @csrf
 
                     <!-- Step 1: Chọn loại văn bằng -->
-                    <div class="form-section">
-                        <div class="section-header">
-                            <h3 class="section-title">
+                    <div class="form-step">
+                        <div class="step-header">
+                            <h3 class="step-title">
                                 <span class="step-number">1</span>
                                 Thông tin cơ bản
                             </h3>
@@ -100,13 +98,13 @@
                     </div>
 
                     <!-- Step 2: Serial Range -->
-                    <div class="form-section">
-                        <div class="section-header">
-                            <h3 class="section-title">
+                    <div class="form-step">
+                        <div class="step-header">
+                            <h3 class="step-title">
                                 <span class="step-number">2</span>
                                 Thông tin Serial
                             </h3>
-                            <div class="section-help">
+                            <div class="step-help">
                                 <i class="fas fa-info-circle"></i>
                                 <span>Serial có thể có định dạng: [Cố định 1][Số chạy], [Cố định 1][Số chạy][Cố định 2],
                                     hoặc [Số chạy][Cố định 2]</span>
@@ -191,49 +189,6 @@
             </div>
         </div>
     </main>
-
-    <style>
-        .serial-range-group {
-            display: flex;
-            align-items: flex-end;
-            gap: 15px;
-            margin: 10px 0;
-        }
-
-        .serial-range-group .serial-field {
-            flex: 1;
-        }
-
-        .range-separator {
-            padding: 0 10px;
-            font-weight: 500;
-            color: #666;
-            margin-bottom: 5px;
-            white-space: nowrap;
-        }
-
-        .preview-range {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 5px;
-        }
-
-        .range-arrow {
-            font-size: 18px;
-            color: #666;
-            font-weight: bold;
-        }
-
-        .preview-value {
-            font-family: monospace;
-            padding: 5px 10px;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            min-width: 80px;
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

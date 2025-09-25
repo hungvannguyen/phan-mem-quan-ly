@@ -100,7 +100,7 @@
 
                     <!-- Search Actions -->
                     <div class="search-actions">
-                        <button type="submit" class="btn-search">
+                        <button type="submit" class="btn-search" id="search-btn" disabled>
                             <i class="fas fa-search"></i>
                             Tìm kiếm
                         </button>
@@ -143,4 +143,69 @@
             </div>
         </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get form elements
+            const searchForm = document.querySelector('.search-form');
+            const searchBtn = document.getElementById('search-btn');
+            const formFields = [
+                'document_reference',
+                'type_id',
+                'status',
+                'import_date_from',
+                'import_date_to',
+                'issue_date_from'
+            ];
+
+            // Function to check if form has any data
+            function validateForm() {
+                let hasData = false;
+
+                formFields.forEach(fieldName => {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (field && field.value && field.value.trim() !== '') {
+                        hasData = true;
+                    }
+                });
+
+                // Enable/disable search button
+                if (hasData) {
+                    searchBtn.disabled = false;
+                    searchBtn.classList.remove('btn-search-disabled');
+                    searchBtn.classList.add('btn-search-enabled');
+                } else {
+                    searchBtn.disabled = true;
+                    searchBtn.classList.add('btn-search-disabled');
+                    searchBtn.classList.remove('btn-search-enabled');
+                }
+            }
+
+            // Add event listeners to all form fields
+            formFields.forEach(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    // Handle different input types
+                    if (field.type === 'select-one') {
+                        field.addEventListener('change', validateForm);
+                    } else {
+                        field.addEventListener('input', validateForm);
+                        field.addEventListener('change', validateForm);
+                    }
+                }
+            });
+
+            // Initial validation on page load
+            validateForm();
+
+            // Prevent form submission if no data
+            searchForm.addEventListener('submit', function(e) {
+                if (searchBtn.disabled) {
+                    e.preventDefault();
+                    alert('Vui lòng nhập ít nhất một tiêu chí tìm kiếm!');
+                    return false;
+                }
+            });
+        });
+    </script>
 @endsection
