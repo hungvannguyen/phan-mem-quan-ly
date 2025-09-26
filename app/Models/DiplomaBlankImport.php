@@ -11,7 +11,7 @@ class DiplomaBlankImport extends Model
 {
     use HasFactory;
     protected $table = 'diploma_blank_import';
-    protected $primaryKey = 'import_id';
+    // Primary key sử dụng mặc định 'id' từ $table->id() trong migration
 
     protected $fillable = [
         'type_id',

@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Jobs\ProcessDiplomaBlankImportJob;
+use App\Models\DiplomaBlankImport;
+use App\Enums\ImportStatus;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+
+class ProcessPendingImports extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'imports:process-pending {--limit=5 : Maximum number of imports to process per run}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Process pending DiplomaBlankImport records by dispatching ProcessDiplomaBlankImportJob';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $limit = (int) $this->option('limit');
+
+        $this->info('Scanning for pending DiplomaBlankImport records...');
+
+        // Lấy các import đang pending
+        $pendingImports = DiplomaBlankImport::where('status', ImportStatus::PENDING)
+            ->orderBy('created_at', 'asc') // FIFO - First In, First Out
+            ->limit($limit)
+            ->get();
+
+        if ($pendingImports->isEmpty()) {
+            $this->info('No pending imports found.');
+            return Command::SUCCESS;
+        }
+
+        $this->info("Found {$pendingImports->count()} pending import(s). Dispatching jobs...");
+
+        $dispatchedCount = 0;
+
+        foreach ($pendingImports as $import) {
+            try {
+                // Dispatch job để xử lý import
+                ProcessDiplomaBlankImportJob::dispatch($import);
+
+                $dispatchedCount++;
+
+                $this->line("✓ Dispatched job for Import ID: {$import->id} - {$import->document_reference}");
+
+                Log::info("Dispatched ProcessDiplomaBlankImportJob for import ID: {$import->id}");
+            } catch (\Exception $e) {
+                $this->error("✗ Failed to dispatch job for Import ID: {$import->id} - Error: {$e->getMessage()}");
+
+                Log::error("Failed to dispatch job for import ID: {$import->id}", [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        }
+
+        $this->info("Successfully dispatched {$dispatchedCount} job(s).");
+
+        // Log thống kê
+        $this->displayStatistics();
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Hiển thị thống kê về trạng thái imports
+     */
+    private function displayStatistics(): void
+    {
+        $stats = [
+            'Pending' => DiplomaBlankImport::where('status', ImportStatus::PENDING)->count(),
+            'Processing' => DiplomaBlankImport::where('status', ImportStatus::PROCESSING)->count(),
+            'Completed' => DiplomaBlankImport::where('status', ImportStatus::COMPLETED)->count(),
+            'Failed' => DiplomaBlankImport::where('status', ImportStatus::FAILED)->count(),
+        ];
+
+        $this->newLine();
+        $this->info('Import Statistics:');
+
+        foreach ($stats as $status => $count) {
+            $this->line("  {$status}: {$count}");
+        }
+    }
+}

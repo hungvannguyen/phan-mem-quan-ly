@@ -44,7 +44,7 @@
 
             <!-- Import Form -->
             <div class="form-card">
-                <form class="data-form" method="POST" action="{{ route('diploma-blank.import.store') }}" id="importForm">
+                <form class="data-form" method="POST" action="{{ route('diploma-blank-import.store') }}" id="importForm">
                     @csrf
 
                     <!-- Step 1: Chọn loại văn bằng -->
@@ -85,14 +85,6 @@
                                 <input type="date" id="issue_date" name="issue_date" class="field-input"
                                     value="{{ old('issue_date', date('Y-m-d')) }}" required>
                                 <div class="field-error" id="issue_date_error"></div>
-                            </div>
-
-                            <div class="form-field">
-                                <label for="quantity" class="field-label required">Số lượng phôi được cấp</label>
-                                <input type="number" id="quantity" name="quantity" class="field-input"
-                                    placeholder="Nhập số lượng phôi" value="{{ old('quantity') }}" min="1"
-                                    max="10000" required>
-                                <div class="field-error" id="quantity_error"></div>
                             </div>
                         </div>
                     </div>
@@ -170,7 +162,6 @@
                                 <span class="validation-label">Số lượng tính toán:</span>
                                 <span class="validation-value" id="calculated_quantity">--</span>
                             </div>
-                            <div class="field-error" id="quantity_validation_error"></div>
                         </div>
                     </div>
 
@@ -200,7 +191,6 @@
             const typeId = document.getElementById('type_id');
             const documentReference = document.getElementById('document_reference');
             const issueDate = document.getElementById('issue_date');
-            const quantityInput = document.getElementById('quantity');
 
             // Serial inputs
             const prefix = document.getElementById('prefix');
@@ -221,16 +211,6 @@
                     errorElement.style.display = 'block';
                     errorElement.style.color = 'red';
                 }
-
-                // Also show quantity error in validation area
-                if (elementId === 'quantity') {
-                    const validationError = document.getElementById('quantity_validation_error');
-                    if (validationError) {
-                        validationError.textContent = message;
-                        validationError.style.display = 'block';
-                        validationError.style.color = 'red';
-                    }
-                }
             }
 
             function clearError(elementId) {
@@ -239,29 +219,13 @@
                     errorElement.textContent = '';
                     errorElement.style.display = 'none';
                 }
-
-                // Also clear quantity error in validation area
-                if (elementId === 'quantity') {
-                    const validationError = document.getElementById('quantity_validation_error');
-                    if (validationError) {
-                        validationError.textContent = '';
-                        validationError.style.display = 'none';
-                    }
-                }
             }
 
             function clearAllErrors() {
-                const errorIds = ['type_id', 'document_reference', 'issue_date', 'quantity', 'serial',
+                const errorIds = ['type_id', 'document_reference', 'issue_date', 'serial',
                     'prefix', 'from_number', 'to_number', 'suffix'
                 ];
                 errorIds.forEach(id => clearError(id));
-
-                // Also clear quantity validation error
-                const quantityValidationError = document.getElementById('quantity_validation_error');
-                if (quantityValidationError) {
-                    quantityValidationError.textContent = '';
-                    quantityValidationError.style.display = 'none';
-                }
             }
 
             // Update serial previews
@@ -350,14 +314,6 @@
                         isValid = false;
                     } else if (fromNum >= toNum) {
                         isValid = false;
-                    } else {
-                        // 5. Validate quantity matching - MUST match calculated quantity
-                        const calculatedQty = toNum - fromNum + 1;
-                        const inputQty = parseInt(quantityInput.value);
-
-                        if (calculatedQty !== inputQty) {
-                            isValid = false;
-                        }
                     }
                 }
 
@@ -401,27 +357,6 @@
                         }
                         break;
 
-                    case 'quantity':
-                        if (!field.value || parseInt(field.value) <= 0) {
-                            showError('quantity', 'Vui lòng nhập số lượng phôi hợp lệ (lớn hơn 0)');
-                        } else if (fromNumber.value && toNumber.value) {
-                            // Check quantity matching when quantity field is validated
-                            const fromNum = parseInt(fromNumber.value);
-                            const toNum = parseInt(toNumber.value);
-
-                            if (!isNaN(fromNum) && !isNaN(toNum) && toNum > fromNum) {
-                                const calculatedQty = toNum - fromNum + 1;
-                                const inputQty = parseInt(field.value);
-
-                                if (calculatedQty !== inputQty) {
-                                    showError('quantity',
-                                        `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                    );
-                                }
-                            }
-                        }
-                        break;
-
                     case 'from_number':
                         if (!field.value.trim()) {
                             showError('from_number', 'Vui lòng nhập số bắt đầu');
@@ -434,18 +369,6 @@
 
                             if (fromNum >= toNum) {
                                 showError('from_number', 'Số bắt đầu phải nhỏ hơn số kết thúc');
-                            } else if (quantityInput.value) {
-                                // Check quantity matching when serial changes
-                                const calculatedQty = toNum - fromNum + 1;
-                                const inputQty = parseInt(quantityInput.value);
-
-                                if (!isNaN(inputQty) && calculatedQty !== inputQty) {
-                                    showError('quantity',
-                                        `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                    );
-                                } else if (calculatedQty === inputQty) {
-                                    clearError('quantity');
-                                }
                             }
                         }
                         break;
@@ -463,18 +386,6 @@
 
                                 if (fromNum >= toNum) {
                                     showError('to_number', 'Số kết thúc phải lớn hơn số bắt đầu');
-                                } else if (quantityInput.value) {
-                                    // Check quantity matching when serial changes
-                                    const calculatedQty = toNum - fromNum + 1;
-                                    const inputQty = parseInt(quantityInput.value);
-
-                                    if (!isNaN(inputQty) && calculatedQty !== inputQty) {
-                                        showError('quantity',
-                                            `Số lượng không khớp! Tính từ serial: ${calculatedQty}, nhập vào: ${inputQty}`
-                                        );
-                                    } else if (calculatedQty === inputQty) {
-                                        clearError('quantity');
-                                    }
                                 }
                             }
                         }
@@ -509,7 +420,7 @@
             // function autoFillToFields() - Removed
 
             // Event listeners
-            const allInputs = [typeId, documentReference, issueDate, quantityInput, prefix, fromNumber,
+            const allInputs = [typeId, documentReference, issueDate, prefix, fromNumber,
                 toNumber, suffix
             ];
 
