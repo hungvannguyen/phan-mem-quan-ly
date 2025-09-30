@@ -1,156 +1,204 @@
-<div class="diploma-blanks-table-container">
-    <table class="diploma-blanks-data-table">
-        <thead>
-            <tr class="table-header-row">
-                <th class="table-header-cell">Số seri</th>
-                <th class="table-header-cell">Loại phôi</th>
-                <th class="table-header-cell">Trạng thái</th>
-                <th class="table-header-cell">Ngày nhập</th>
-                <th class="table-header-cell">Ngày cấp</th>
-                <th class="table-header-cell">Ngày thu hồi</th>
-                <th class="table-header-cell">Lý do cấp</th>
-                <th class="table-header-cell">Lý do thu hồi</th>
-                <th class="table-header-cell">Hành động</th>
-            </tr>
-        </thead>
-        <tbody class="table-body">
-            <tr id="loading" class="loading-overlay hidden">
-                <td colspan="9" class="loading-cell">
-                    <div class="spinner"></div>
-                    <span class="loading-text">Đang tải dữ liệu...</span>
-                </td>
-            </tr>
-            @forelse($diplomaBlanks as $index => $blank)
-                <tr class="table-row" data-blank-id="{{ $blank->diploma_blank_id }}" onclick="toggleRowHighlight(this)">
-                    <td class="table-cell">
-                        <span class="serial-number">{{ $blank->serial_number }}</span>
-                    </td>
-                    <td class="table-cell">
-                        @if ($blank->type)
-                            <div class="type-info">
-                                <span class="type-name">{{ $blank->type->type_name }}</span>
-                                <small
-                                    class="type-description text-muted d-block">{{ $blank->type->description ?? '' }}</small>
-                            </div>
-                        @else
-                            <span class="text-muted">Chưa xác định</span>
-                        @endif
-                    </td>
-                    <td class="table-cell">
-                        <span
-                            class="badge @if ($blank->status === 'InStock') badge-primary
-                            @elseif($blank->status === 'Issued') badge-success
-                            @elseif($blank->status === 'Damaged') badge-danger
-                            @else badge-warning @endif">
-                            @switch($blank->status)
-                                @case('InStock')
-                                    Trong kho
-                                @break
+{{-- Table component cho DiplomaBlank --}}
+<div class="data-table-container">
+    <div class="table-header">
+        <h3 class="table-title">Danh sách Phôi Văn Bằng</h3>
+        <div class="table-stats">
+            <span class="stat-item">
+                <strong>{{ $diplomaBlanks->total() ?? 0 }}</strong> bản ghi
+            </span>
+        </div>
+    </div>
 
-                                @case('Issued')
-                                    Đã cấp
-                                @break
-
-                                @case('Damaged')
-                                    Hư hỏng
-                                @break
-
-                                @case('Recalled')
-                                    Thu hồi
-                                @break
-
-                                @default
-                                    {{ $blank->status }}
-                            @endswitch
-                        </span>
-                    </td>
-                    <td class="table-cell">
-                        @if ($blank->import_date)
-                            <span class="import-date">{{ $blank->import_date->format('d/m/Y') }}</span>
-                        @else
-                            <span class="text-muted">--</span>
-                        @endif
-                    </td>
-                    <td class="table-cell">
-                        @if ($blank->issue_date)
-                            <span class="issue-date">{{ $blank->issue_date->format('d/m/Y') }}</span>
-                        @else
-                            <span class="text-muted">--</span>
-                        @endif
-                    </td>
-                    <td class="table-cell">
-                        @if ($blank->recall_date)
-                            <span class="recall-date">{{ $blank->recall_date->format('d/m/Y') }}</span>
-                        @else
-                            <span class="text-muted">--</span>
-                        @endif
-                    </td>
-                    <td class="table-cell">
-                        <div class="issue-reason">
-                            @if ($blank->issue_reason)
-                                <span class="reason-text">{{ Str::limit($blank->issue_reason, 30) }}</span>
-                                @if (strlen($blank->issue_reason) > 30)
-                                    <i class="fas fa-info-circle text-info ml-1" title="{{ $blank->issue_reason }}"></i>
-                                @endif
-                            @else
-                                <span class="text-muted">--</span>
-                            @endif
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="recall-reason">
-                            @if ($blank->recall_reason)
-                                <span class="reason-text">{{ Str::limit($blank->recall_reason, 30) }}</span>
-                                @if (strlen($blank->recall_reason) > 30)
-                                    <i class="fas fa-info-circle text-info ml-1"
-                                        title="{{ $blank->recall_reason }}"></i>
-                                @endif
-                            @else
-                                <span class="text-muted">--</span>
-                            @endif
-                        </div>
-                    </td>
-                    <td class="table-cell">
-                        <div class="action-buttons">
-                            <button class="btn btn-table btn-sm" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i> Xem
-                            </button>
-
-                            @if ($blank->status === 'InStock')
-                                <button class="btn btn-table btn-sm btn-success" title="Cấp phôi">
-                                    <i class="fas fa-paper-plane"></i> Cấp
-                                </button>
-                            @elseif ($blank->status === 'Issued')
-                                <button class="btn btn-table btn-sm btn-warning" title="Thu hồi phôi">
-                                    <i class="fas fa-undo"></i> Thu hồi
-                                </button>
-                            @endif
-
-                            @if ($blank->status !== 'Damaged')
-                                <button class="btn btn-table btn-sm btn-danger" title="Báo hư hỏng">
-                                    <i class="fas fa-exclamation-triangle"></i> Hư hỏng
-                                </button>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @empty
+    @if ($diplomaBlanks && $diplomaBlanks->count() > 0)
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td colspan="9" class="py-4 text-center">
-                            <div class="empty-state">
-                                <i class="fas fa-file-contract fa-3x text-muted mb-3"></i>
-                                <p class="text-muted mb-0">Không tìm thấy phôi văn bằng nào</p>
-                                <small class="text-muted">Hãy thử điều chỉnh bộ lọc tìm kiếm hoặc thêm phôi mới</small>
-                            </div>
+                        <th class="th">Số seri</th>
+                        <th class="th">Loại phôi</th>
+                        <th class="th">Trạng thái</th>
+                        <th class="th">Ngày nhập</th>
+                        <th class="th">Ngày cấp</th>
+                        <th class="th">Ngày thu hồi</th>
+                        <th class="th">Lý do cấp</th>
+                        <th class="th">Lý do thu hồi</th>
+                        <th class="th">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="loading" class="loading-overlay hidden">
+                        <td colspan="9" class="loading-cell">
+                            <div class="spinner"></div>
+                            <span class="loading-text">Đang tải dữ liệu...</span>
                         </td>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                    @foreach ($diplomaBlanks as $blank)
+                        <tr class="table-row" data-blank-id="{{ $blank->diploma_blank_id }}"
+                            onclick="toggleRowHighlight(this)">
+                            <td class="td">
+                                <span class="serial-number">{{ $blank->serial_number }}</span>
+                            </td>
+                            <td class="td">
+                                @if ($blank->type)
+                                    <div class="type-info">
+                                        <span class="type-name">{{ $blank->type->type_name }}</span>
+                                        <small
+                                            class="type-description text-muted d-block">{{ $blank->type->description ?? '' }}</small>
+                                    </div>
+                                @else
+                                    <span class="text-muted">Chưa xác định</span>
+                                @endif
+                            </td>
+                            <td class="td">
+                                @php
+                                    $statusClass = match ($blank->status) {
+                                        'InStock' => 'status-pending',
+                                        'Issued' => 'status-completed',
+                                        'Damaged' => 'status-failed',
+                                        'Recalled' => 'status-processing',
+                                        default => 'status-unknown',
+                                    };
+                                @endphp
+                                <span class="status-badge {{ $statusClass }}">
+                                    @switch($blank->status)
+                                        @case('InStock')
+                                            Trong kho
+                                        @break
 
-    <!-- Custom Pagination Section -->
-    <div class="diploma-blanks-pagination-wrapper">
-        <x-pagination.custom :paginator="$diplomaBlanks" item-name="phôi văn bằng" label="Diploma Blanks Pagination Navigation"
-            :per-page-options="[5, 10, 15, 25, 50]" />
-    </div>
+                                        @case('Issued')
+                                            Đã cấp
+                                        @break
+
+                                        @case('Damaged')
+                                            Hư hỏng
+                                        @break
+
+                                        @case('Recalled')
+                                            Thu hồi
+                                        @break
+
+                                        @default
+                                            {{ $blank->status }}
+                                    @endswitch
+                                </span>
+                            </td>
+                            <td class="td">
+                                @if ($blank->import_date)
+                                    <span class="date-text">{{ $blank->import_date->format('d/m/Y') }}</span>
+                                @else
+                                    <span class="text-muted">--</span>
+                                @endif
+                            </td>
+                            <td class="td">
+                                @if ($blank->issue_date)
+                                    <span class="date-text">{{ $blank->issue_date->format('d/m/Y') }}</span>
+                                @else
+                                    <span class="text-muted">--</span>
+                                @endif
+                            </td>
+                            <td class="td">
+                                @if ($blank->recall_date)
+                                    <span class="date-text">{{ $blank->recall_date->format('d/m/Y') }}</span>
+                                @else
+                                    <span class="text-muted">--</span>
+                                @endif
+                            </td>
+                            <td class="td">
+                                <div class="issue-reason">
+                                    @if ($blank->issue_reason)
+                                        <span class="reason-text">{{ Str::limit($blank->issue_reason, 30) }}</span>
+                                        @if (strlen($blank->issue_reason) > 30)
+                                            <i class="fas fa-info-circle text-info ml-1"
+                                                title="{{ $blank->issue_reason }}"></i>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">--</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="td">
+                                <div class="recall-reason">
+                                    @if ($blank->recall_reason)
+                                        <span class="reason-text">{{ Str::limit($blank->recall_reason, 30) }}</span>
+                                        @if (strlen($blank->recall_reason) > 30)
+                                            <i class="fas fa-info-circle text-info ml-1"
+                                                title="{{ $blank->recall_reason }}"></i>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">--</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="td">
+                                <div class="action-buttons">
+                                    <button type="button" class="btn-action btn-view" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    @if ($blank->status === 'InStock')
+                                        <button type="button" class="btn-action btn-start" title="Cấp phôi">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    @elseif ($blank->status === 'Issued')
+                                        <button type="button" class="btn-action btn-pause" title="Thu hồi phôi">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    @endif
+
+                                    @if ($blank->status !== 'Damaged')
+                                        <button type="button" class="btn-action btn-delete" title="Báo hư hỏng">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+
+    {{-- Custom Pagination Section - Luôn hiển thị khi có pagination --}}
+    @if (isset($diplomaBlanks) && $diplomaBlanks->hasPages())
+        <div class="table-pagination-wrapper">
+            <x-pagination.custom :paginator="$diplomaBlanks" item-name="phôi văn bằng"
+                label="Diploma Blanks Pagination Navigation" :per-page-options="[5, 10, 15, 25, 50]" />
+        </div>
+    @elseif (isset($diplomaBlanks) && $diplomaBlanks->total() > 0)
+        {{-- Hiển thị info khi không có nhiều trang nhưng có dữ liệu --}}
+        <div class="table-pagination-wrapper">
+            <div class="pagination-info">
+                <span class="pagination-text">
+                    Hiển thị {{ $diplomaBlanks->firstItem() ?? 0 }} đến {{ $diplomaBlanks->lastItem() ?? 0 }}
+                    trong tổng số {{ $diplomaBlanks->total() }} phôi văn bằng
+                </span>
+            </div>
+        </div>
+    @endif
+
+    {{-- Empty State --}}
+    @if (!isset($diplomaBlanks) || $diplomaBlanks->count() === 0)
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <h3 class="empty-title">Không có dữ liệu</h3>
+            <p class="empty-message">
+                @if (request()->hasAny(['serial_number', 'type_id', 'status', 'import_date_from', 'import_date_to']))
+                    Không tìm thấy phôi văn bằng nào phù hợp với bộ lọc hiện tại.
+                @else
+                    Chưa có phôi văn bằng nào trong hệ thống.
+                @endif
+            </p>
+            <div class="empty-actions">
+                @if (request()->hasAny(['serial_number', 'type_id', 'status', 'import_date_from', 'import_date_to']))
+                    <a href="{{ route('diploma-blanks.index') }}" class="btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Xóa bộ lọc
+                    </a>
+                @endif
+            </div>
+        </div>
+    @endif
+</div>

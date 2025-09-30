@@ -29,6 +29,11 @@ Route::get(
 )->middleware('auth')->name('diploma-blank-management');
 
 Route::get(
+    '/diploma-blanks',
+    [DiplomaBlankController::class, 'index']
+)->middleware('auth')->name('diploma-blanks.index');
+
+Route::get(
     '/diploma-blank-management/create',
     [DiplomaBlankImportController::class, 'create']
 )->middleware('auth')->name('diploma-blank-import.create');

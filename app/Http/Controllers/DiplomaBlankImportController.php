@@ -8,6 +8,7 @@ use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class DiplomaBlankImportController extends Controller
 {
@@ -144,13 +145,12 @@ class DiplomaBlankImportController extends Controller
     }
 
     /**
-     * Xem chi tiết import
+     * Xem chi tiết import - chuyển hướng đến trang hiển thị DiplomaBlank thuộc import này
      */
-    public function show(DiplomaBlankImport $import): View
+    public function show(DiplomaBlankImport $import)
     {
-        $import->load('diplomaBlankType');
-
-        return view('diploma-blank-import-detail', compact('import'));
+        // Chuyển hướng đến trang diploma-blanks với filter theo import_id
+        return redirect()->route('diploma-blanks.index', ['import_id' => $import->id]);
     }
 
     /**

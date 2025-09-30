@@ -91,6 +91,12 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
 
+                                    <button type="button" class="btn-action btn-blanks" title="Xem phôi được tạo"
+                                        data-import-id="{{ $import->id }}"
+                                        onclick="viewDiplomaBlanks({{ $import->id }})">
+                                        <i class="fas fa-list-alt"></i>
+                                    </button>
+
                                     @if ($import->status === App\Enums\ImportStatus::PENDING)
                                         <button type="button" class="btn-action btn-start" title="Bắt đầu xử lý"
                                             data-import-id="{{ $import->id }}"

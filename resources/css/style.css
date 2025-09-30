@@ -2,1791 +2,2105 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .navbar {
-  @apply mx-auto my-[20px] container max-w-[1500px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
+    @apply mx-auto my-[20px] container max-w-[1500px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
+
 .navbar-menu {
-  @apply grid w-full grid-cols-6 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
+    @apply grid w-full grid-cols-6 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
 }
 
 .menu-item {
-  @apply flex h-full w-full cursor-pointer items-center justify-center px-2 py-4 text-center text-[16px] font-semibold uppercase text-[var(--color-text-secondary)] transition-colors duration-200 ease-in-out hover:bg-[var(--color-secondary-light)];
+    @apply flex h-full w-full cursor-pointer items-center justify-center px-2 py-4 text-center text-[16px] font-semibold uppercase text-[var(--color-text-secondary)] transition-colors duration-200 ease-in-out hover:bg-[var(--color-secondary-light)];
 }
 
 .active {
-  @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)];
+    @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)];
 }
 
 .not-found {
-  @apply flex h-screen flex-col items-center justify-center bg-[var(--color-secondary)];
+    @apply flex h-screen flex-col items-center justify-center bg-[var(--color-secondary)];
 }
+
 .not-found-code {
-  @apply mb-4 text-9xl font-bold text-[var(--color-primary-hover)];
+    @apply mb-4 text-9xl font-bold text-[var(--color-primary-hover)];
 }
+
 .not-found-message {
-  @apply mb-8 text-2xl text-[var(--color-text-secondary)];
+    @apply mb-8 text-2xl text-[var(--color-text-secondary)];
 }
+
 .not-found-button {
-  @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
+    @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
 }
 
 .loading-overlay {
-  @apply absolute inset-0 flex h-full w-full items-center justify-center bg-[var(--color-bg-card)];
+    @apply absolute inset-0 flex h-full w-full items-center justify-center bg-[var(--color-bg-card)];
 }
+
 .loading-overlay td {
-  @apply border-none py-4 text-center;
+    @apply border-none py-4 text-center;
 }
+
 .loading-overlay .spinner {
-  @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-t-transparent align-middle;
+    @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-t-transparent align-middle;
 }
+
 .loading-overlay .loading-text {
-  @apply ml-2;
+    @apply ml-2;
 }
 
 .modal {
-  @apply fixed inset-0 z-10 overflow-y-auto;
+    @apply fixed inset-0 z-10 overflow-y-auto;
 }
+
 .modal__dialog {
-  @apply flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0;
+    @apply flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0;
 }
+
 .modal__overlay {
-  @apply fixed inset-0 bg-[var(--color-bg-overlay)] transition-opacity;
+    @apply fixed inset-0 bg-[var(--color-bg-overlay)] transition-opacity;
 }
+
 .modal__container {
-  @apply relative inline-block transform overflow-hidden rounded-lg bg-[var(--color-bg-card)] text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle;
+    @apply relative inline-block transform overflow-hidden rounded-lg bg-[var(--color-bg-card)] text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle;
 }
+
 .modal__content {
-  @apply bg-[var(--color-bg-card)] px-4 pb-4 pt-5 sm:p-6 sm:pb-4;
+    @apply bg-[var(--color-bg-card)] px-4 pb-4 pt-5 sm:p-6 sm:pb-4;
 }
+
 .modal__header {
-  @apply sm:flex sm:items-start;
+    @apply sm:flex sm:items-start;
 }
+
 .modal__title-wrapper {
-  @apply mx-auto my-4;
+    @apply mx-auto my-4;
 }
+
 .modal__title {
-  @apply text-center text-[30px] font-medium leading-6 text-[var(--color-text-primary)];
+    @apply text-center text-[30px] font-medium leading-6 text-[var(--color-text-primary)];
 }
+
 .modal__body {
-  @apply mt-2;
+    @apply mt-2;
 }
+
 .modal__body .form__grid {
-  @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
 }
+
 .modal__body .form-group {
-  @apply mb-4 sm:mb-0;
+    @apply mb-4 sm:mb-0;
 }
+
 .modal__footer {
-  @apply bg-[var(--color-bg-main)] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
+    @apply bg-[var(--color-bg-main)] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
 }
+
 .modal__footer--action-primary {
-  @apply inline-flex w-full justify-center rounded-md border border-transparent bg-[var(--color-primary)] px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-blue)] focus:ring-offset-2 sm:ml-3 sm:w-auto;
+    @apply inline-flex w-full justify-center rounded-md border border-transparent bg-[var(--color-primary)] px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-blue)] focus:ring-offset-2 sm:ml-3 sm:w-auto;
 }
+
 .modal__footer--action-secondary {
-  @apply mt-3 inline-flex w-full justify-center rounded-md border-[var(--color-border-light)] bg-[var(--color-bg-card)] px-4 py-2 text-base font-medium text-[var(--color-text-secondary)] shadow-sm hover:bg-[var(--color-bg-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-indigo)] focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
+    @apply mt-3 inline-flex w-full justify-center rounded-md border-[var(--color-border-light)] bg-[var(--color-bg-card)] px-4 py-2 text-base font-medium text-[var(--color-text-secondary)] shadow-sm hover:bg-[var(--color-bg-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-indigo)] focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
 }
 
 .students-table-container {
-  @apply w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200;
+    @apply w-full overflow-auto bg-white rounded-lg shadow-sm border border-gray-200;
 }
 
 .students-data-table {
-  @apply w-full border-collapse;
+    @apply w-full border-collapse;
 }
+
 .students-data-table .table-header-row {
-  @apply bg-gray-50 border-b-2 border-gray-200;
+    @apply bg-gray-50 border-b-2 border-gray-200;
 }
+
 .students-data-table .table-header-cell {
-  @apply w-auto max-w-full px-4 py-4 text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
+    @apply w-auto max-w-full px-4 py-4 text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
 }
+
 .students-data-table .table-body {
-  @apply bg-white divide-y divide-gray-200;
+    @apply bg-white divide-y divide-gray-200;
 }
+
 .students-data-table .table-row {
-  @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
+    @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
 }
+
 .students-data-table .table-row:last-child {
-  @apply border-b-0;
+    @apply border-b-0;
 }
+
 .students-data-table .table-row:hover {
-  @apply bg-blue-50 shadow-sm;
+    @apply bg-blue-50 shadow-sm;
 }
+
 .students-data-table .table-row.selected {
-  @apply bg-blue-100 border-blue-200;
+    @apply bg-blue-100 border-blue-200;
 }
+
 .students-data-table .table-cell {
-  @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
+    @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
 }
+
 .students-data-table .table-cell:last-child {
-  @apply border-r-0;
+    @apply border-r-0;
 }
+
 .students-data-table .loading-cell {
-  @apply px-4 py-8 text-center text-gray-500;
+    @apply px-4 py-8 text-center text-gray-500;
 }
+
 .students-data-table .empty-cell {
-  @apply px-4 py-12 text-center;
+    @apply px-4 py-12 text-center;
 }
 
 .row-number {
-  @apply inline-flex items-center justify-center w-8 h-8 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full;
+    @apply inline-flex items-center justify-center w-8 h-8 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full;
 }
 
 .student-code {
-  @apply font-semibold text-blue-600 font-mono text-sm;
+    @apply font-semibold text-blue-600 font-mono text-sm;
 }
 
 .student-info {
-  @apply flex flex-col;
+    @apply flex flex-col;
 }
 
 .student-name {
-  @apply font-medium text-gray-900;
+    @apply font-medium text-gray-900;
 }
 
 .date-birth {
-  @apply text-gray-700 font-mono text-sm;
+    @apply text-gray-700 font-mono text-sm;
 }
 
 .class-name {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800;
 }
 
 .major-info {
-  @apply flex flex-col space-y-1;
+    @apply flex flex-col space-y-1;
 }
 
 .major-name {
-  @apply font-medium text-gray-900;
+    @apply font-medium text-gray-900;
 }
 
 .major-code {
-  @apply text-xs text-gray-500 font-mono;
+    @apply text-xs text-gray-500 font-mono;
 }
 
 .nation {
-  @apply text-sm text-gray-800 font-medium;
+    @apply text-sm text-gray-800 font-medium;
 }
 
 .nationality-info {
-  @apply flex items-center justify-center space-x-1;
+    @apply flex items-center justify-center space-x-1;
 }
 
 .nationality {
-  @apply text-sm text-gray-800;
+    @apply text-sm text-gray-800;
 }
+
 .nationality[title="Quốc tịch nước ngoài"] {
-  @apply text-blue-600 font-medium;
+    @apply text-blue-600 font-medium;
 }
 
 .book-number {
-  @apply text-center;
+    @apply text-center;
 }
 
 .book-number-text {
-  @apply text-sm font-mono font-semibold text-gray-900;
+    @apply text-sm font-mono font-semibold text-gray-900;
 }
 
 .degree-count {
-  @apply flex items-center justify-center;
+    @apply flex items-center justify-center;
 }
 
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
 }
+
 .badge.badge-primary {
-  @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-100 text-blue-800;
 }
+
 .badge.badge-success {
-  @apply bg-green-100 text-green-800;
+    @apply bg-green-100 text-green-800;
 }
+
 .badge.badge-warning {
-  @apply bg-yellow-100 text-yellow-800;
+    @apply bg-yellow-100 text-yellow-800;
 }
+
 .badge.badge-info {
-  @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-100 text-blue-800;
 }
+
 .badge.badge-danger {
-  @apply bg-red-100 text-red-800;
+    @apply bg-red-100 text-red-800;
 }
 
 .badge-success {
-  color: #065f46;
-  background-color: #d1fae5;
+    color: #065f46;
+    background-color: #d1fae5;
 }
 
 .badge-warning {
-  color: #92400e;
-  background-color: #fef3c7;
+    color: #92400e;
+    background-color: #fef3c7;
 }
 
 .badge-info {
-  color: #1e40af;
-  background-color: #dbeafe;
+    color: #1e40af;
+    background-color: #dbeafe;
 }
 
 .action-buttons {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
 }
 
 .btn-table {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  line-height: 1.25rem;
-  border-radius: 0.25rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: all 0.15s ease-in-out;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.15s ease-in-out;
 }
 
 .btn-table:hover {
-  text-decoration: none;
-  transform: translateY(-1px);
+    text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .btn-table.btn-sm {
-  padding: 0.125rem 0.375rem;
-  font-size: 0.6875rem;
+    padding: 0.125rem 0.375rem;
+    font-size: 0.6875rem;
 }
 
 .btn-table i {
-  font-size: 0.75rem;
+    font-size: 0.75rem;
 }
 
 /* Default button style */
 .btn-table {
-  color: #374151;
-  background-color: #f9fafb;
-  border-color: #d1d5db;
+    color: #374151;
+    background-color: #f9fafb;
+    border-color: #d1d5db;
 }
 
 .btn-table:hover {
-  color: #1f2937;
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+    color: #1f2937;
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
 }
 
 /* Success button */
 .btn-table.btn-success {
-  color: #065f46;
-  background-color: #d1fae5;
-  border-color: #a7f3d0;
+    color: #065f46;
+    background-color: #d1fae5;
+    border-color: #a7f3d0;
 }
 
 .btn-table.btn-success:hover {
-  color: #064e3b;
-  background-color: #a7f3d0;
-  border-color: #6ee7b7;
+    color: #064e3b;
+    background-color: #a7f3d0;
+    border-color: #6ee7b7;
 }
 
 /* Info button */
 .btn-table.btn-info {
-  color: #1e40af;
-  background-color: #dbeafe;
-  border-color: #93c5fd;
+    color: #1e40af;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
 }
 
 .btn-table.btn-info:hover {
-  color: #1e3a8a;
-  background-color: #bfdbfe;
-  border-color: #60a5fa;
+    color: #1e3a8a;
+    background-color: #bfdbfe;
+    border-color: #60a5fa;
 }
 
 /* Primary button */
 .btn-table.btn-primary {
-  color: #1e3a8a;
-  background-color: #dbeafe;
-  border-color: #93c5fd;
+    color: #1e3a8a;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
 }
 
 .btn-table.btn-primary:hover {
-  color: #1e40af;
-  background-color: #bfdbfe;
-  border-color: #60a5fa;
+    color: #1e40af;
+    background-color: #bfdbfe;
+    border-color: #60a5fa;
 }
 
 .empty-state {
-  text-align: center;
-  padding: 2rem;
+    text-align: center;
+    padding: 2rem;
 }
 
 .empty-state i {
-  margin-bottom: 1rem;
-  color: #9ca3af;
+    margin-bottom: 1rem;
+    color: #9ca3af;
 }
 
 .text-muted {
-  color: #6b7280;
+    color: #6b7280;
 }
 
 .text-center {
-  text-align: center;
+    text-align: center;
 }
 
 .py-4 {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .mb-3 {
-  margin-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .mb-0 {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .action-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .btn-table {
-    justify-content: center;
-    width: 100%;
-  }
-  .major-info {
-    font-size: 0.875rem;
-  }
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-table {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .major-info {
+        font-size: 0.875rem;
+    }
 }
+
 .diploma-import-form {
-  @apply space-y-8;
+    @apply space-y-8;
 }
 
 .header-with-nav {
-  @apply space-y-4;
+    @apply space-y-4;
 }
 
 .breadcrumb {
-  @apply flex items-center;
+    @apply flex items-center;
 }
 
 .breadcrumb-item {
-  @apply text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200;
+    @apply text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200;
 }
+
 .breadcrumb-item i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .form-section {
-  @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm;
+    @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm;
 }
 
 .section-title {
-  @apply flex items-center text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200;
+    @apply flex items-center text-lg font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200;
 }
 
 .step-number {
-  @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full mr-3;
+    @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full mr-3;
 }
 
 .form-grid-2 {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 
 .field-label {
-  @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-medium text-gray-700 mb-2;
 }
+
 .field-label.required::after {
-  content: " *";
-  @apply text-red-500;
+    content: " *";
+    @apply text-red-500;
 }
 
 .field-help {
-  @apply text-xs text-gray-500 mt-1 block;
+    @apply text-xs text-gray-500 mt-1 block;
 }
 
 .field-input,
 .field-select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
 
 .serial-group {
-  @apply space-y-6;
+    @apply space-y-6;
 }
 
 .serial-fields {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
 }
 
 .serial-preview {
-  @apply bg-gray-50 border border-gray-200 rounded-lg p-4;
+    @apply bg-gray-50 border border-gray-200 rounded-lg p-4;
 }
+
 .serial-preview .field-label {
-  @apply text-sm font-medium text-gray-600 mb-2;
+    @apply text-sm font-medium text-gray-600 mb-2;
 }
 
 .preview-box {
-  @apply bg-white border border-gray-300 rounded-md px-3 py-2 min-h-[40px] flex items-center;
+    @apply bg-white border border-gray-300 rounded-md px-3 py-2 min-h-[40px] flex items-center;
 }
 
 .preview-text {
-  @apply text-gray-400 italic text-sm;
+    @apply text-gray-400 italic text-sm;
 }
 
 .serial-complete {
-  @apply font-mono font-semibold text-gray-900 bg-blue-50 px-2 py-1 rounded text-sm;
+    @apply font-mono font-semibold text-gray-900 bg-blue-50 px-2 py-1 rounded text-sm;
 }
 
 .validation-summary {
-  @apply bg-blue-50 border border-blue-200 rounded-lg p-4;
+    @apply bg-blue-50 border border-blue-200 rounded-lg p-4;
 }
+
 .validation-summary h4 {
-  @apply text-blue-800 font-semibold mb-3 flex items-center;
+    @apply text-blue-800 font-semibold mb-3 flex items-center;
 }
+
 .validation-summary h4 i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .validation-item {
-  @apply flex items-center space-x-3 py-2;
+    @apply flex items-center space-x-3 py-2;
 }
+
 .validation-item i {
-  @apply text-sm;
+    @apply text-sm;
 }
+
 .validation-item span {
-  @apply text-sm text-gray-700;
+    @apply text-sm text-gray-700;
 }
 
 .form-actions {
-  @apply flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200;
+    @apply flex flex-col sm:flex-row gap-3 justify-end pt-6 border-t border-gray-200;
 }
 
 .btn-primary,
 .btn-secondary,
 .btn-cancel {
-  @apply px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center;
+    @apply px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center;
 }
+
 .btn-primary i,
 .btn-secondary i,
 .btn-cancel i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
+
 .btn-primary:disabled {
-  @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+    @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
 }
 
 .btn-secondary {
-  @apply bg-gray-600 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-gray-600 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
 }
 
 .btn-cancel {
-  @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
 }
 
 .text-success {
-  @apply text-green-600;
+    @apply text-green-600;
 }
 
 .text-danger {
-  @apply text-red-600;
+    @apply text-red-600;
 }
 
 .text-muted {
-  @apply text-gray-400;
+    @apply text-gray-400;
 }
 
 @media (max-width: 768px) {
-  .serial-fields {
-    @apply grid-cols-1;
-  }
-  .form-grid-2 {
-    @apply grid-cols-1;
-  }
-  .form-actions {
-    @apply flex-col;
-  }
-  .step-number {
-    @apply w-6 h-6 text-xs mr-2;
-  }
+    .serial-fields {
+        @apply grid-cols-1;
+    }
+
+    .form-grid-2 {
+        @apply grid-cols-1;
+    }
+
+    .form-actions {
+        @apply flex-col;
+    }
+
+    .step-number {
+        @apply w-6 h-6 text-xs mr-2;
+    }
 }
+
 .diploma-blank-import {
-  @apply min-h-screen bg-gray-50 py-8;
+    @apply min-h-screen bg-gray-50 py-8;
 }
 
 .import-form-section {
-  @apply max-w-4xl mx-auto px-4;
+    @apply max-w-4xl mx-auto px-4;
 }
 
 .import-page-header {
-  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4;
+    @apply flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4;
 }
 
 .header-content {
-  @apply flex-1;
+    @apply flex-1;
 }
 
 .import-page-title {
-  @apply text-3xl font-bold text-gray-900 mb-2;
+    @apply text-3xl font-bold text-gray-900 mb-2;
 }
 
 .import-page-subtitle {
-  @apply text-lg text-gray-600;
+    @apply text-lg text-gray-600;
 }
 
 .header-actions {
-  @apply flex-shrink-0;
+    @apply flex-shrink-0;
 }
 
 .btn-back {
-  @apply inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200;
+    @apply inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200;
 }
+
 .btn-back i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .import-form-card {
-  @apply bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden;
+    @apply bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden;
 }
 
 .diploma-import-form {
-  @apply p-8;
+    @apply p-8;
 }
 
 .form-section {
-  @apply mb-8 pb-8 border-b border-gray-200;
+    @apply mb-8 pb-8 border-b border-gray-200;
 }
+
 .form-section:last-child {
-  @apply border-b-0 mb-0 pb-0;
+    @apply border-b-0 mb-0 pb-0;
 }
 
 .section-header {
-  @apply mb-6;
+    @apply mb-6;
 }
 
 .section-title {
-  @apply text-xl font-semibold text-gray-900 flex items-center mb-2;
+    @apply text-xl font-semibold text-gray-900 flex items-center mb-2;
 }
 
 .step-number {
-  @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full text-sm font-bold mr-3;
+    @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full text-sm font-bold mr-3;
 }
 
 .section-help {
-  @apply flex items-start text-sm text-gray-600 bg-blue-50 p-3 rounded-lg;
+    @apply flex items-start text-sm text-gray-600 bg-blue-50 p-3 rounded-lg;
 }
+
 .section-help i {
-  @apply text-blue-500 mr-2 mt-0.5;
+    @apply text-blue-500 mr-2 mt-0.5;
 }
 
 .form-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
 
 .form-field {
-  @apply flex flex-col;
+    @apply flex flex-col;
 }
 
 .field-label {
-  @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-medium text-gray-700 mb-2;
 }
+
 .field-label.required::after {
-  @apply text-red-500 ml-1;
-  content: "*";
+    @apply text-red-500 ml-1;
+    content: "*";
 }
 
 .field-input,
 .field-select {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-input:focus,
 .field-select:focus {
-  @apply outline-none;
+    @apply outline-none;
 }
+
 .field-input.error,
 .field-select.error {
-  @apply border-red-300 bg-red-50;
+    @apply border-red-300 bg-red-50;
 }
 
 .field-error {
-  @apply text-red-600 text-sm mt-1 hidden;
+    @apply text-red-600 text-sm mt-1 hidden;
 }
 
 .serial-section {
-  @apply mb-6 p-6 bg-gray-50 rounded-lg;
+    @apply mb-6 p-6 bg-gray-50 rounded-lg;
 }
 
 .serial-title {
-  @apply text-lg font-medium text-gray-900 mb-4;
+    @apply text-lg font-medium text-gray-900 mb-4;
 }
 
 .serial-input-group {
-  @apply grid grid-cols-4 gap-4 mb-4;
+    @apply grid grid-cols-4 gap-4 mb-4;
 }
 
 .serial-field {
-  @apply flex flex-col;
+    @apply flex flex-col;
 }
 
 .serial-input {
-  @apply text-center font-mono;
+    @apply text-center font-mono;
 }
 
 .serial-preview {
-  @apply flex items-center justify-between p-3 bg-white rounded border border-gray-200;
+    @apply flex items-center justify-between p-3 bg-white rounded border border-gray-200;
 }
 
 .preview-label {
-  @apply text-sm font-medium text-gray-700;
+    @apply text-sm font-medium text-gray-700;
 }
 
 .preview-value {
-  @apply font-mono text-lg font-semibold text-blue-600;
+    @apply font-mono text-lg font-semibold text-blue-600;
 }
 
 .validation-info {
-  @apply mt-6 grid grid-cols-1 md:grid-cols-2 gap-4;
+    @apply mt-6 grid grid-cols-1 md:grid-cols-2 gap-4;
 }
 
 .validation-item {
-  @apply flex justify-between items-center p-3 bg-white rounded border border-gray-200;
+    @apply flex justify-between items-center p-3 bg-white rounded border border-gray-200;
 }
 
 .validation-label {
-  @apply text-sm font-medium text-gray-700;
+    @apply text-sm font-medium text-gray-700;
 }
 
 .validation-value {
-  @apply font-semibold text-gray-900;
+    @apply font-semibold text-gray-900;
 }
+
 .validation-value.success {
-  @apply text-green-600;
+    @apply text-green-600;
 }
+
 .validation-value.error {
-  @apply text-red-600;
+    @apply text-red-600;
 }
 
 .form-actions {
-  @apply flex flex-col sm:flex-row gap-4 justify-end pt-8 mt-8 border-t border-gray-200;
+    @apply flex flex-col sm:flex-row gap-4 justify-end pt-8 mt-8 border-t border-gray-200;
 }
 
 .btn-validate {
-  @apply inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
+    @apply inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
 }
+
 .btn-validate i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .btn-submit {
-  @apply inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200;
+    @apply inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200;
 }
+
 .btn-submit:disabled {
-  @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
+    @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
 }
+
 .btn-submit i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 .btn-cancel {
-  @apply inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200;
+    @apply inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200;
 }
+
 .btn-cancel i {
-  @apply mr-2;
+    @apply mr-2;
 }
 
 @media (max-width: 768px) {
-  .import-form-section {
-    @apply px-2;
-  }
-  .diploma-import-form {
-    @apply p-4;
-  }
-  .serial-input-group {
-    @apply grid-cols-1;
-  }
-  .form-actions {
-    @apply flex-col;
-  }
-  .form-actions .btn-validate,
-  .form-actions .btn-submit,
-  .form-actions .btn-cancel {
-    @apply w-full justify-center;
-  }
+    .import-form-section {
+        @apply px-2;
+    }
+
+    .diploma-import-form {
+        @apply p-4;
+    }
+
+    .serial-input-group {
+        @apply grid-cols-1;
+    }
+
+    .form-actions {
+        @apply flex-col;
+    }
+
+    .form-actions .btn-validate,
+    .form-actions .btn-submit,
+    .form-actions .btn-cancel {
+        @apply w-full justify-center;
+    }
 }
+
 .management-page {
-  @apply min-h-screen p-4;
+    @apply min-h-screen p-4;
 }
+
 .management-page .form-section {
-  @apply max-w-[1500px] mx-auto space-y-6;
+    @apply max-w-[1500px] mx-auto space-y-6;
 }
+
 .management-page .form-section .page {
-  @apply text-center mb-8;
+    @apply text-center mb-8;
 }
+
 .management-page .form-section .page-title {
-  @apply text-3xl font-bold text-gray-900 mb-2;
+    @apply text-3xl font-bold text-gray-900 mb-2;
 }
+
 .management-page .form-section .page-subtitle {
-  @apply text-lg text-gray-600 max-w-2xl mx-auto;
+    @apply text-lg text-gray-600 max-w-2xl mx-auto;
 }
+
 .management-page .form-section .search-card {
-  @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
 }
+
 .management-page .form-section .search-form {
-  @apply space-y-6;
+    @apply space-y-6;
 }
+
 .management-page .form-section .search-actions {
-  @apply flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200;
+    @apply flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200;
 }
+
 .management-page .form-section .form-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
 }
+
 .management-page .form-section .form-field {
-  @apply space-y-2;
+    @apply space-y-2;
 }
+
 .management-page .form-section .field-label {
-  @apply block text-sm font-semibold text-gray-700;
+    @apply block text-sm font-semibold text-gray-700;
 }
+
 .management-page .form-section .field-input {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
 }
+
 .management-page .form-section .field-input::placeholder {
-  @apply text-gray-400;
+    @apply text-gray-400;
 }
+
 .management-page .form-section .field-input:focus {
-  @apply outline-none ring-2 ring-blue-500 border-transparent;
+    @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .management-page .form-section .field-input.is-invalid {
-  @apply border-red-300 ring-2 ring-red-200;
+    @apply border-red-300 ring-2 ring-red-200;
 }
+
 .management-page .form-section .field-select {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
 }
+
 .management-page .form-section .field-select:focus {
-  @apply outline-none ring-2 ring-blue-500 border-transparent;
+    @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .management-page .form-section .field-select.is-invalid {
-  @apply border-red-300 ring-2 ring-red-200;
+    @apply border-red-300 ring-2 ring-red-200;
 }
+
 .management-page .form-section .invalid-feedback {
-  @apply text-sm text-red-600 mt-1;
+    @apply text-sm text-red-600 mt-1;
 }
+
 .management-page .form-section .btn-search {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
 }
+
 .management-page .form-section .btn-search-disabled {
-  @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .management-page .form-section .btn-search-disabled:hover {
-  @apply bg-gray-300 text-gray-500;
+    @apply bg-gray-300 text-gray-500;
 }
+
 .management-page .form-section .btn-search-enabled {
-  @apply bg-blue-600 text-white cursor-pointer opacity-100;
+    @apply bg-blue-600 text-white cursor-pointer opacity-100;
 }
+
 .management-page .form-section .btn-search-enabled:hover {
-  @apply bg-blue-700;
+    @apply bg-blue-700;
 }
+
 .management-page .form-section .btn-search:disabled {
-  @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .management-page .form-section .btn-search:disabled:hover {
-  @apply bg-gray-300 text-gray-500;
+    @apply bg-gray-300 text-gray-500;
 }
+
 .management-page .form-section .btn-reset {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
 }
+
 .management-page .form-section .page-actions {
-  @apply flex flex-wrap gap-3 justify-center md:justify-start;
+    @apply flex flex-wrap gap-3 justify-center md:justify-start;
 }
+
 .management-page .form-section .action-btn {
-  @apply inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-all duration-200 shadow-sm no-underline border-0 cursor-pointer focus:ring-2 focus:ring-offset-2 focus:outline-none;
+    @apply inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-all duration-200 shadow-sm no-underline border-0 cursor-pointer focus:ring-2 focus:ring-offset-2 focus:outline-none;
 }
+
 .management-page .form-section .action-btn i {
-  @apply text-sm;
+    @apply text-sm;
 }
+
 .management-page .form-section .action-btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
 }
+
 .management-page .form-section .action-btn-warning {
-  @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
+    @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
 }
+
 .management-page .form-section .action-btn-info {
-  @apply bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500;
+    @apply bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500;
 }
+
 .management-page .form-section .action-btn-success {
-  @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
 }
+
 .management-page .form-section .action-btn-secondary {
-  @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
+    @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
 }
+
 .management-page .table-section {
-  @apply max-w-[1500px] mx-auto;
+    @apply max-w-[1500px] mx-auto;
 }
+
 .management-page .table-wrapper {
-  @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
 }
 
 .data-table-container {
-  @apply bg-white rounded-xl shadow-lg overflow-hidden;
+    @apply bg-white rounded-xl shadow-lg overflow-hidden;
 }
+
 .data-table {
-  @apply w-full border-collapse;
+    @apply w-full border-collapse;
 }
+
 .data-table th,
 .data-table td {
-  @apply px-3 py-3 text-left border-b border-gray-200 align-middle;
+    @apply px-3 py-3 text-left border-b border-gray-200 align-middle;
 }
+
 .data-table th {
-  @apply bg-gray-50 font-semibold text-gray-700 text-sm;
+    @apply bg-gray-50 font-semibold text-gray-700 text-sm;
 }
 
 .table-header {
-  @apply flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50;
+    @apply flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50;
 }
+
 .table-title {
-  @apply text-gray-900 text-xl font-semibold m-0;
+    @apply text-gray-900 text-xl font-semibold m-0;
 }
+
 .table-stats {
-  @apply flex gap-4;
+    @apply flex gap-4;
 }
+
 .table-responsive {
-  @apply overflow-x-auto;
+    @apply overflow-x-auto;
 }
+
 .table-row {
-  @apply hover:bg-gray-50;
+    @apply hover:bg-gray-50;
 }
+
 .table-pagination-wrapper {
-  @apply p-6 border-t border-gray-200 bg-gray-50;
+    @apply p-6 border-t border-gray-200 bg-gray-50 relative z-10;
 }
 
 .stat-item {
-  @apply text-gray-500 text-sm;
+    @apply text-gray-500 text-sm;
 }
 
 .th {
-  @apply w-auto;
+    @apply w-auto;
 }
 
 .td {
-  @apply px-3 py-3 text-left border-b border-gray-200 align-middle;
+    @apply px-3 py-3 text-left border-b border-gray-200 align-middle;
 }
 
 .document-ref {
-  @apply font-medium text-gray-900;
+    @apply font-medium text-gray-900;
 }
 
 .type-name {
-  @apply text-gray-500 text-sm;
+    @apply text-gray-500 text-sm;
 }
 
 .date-text {
-  @apply text-gray-500 text-sm;
+    @apply text-gray-500 text-sm;
 }
 
 .serial-range .range-text {
-  @apply font-mono bg-gray-100 px-2 py-1 rounded text-xs text-gray-700;
+    @apply font-mono bg-gray-100 px-2 py-1 rounded text-xs text-gray-700;
 }
 
 .quantity-text {
-  @apply font-semibold text-gray-900;
+    @apply font-semibold text-gray-900;
 }
 
 .progress-container {
-  @apply flex flex-col gap-1;
+    @apply flex flex-col gap-1;
 }
+
 .progress-bar {
-  @apply w-full h-2 bg-gray-200 rounded overflow-hidden;
+    @apply w-full h-2 bg-gray-200 rounded overflow-hidden;
 }
+
 .progress-fill {
-  @apply h-full bg-emerald-500 transition-all duration-300 ease-in-out;
+    @apply h-full bg-emerald-500 transition-all duration-300 ease-in-out;
 }
+
 .progress-text {
-  @apply text-xs text-gray-500 text-center;
+    @apply text-xs text-gray-500 text-center;
 }
 
 .status-badge {
-  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase;
+    @apply inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase;
 }
+
 .status-pending {
-  @apply bg-yellow-100 text-yellow-800;
+    @apply bg-yellow-100 text-yellow-800;
 }
+
 .status-processing {
-  @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-100 text-blue-800;
 }
+
 .status-completed {
-  @apply bg-emerald-100 text-emerald-800;
+    @apply bg-emerald-100 text-emerald-800;
 }
+
 .status-failed {
-  @apply bg-red-100 text-red-800;
+    @apply bg-red-100 text-red-800;
 }
+
 .status-unknown {
-  @apply bg-gray-100 text-gray-600;
+    @apply bg-gray-100 text-gray-600;
 }
 
 .action-buttons {
-  @apply flex gap-1;
+    @apply flex gap-1;
 }
 
 .btn-action {
-  @apply w-8 h-8 border-0 rounded-md cursor-pointer flex items-center justify-center text-sm transition-all duration-200 ease-in-out;
+    @apply w-8 h-8 border-0 rounded-md cursor-pointer flex items-center justify-center text-sm transition-all duration-200 ease-in-out;
 }
+
 .btn-view {
-  @apply bg-gray-100 text-gray-500;
+    @apply bg-gray-100 text-gray-500;
 }
+
 .btn-view:hover {
-  @apply bg-gray-200 text-gray-700;
+    @apply bg-gray-200 text-gray-700;
 }
+
+.btn-blanks {
+    @apply bg-indigo-50 text-indigo-700;
+}
+
+.btn-blanks:hover {
+    @apply bg-indigo-100;
+}
+
 .btn-start {
-  @apply bg-emerald-50 text-emerald-700;
+    @apply bg-emerald-50 text-emerald-700;
 }
+
 .btn-start:hover {
-  @apply bg-emerald-100;
+    @apply bg-emerald-100;
 }
+
 .btn-pause {
-  @apply bg-yellow-100 text-yellow-700;
+    @apply bg-yellow-100 text-yellow-700;
 }
+
 .btn-pause:hover {
-  @apply bg-yellow-200;
+    @apply bg-yellow-200;
 }
+
 .btn-retry {
-  @apply bg-blue-50 text-blue-700;
+    @apply bg-blue-50 text-blue-700;
 }
+
 .btn-retry:hover {
-  @apply bg-blue-100;
+    @apply bg-blue-100;
 }
+
 .btn-delete {
-  @apply bg-red-50 text-red-700;
+    @apply bg-red-50 text-red-700;
 }
+
 .btn-delete:hover {
-  @apply bg-red-100;
+    @apply bg-red-100;
 }
+
 .btn-primary {
-  @apply inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
 }
+
 .btn-primary:hover {
-  @apply bg-blue-700 no-underline;
+    @apply bg-blue-700 no-underline;
 }
+
 .btn-secondary {
-  @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
 }
+
 .btn-secondary:hover {
-  @apply bg-gray-200 no-underline;
+    @apply bg-gray-200 no-underline;
 }
 
 .empty-state {
-  @apply text-center p-16 py-32;
+    @apply text-center p-16 py-32;
 }
+
 .empty-icon {
-  @apply mb-4;
+    @apply mb-4;
 }
+
 .empty-icon i {
-  @apply text-6xl text-gray-300;
+    @apply text-6xl text-gray-300;
 }
+
 .empty-title {
-  @apply text-gray-900 text-2xl font-semibold mb-2;
+    @apply text-gray-900 text-2xl font-semibold mb-2;
 }
+
 .empty-message {
-  @apply text-gray-500 mb-8;
+    @apply text-gray-500 mb-8;
 }
+
 .empty-actions {
-  @apply flex gap-4 justify-center;
+    @apply flex gap-4 justify-center;
 }
 
 .pagination-wrapper {
-  @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200 w-full;
+    @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200 w-full;
 }
 
 .students-pagination-wrapper {
-  @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200;
+    @apply flex flex-col lg:flex-row items-center justify-between gap-4 p-6 bg-gray-50 border-t border-gray-200;
 }
 
 .pagination-info {
-  @apply flex-shrink-0 order-2 lg:order-1;
+    @apply flex-shrink-0 order-2 lg:order-1;
 }
 
 .pagination-text {
-  @apply text-sm text-gray-700 font-medium;
+    @apply text-sm text-gray-700 font-medium;
 }
 
 .pagination-controls {
-  @apply flex-1 flex justify-center order-1 lg:order-2;
+    @apply flex-1 flex justify-center order-1 lg:order-2;
 }
 
 .custom-pagination {
-  @apply flex items-center;
+    @apply flex items-center;
 }
 
 .pagination-container {
-  @apply flex items-center gap-1 bg-white rounded-lg border border-gray-300 shadow-sm p-1;
+    @apply flex items-center gap-1 bg-white rounded-lg border border-gray-300 shadow-sm p-1;
 }
 
 .pagination-btn {
-  @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 text-sm font-medium transition-all duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1;
+    @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 text-sm font-medium transition-all duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1;
 }
+
 .pagination-btn.pagination-btn-active {
-  @apply text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 border-0;
+    @apply text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 border-0;
 }
+
 .pagination-btn.pagination-btn-active:hover {
-  @apply transform scale-105;
+    @apply transform scale-105;
 }
+
 .pagination-btn.pagination-btn-current {
-  @apply text-white bg-blue-600 shadow-sm cursor-default border-0 font-semibold;
+    @apply text-white bg-blue-600 shadow-sm cursor-default border-0 font-semibold;
 }
+
 .pagination-btn.pagination-btn-disabled {
-  @apply text-gray-400 bg-gray-100 cursor-not-allowed border-0;
+    @apply text-gray-400 bg-gray-100 cursor-not-allowed border-0;
 }
+
 .pagination-btn i {
-  @apply text-xs;
+    @apply text-xs;
 }
 
 .pagination-dots {
-  @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 text-gray-400 text-sm;
+    @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 text-gray-400 text-sm;
 }
 
 .pagination-per-page {
-  @apply flex-shrink-0 order-3;
+    @apply flex-shrink-0 order-3;
 }
 
 .per-page-selector {
-  @apply flex items-center gap-2;
+    @apply flex items-center gap-2;
 }
 
 .per-page-label {
-  @apply text-sm text-gray-700 font-medium whitespace-nowrap;
+    @apply text-sm text-gray-700 font-medium whitespace-nowrap;
 }
 
 .per-page-select {
-  @apply px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
 
 /* Responsive adjustments for pagination */
 @media (max-width: 768px) {
-  .pagination-wrapper,
-  .students-pagination-wrapper {
-    @apply flex-col gap-3 p-4;
-  }
-  .pagination-info {
-    @apply order-3 text-center;
-  }
-  .pagination-controls {
-    @apply order-1;
-  }
-  .pagination-per-page {
-    @apply order-2 flex justify-center;
-  }
-  .pagination-container {
-    @apply flex-wrap justify-center gap-1 p-2;
-  }
-  .pagination-btn {
-    @apply min-w-[2rem] h-8 text-xs;
-  }
+
+    .pagination-wrapper,
+    .students-pagination-wrapper {
+        @apply flex-col gap-3 p-4;
+    }
+
+    .pagination-info {
+        @apply order-3 text-center;
+    }
+
+    .pagination-controls {
+        @apply order-1;
+    }
+
+    .pagination-per-page {
+        @apply order-2 flex justify-center;
+    }
+
+    .pagination-container {
+        @apply flex-wrap justify-center gap-1 p-2;
+    }
+
+    .pagination-btn {
+        @apply min-w-[2rem] h-8 text-xs;
+    }
 }
+
 .pagination-wrapper.pagination-dark {
-  @apply bg-gray-800 border-gray-700;
+    @apply bg-gray-800 border-gray-700;
 }
+
 .pagination-wrapper.pagination-dark .pagination-text {
-  @apply text-gray-300;
+    @apply text-gray-300;
 }
+
 .pagination-wrapper.pagination-dark .per-page-label {
-  @apply text-gray-300;
+    @apply text-gray-300;
 }
+
 .pagination-wrapper.pagination-dark .pagination-container {
-  @apply bg-gray-700 border-gray-600;
+    @apply bg-gray-700 border-gray-600;
 }
+
 .pagination-wrapper.pagination-dark .pagination-btn-active {
-  @apply text-gray-200 bg-gray-700 hover:bg-gray-600;
+    @apply text-gray-200 bg-gray-700 hover:bg-gray-600;
 }
+
 .pagination-wrapper.pagination-minimal {
-  @apply bg-transparent border-0 p-4;
+    @apply bg-transparent border-0 p-4;
 }
+
 .pagination-wrapper.pagination-minimal .pagination-container {
-  @apply bg-transparent border-0 shadow-none;
+    @apply bg-transparent border-0 shadow-none;
 }
+
 .pagination-wrapper.pagination-compact {
-  @apply p-3 gap-2;
+    @apply p-3 gap-2;
 }
+
 .pagination-wrapper.pagination-compact .pagination-btn {
-  @apply min-w-[2rem] h-8 px-2 text-xs;
+    @apply min-w-[2rem] h-8 px-2 text-xs;
 }
 
 .import-page {
-  @apply min-h-screen bg-gray-50 p-4;
+    @apply min-h-screen bg-gray-50 p-4;
 }
 
 .form-section {
-  @apply max-w-7xl mx-auto space-y-6;
+    @apply max-w-7xl mx-auto space-y-6;
 }
+
 .form-card {
-  @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
 }
+
 .form-step {
-  @apply space-y-6 p-6 border-b border-gray-200;
+    @apply space-y-6 p-6 border-b border-gray-200;
 }
+
 .form-step:last-child {
-  @apply border-b-0;
+    @apply border-b-0;
 }
+
 .form-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
+
 .form-field {
-  @apply space-y-2;
+    @apply space-y-2;
 }
+
 .form-actions {
-  @apply flex flex-col sm:flex-row gap-4 justify-center sm:justify-start p-6 bg-gray-50 border-t border-gray-200;
+    @apply flex flex-col sm:flex-row gap-4 justify-center sm:justify-start p-6 bg-gray-50 border-t border-gray-200;
 }
 
 .page-header {
-  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-lg border border-gray-200 mb-6;
+    @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-lg border border-gray-200 mb-6;
 }
+
 .page-title {
-  @apply text-3xl font-bold text-gray-900 m-0;
+    @apply text-3xl font-bold text-gray-900 m-0;
 }
+
 .page-subtitle {
-  @apply text-lg text-gray-600 mt-2;
+    @apply text-lg text-gray-600 mt-2;
 }
 
 .header-content {
-  @apply flex-1;
+    @apply flex-1;
 }
+
 .header-actions {
-  @apply flex gap-2;
+    @apply flex gap-2;
 }
 
 .step-header {
-  @apply mb-6;
+    @apply mb-6;
 }
+
 .step-title {
-  @apply text-xl font-semibold text-gray-900 flex items-center gap-3 mb-2;
+    @apply text-xl font-semibold text-gray-900 flex items-center gap-3 mb-2;
 }
+
 .step-number {
-  @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold rounded-full text-sm;
+    @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold rounded-full text-sm;
 }
+
 .step-help {
-  @apply flex items-start gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm;
+    @apply flex items-start gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm;
 }
+
 .step-help i {
-  @apply text-blue-600 mt-0.5;
+    @apply text-blue-600 mt-0.5;
 }
 
 .data-form {
-  @apply space-y-0;
+    @apply space-y-0;
 }
 
 .field-label {
-  @apply block text-sm font-semibold text-gray-700 mb-1;
+    @apply block text-sm font-semibold text-gray-700 mb-1;
 }
+
 .field-label.required::after {
-  content: " *";
-  @apply text-red-500;
+    content: " *";
+    @apply text-red-500;
 }
+
 .field-input {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
 }
+
 .field-input::placeholder {
-  @apply text-gray-400;
+    @apply text-gray-400;
 }
+
 .field-input:focus {
-  @apply outline-none ring-2 ring-blue-500 border-transparent;
+    @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .field-input.is-invalid {
-  @apply border-red-300 ring-2 ring-red-200;
+    @apply border-red-300 ring-2 ring-red-200;
 }
+
 .field-select {
-  @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
 }
+
 .field-select:focus {
-  @apply outline-none ring-2 ring-blue-500 border-transparent;
+    @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .field-select.is-invalid {
-  @apply border-red-300 ring-2 ring-red-200;
+    @apply border-red-300 ring-2 ring-red-200;
 }
+
 .field-error {
-  @apply text-sm text-red-600 mt-1 hidden;
+    @apply text-sm text-red-600 mt-1 hidden;
 }
+
 .field-error.show {
-  @apply block;
+    @apply block;
 }
 
 .serial-section {
-  @apply space-y-4;
+    @apply space-y-4;
 }
+
 .serial-title {
-  @apply text-lg font-semibold text-gray-800 mb-4;
+    @apply text-lg font-semibold text-gray-800 mb-4;
 }
+
 .serial-input-group {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
 }
+
 .serial-field {
-  @apply space-y-2;
+    @apply space-y-2;
 }
+
 .serial-input {
-  @apply font-mono;
+    @apply font-mono;
 }
+
 .serial-preview {
-  @apply mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg;
+    @apply mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg;
 }
 
 .preview-label {
-  @apply block text-sm font-semibold text-gray-700 mb-3;
+    @apply block text-sm font-semibold text-gray-700 mb-3;
 }
+
 .preview-range {
-  @apply flex items-center gap-4 mt-2;
+    @apply flex items-center gap-4 mt-2;
 }
+
 .preview-value {
-  @apply font-mono px-3 py-2 bg-white border border-gray-300 rounded text-gray-800 min-w-20 text-center;
+    @apply font-mono px-3 py-2 bg-white border border-gray-300 rounded text-gray-800 min-w-20 text-center;
 }
 
 .range-arrow {
-  @apply text-lg text-gray-500 font-bold;
+    @apply text-lg text-gray-500 font-bold;
 }
 
 .validation-info {
-  @apply mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg;
+    @apply mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg;
 }
+
 .validation-item {
-  @apply flex justify-between items-center text-sm;
+    @apply flex justify-between items-center text-sm;
 }
+
 .validation-label {
-  @apply font-semibold text-gray-700;
+    @apply font-semibold text-gray-700;
 }
+
 .validation-value {
-  @apply font-mono text-gray-900 bg-white px-2 py-1 rounded border;
+    @apply font-mono text-gray-900 bg-white px-2 py-1 rounded border;
 }
 
 .btn-back {
-  @apply inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline font-medium;
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline font-medium;
 }
+
 .btn-back:hover {
-  @apply no-underline text-gray-800;
+    @apply no-underline text-gray-800;
 }
+
 .btn-submit {
-  @apply inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
 }
+
 .btn-submit:hover {
-  @apply bg-green-700;
+    @apply bg-green-700;
 }
+
 .btn-submit:disabled {
-  @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .btn-submit:disabled:hover {
-  @apply bg-gray-300;
+    @apply bg-gray-300;
 }
+
 .btn-cancel {
-  @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
 }
+
 .btn-cancel:hover {
-  @apply no-underline text-gray-800 bg-gray-200;
+    @apply no-underline text-gray-800 bg-gray-200;
 }
 
 @media print {
-  .import-page {
-    @apply p-0 bg-white;
-  }
-  .header-actions {
-    @apply hidden;
-  }
-  .form-actions {
-    @apply hidden;
-  }
-  .btn-back {
-    @apply hidden;
-  }
-}
-.field-input:focus, .field-select:focus {
-  @apply ring-2 ring-blue-500 ring-opacity-50;
+    .import-page {
+        @apply p-0 bg-white;
+    }
+
+    .header-actions {
+        @apply hidden;
+    }
+
+    .form-actions {
+        @apply hidden;
+    }
+
+    .btn-back {
+        @apply hidden;
+    }
 }
 
-.btn-submit:focus, .btn-cancel:focus, .btn-back:focus {
-  @apply outline-none ring-2 ring-offset-2;
+.field-input:focus,
+.field-select:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-50;
+}
+
+.btn-submit:focus,
+.btn-cancel:focus,
+.btn-back:focus {
+    @apply outline-none ring-2 ring-offset-2;
 }
 
 .fade-in {
-  @apply opacity-0;
-  animation: fadeIn 0.3s ease-in-out forwards;
+    @apply opacity-0;
+    animation: fadeIn 0.3s ease-in-out forwards;
 }
 
 @keyframes fadeIn {
-  from {
-    @apply opacity-0;
-  }
-  to {
-    @apply opacity-100;
-  }
+    from {
+        @apply opacity-0;
+    }
+
+    to {
+        @apply opacity-100;
+    }
 }
+
 .auth-login {
-  @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
+    @apply mx-auto my-[50px] max-w-[600px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
+
 .auth-login-body {
-  @apply flex flex-col items-stretch justify-center bg-[var(--color-secondary)] p-6;
+    @apply flex flex-col items-stretch justify-center bg-[var(--color-secondary)] p-6;
 }
+
 .auth-login-body .title {
-  @apply mb-4 text-center text-xl font-semibold uppercase;
+    @apply mb-4 text-center text-xl font-semibold uppercase;
 }
+
 .auth-login-form {
-  @apply flex flex-col gap-4 p-[20px];
+    @apply flex flex-col gap-4 p-[20px];
 }
+
 .auth-login .form-group {
-  @apply mb-[15px] flex flex-row items-center gap-3;
+    @apply mb-[15px] flex flex-row items-center gap-3;
 }
+
 .auth-login .form-group label {
-  @apply w-1/3 text-sm font-semibold uppercase;
+    @apply w-1/3 text-sm font-semibold uppercase;
 }
+
 .auth-login .form-group input {
-  @apply w-full rounded-md border-[var(--color-border-light)] p-3 outline-none;
+    @apply w-full rounded-md border-[var(--color-border-light)] p-3 outline-none;
 }
+
 .auth-login .form-check {
-  @apply flex items-center gap-2;
+    @apply flex items-center gap-2;
 }
+
 .auth-login .form-submit {
-  @apply mt-6 flex justify-center;
+    @apply mt-6 flex justify-center;
 }
+
 .auth-login .form-submit button {
-  @apply w-full rounded-md bg-[var(--color-primary)] px-6 py-3 font-bold text-white hover:bg-[var(--color-primary-dark)];
+    @apply w-full rounded-md bg-[var(--color-primary)] px-6 py-3 font-bold text-white hover:bg-[var(--color-primary-dark)];
 }
 
 .diploma-form-section {
-  @apply w-full max-w-none mx-auto p-6 space-y-8;
+    @apply w-full max-w-none mx-auto p-6 space-y-8;
 }
 
 .diploma-page-header {
-  @apply mb-8;
+    @apply mb-8;
 }
 
 .diploma-page-title {
-  @apply text-3xl font-bold text-gray-900 mb-2;
+    @apply text-3xl font-bold text-gray-900 mb-2;
 }
 
 .diploma-page-subtitle {
-  @apply text-base text-gray-600 leading-relaxed;
+    @apply text-base text-gray-600 leading-relaxed;
 }
 
 .diploma-search-card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
 }
 
 .diploma-search-form {
-  @apply space-y-6;
+    @apply space-y-6;
 }
 
 .search-form-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
 }
 
 .form-field {
-  @apply flex flex-col space-y-2;
+    @apply flex flex-col space-y-2;
 }
 
 .field-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-gray-700 mb-1;
 }
 
 .field-input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-input:hover {
-  @apply border-gray-400;
+    @apply border-gray-400;
 }
+
 .field-input:disabled {
-  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+    @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
 
 .field-select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-select:hover {
-  @apply border-gray-400;
+    @apply border-gray-400;
 }
+
 .field-select:disabled {
-  @apply bg-gray-50 text-gray-500 cursor-not-allowed;
+    @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
+
 .field-select option {
-  @apply text-gray-900 bg-white;
+    @apply text-gray-900 bg-white;
 }
 
 .search-actions {
-  @apply flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-gray-200;
+    @apply flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-gray-200;
 }
 
 .btn-search {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105;
 }
+
 .btn-search i {
-  @apply text-sm;
+    @apply text-sm;
 }
 
 .btn-reset {
-  @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-md shadow-sm border border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-md shadow-sm border border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline;
 }
+
 .btn-reset:hover {
-  @apply no-underline text-gray-800;
+    @apply no-underline text-gray-800;
 }
+
 .btn-reset i {
-  @apply text-sm;
+    @apply text-sm;
 }
 
 .diploma-actions {
-  @apply flex flex-wrap gap-3 p-6 bg-gray-50 rounded-lg border border-gray-200;
+    @apply flex flex-wrap gap-3 p-6 bg-gray-50 rounded-lg border border-gray-200;
 }
 
 .action-btn {
-  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-medium text-sm rounded-md shadow-sm border transition-all duration-200 transform hover:scale-105 no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-medium text-sm rounded-md shadow-sm border transition-all duration-200 transform hover:scale-105 no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
 }
+
 .action-btn i {
-  @apply text-sm;
+    @apply text-sm;
 }
+
 .action-btn:hover {
-  @apply no-underline;
+    @apply no-underline;
 }
 
 .action-btn-primary {
-  @apply bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 hover:text-white focus:ring-green-500;
+    @apply bg-green-600 text-white border-green-600 hover:bg-green-700 hover:border-green-700 hover:text-white focus:ring-green-500;
 }
 
 .action-btn-warning {
-  @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600 hover:border-yellow-600 hover:text-white focus:ring-yellow-400;
+    @apply bg-yellow-500 text-white border-yellow-500 hover:bg-yellow-600 hover:border-yellow-600 hover:text-white focus:ring-yellow-400;
 }
 
 .action-btn-info {
-  @apply bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 hover:text-white focus:ring-blue-400;
+    @apply bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 hover:text-white focus:ring-blue-400;
 }
 
 .action-btn-success {
-  @apply bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 hover:text-white focus:ring-emerald-500;
+    @apply bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 hover:text-white focus:ring-emerald-500;
 }
 
 @media (max-width: 768px) {
-  .search-form-grid {
-    @apply grid-cols-1 gap-4;
-  }
-  .search-actions {
-    @apply flex-col;
-  }
-  .search-actions .btn-search,
-  .search-actions .btn-reset {
-    @apply w-full justify-center;
-  }
-  .diploma-actions {
-    @apply flex-col;
-  }
-  .diploma-actions .action-btn {
-    @apply w-full justify-center;
-  }
-  .diploma-form-section {
-    @apply p-4 space-y-6;
-  }
-  .diploma-search-card {
-    @apply p-4;
-  }
+    .search-form-grid {
+        @apply grid-cols-1 gap-4;
+    }
+
+    .search-actions {
+        @apply flex-col;
+    }
+
+    .search-actions .btn-search,
+    .search-actions .btn-reset {
+        @apply w-full justify-center;
+    }
+
+    .diploma-actions {
+        @apply flex-col;
+    }
+
+    .diploma-actions .action-btn {
+        @apply w-full justify-center;
+    }
+
+    .diploma-form-section {
+        @apply p-4 space-y-6;
+    }
+
+    .diploma-search-card {
+        @apply p-4;
+    }
 }
+
 @media (min-width: 1024px) {
-  .search-form-grid {
-    @apply grid-cols-3;
-  }
-  .form-field:nth-child(1) {
-    @apply lg:col-span-1;
-  }
-  .form-field:nth-child(2) {
-    @apply lg:col-span-1;
-  }
-  .form-field:nth-child(3) {
-    @apply lg:col-span-1;
-  }
-  .form-field:nth-child(4) {
-    @apply lg:col-span-1;
-  }
-  .form-field:nth-child(5) {
-    @apply lg:col-span-1;
-  }
-  .form-field:nth-child(6) {
-    @apply lg:col-span-1;
-  }
+    .search-form-grid {
+        @apply grid-cols-3;
+    }
+
+    .form-field:nth-child(1) {
+        @apply lg:col-span-1;
+    }
+
+    .form-field:nth-child(2) {
+        @apply lg:col-span-1;
+    }
+
+    .form-field:nth-child(3) {
+        @apply lg:col-span-1;
+    }
+
+    .form-field:nth-child(4) {
+        @apply lg:col-span-1;
+    }
+
+    .form-field:nth-child(5) {
+        @apply lg:col-span-1;
+    }
+
+    .form-field:nth-child(6) {
+        @apply lg:col-span-1;
+    }
 }
+
 .field-input:focus,
 .field-select:focus {
-  @apply transform scale-105;
-  transition: all 0.2s ease-in-out;
+    @apply transform scale-105;
+    transition: all 0.2s ease-in-out;
 }
 
 .field-input:disabled,
 .field-select:disabled {
-  @apply opacity-50 cursor-not-allowed;
+    @apply opacity-50 cursor-not-allowed;
 }
 
 .field-input.error,
 .field-select.error {
-  @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
+    @apply border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500;
 }
 
 .field-input.success,
 .field-select.success {
-  @apply border-green-300 text-green-900 focus:ring-green-500 focus:border-green-500;
+    @apply border-green-300 text-green-900 focus:ring-green-500 focus:border-green-500;
 }
 
 .embryo-management {
-  @apply mx-auto mt-10 max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
+    @apply mx-auto mt-10 max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
 }
+
 .embryo-management .form-group-full {
-  @apply col-span-1 md:col-span-2 lg:col-span-3;
+    @apply col-span-1 md:col-span-2 lg:col-span-3;
 }
 
 .student-edit-page {
-  @apply mx-auto max-w-7xl bg-gray-100 p-10 rounded-md;
+    @apply mx-auto max-w-7xl bg-gray-100 p-10 rounded-md;
 }
+
 .student-edit-page .page-header {
-  @apply mb-8;
+    @apply mb-8;
 }
+
 .student-edit-page .page-header h1 {
-  @apply text-3xl font-bold text-gray-900;
+    @apply text-3xl font-bold text-gray-900;
 }
+
 .student-edit-page .page-header p {
-  @apply text-gray-600 mt-2;
+    @apply text-gray-600 mt-2;
 }
+
 .student-edit-page .form-field {
-  @apply space-y-2;
+    @apply space-y-2;
 }
+
 .student-edit-page .form-field .field-label {
-  @apply block text-sm font-medium text-gray-700;
+    @apply block text-sm font-medium text-gray-700;
 }
+
 .student-edit-page .form-field .field-input,
 .student-edit-page .form-field .field-select {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .student-edit-page .form-field .error-message {
-  @apply text-red-600 text-sm mt-1;
+    @apply text-red-600 text-sm mt-1;
 }
+
 .student-edit-page .section-card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
 }
+
 .student-edit-page .section-card .section-title {
-  @apply text-xl font-semibold text-gray-900 mb-6 flex items-center;
+    @apply text-xl font-semibold text-gray-900 mb-6 flex items-center;
 }
+
 .student-edit-page .section-card .section-title i {
-  @apply mr-3;
+    @apply mr-3;
 }
+
 .student-edit-page .degree-card {
-  @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
+    @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
 }
+
 .student-edit-page .degree-card .degree-header {
-  @apply flex items-center justify-between mb-3;
+    @apply flex items-center justify-between mb-3;
 }
+
 .student-edit-page .degree-card .degree-header h3 {
-  @apply font-medium text-gray-900;
+    @apply font-medium text-gray-900;
 }
+
 .student-edit-page .degree-card .degree-header .degree-type-badge {
-  @apply ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full;
+    @apply ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full;
 }
+
 .student-edit-page .degree-card .degree-header small {
-  @apply text-gray-500;
+    @apply text-gray-500;
 }
+
 .student-edit-page .degree-card .degree-details {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm;
 }
+
 .student-edit-page .degree-card .degree-details .detail-item .label {
-  @apply font-medium text-gray-700;
+    @apply font-medium text-gray-700;
 }
+
 .student-edit-page .degree-card .degree-details .detail-item .value {
-  @apply ml-2 text-gray-600;
+    @apply ml-2 text-gray-600;
 }
+
 .student-edit-page .empty-state {
-  @apply text-center py-8;
+    @apply text-center py-8;
 }
+
 .student-edit-page .empty-state .empty-icon {
-  @apply inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4;
+    @apply inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4;
 }
+
 .student-edit-page .empty-state .empty-icon i {
-  @apply text-gray-400 text-xl;
+    @apply text-gray-400 text-xl;
 }
+
 .student-edit-page .empty-state .empty-title {
-  @apply text-gray-500 text-lg mb-2;
+    @apply text-gray-500 text-lg mb-2;
 }
+
 .student-edit-page .empty-state .empty-description {
-  @apply text-gray-400 text-sm;
+    @apply text-gray-400 text-sm;
 }
+
 .student-edit-page .action-section {
-  @apply flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-6;
 }
+
 .student-edit-page .action-section .last-updated {
-  @apply text-sm text-gray-600;
+    @apply text-sm text-gray-600;
 }
+
 .student-edit-page .action-section .last-updated i {
-  @apply text-blue-500 mr-2;
+    @apply text-blue-500 mr-2;
 }
+
 .student-edit-page .action-section .action-buttons {
-  @apply flex gap-3;
+    @apply flex gap-3;
 }
+
 .student-edit-page .action-section .action-buttons .btn-cancel {
-  @apply px-6 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors duration-200;
+    @apply px-6 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors duration-200;
 }
+
 .student-edit-page .action-section .action-buttons .btn-save {
-  @apply px-6 py-2 text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200;
+    @apply px-6 py-2 text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200;
 }
+
 .student-edit-page .flash-message {
-  @apply fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50;
+    @apply fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50;
 }
+
 .student-edit-page .flash-message.success {
-  @apply bg-green-100 border border-green-400 text-green-700;
+    @apply bg-green-100 border border-green-400 text-green-700;
 }
+
 .student-edit-page .flash-message.error {
-  @apply bg-red-100 border border-red-400 text-red-700;
+    @apply bg-red-100 border border-red-400 text-red-700;
 }
+
 .student-edit-page .flash-message .message-content {
-  @apply flex items-center;
+    @apply flex items-center;
 }
+
 .student-edit-page .flash-message .message-content i {
-  @apply mr-2;
+    @apply mr-2;
 }
+
 .student-edit-page .flash-message .message-content .close-btn {
-  @apply ml-3 hover:text-gray-900 cursor-pointer;
+    @apply ml-3 hover:text-gray-900 cursor-pointer;
 }
+
 .student-edit-page .field-input.error,
 .student-edit-page .field-select.error {
-  @apply border-red-500 ring-red-500;
+    @apply border-red-500 ring-red-500;
 }
 
 @media (max-width: 768px) {
-  .student-edit-page .page-header {
-    @apply flex flex-col gap-3;
-  }
-  .student-edit-page .section-card {
-    @apply p-4;
-    @apply grid grid-cols-1 gap-4;
-  }
-  .student-edit-page .degree-card .degree-header {
-    @apply flex-col items-start gap-2;
-  }
-  .student-edit-page .degree-card .degree-details {
-    @apply grid-cols-1 gap-2;
-  }
-  .student-edit-page .action-section {
-    @apply flex-col gap-4 items-stretch;
-  }
-  .student-edit-page .action-section .action-buttons {
-    @apply justify-center;
-  }
+    .student-edit-page .page-header {
+        @apply flex flex-col gap-3;
+    }
+
+    .student-edit-page .section-card {
+        @apply p-4;
+        @apply grid grid-cols-1 gap-4;
+    }
+
+    .student-edit-page .degree-card .degree-header {
+        @apply flex-col items-start gap-2;
+    }
+
+    .student-edit-page .degree-card .degree-details {
+        @apply grid-cols-1 gap-2;
+    }
+
+    .student-edit-page .action-section {
+        @apply flex-col gap-4 items-stretch;
+    }
+
+    .student-edit-page .action-section .action-buttons {
+        @apply justify-center;
+    }
 }
+
 .header {
-  @apply min-h-[98px] w-full;
+    @apply min-h-[98px] w-full;
 }
+
 .header img {
-  @apply h-full w-full object-cover;
+    @apply h-full w-full object-cover;
 }
 
 .form-section {
-  @apply mb-6 rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
+    @apply mb-6 rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
+
 .form .form-grid {
-  @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
+    @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
 }
+
 .form .form-grid.--grid-4 {
-  @apply grid-cols-4;
+    @apply grid-cols-4;
 }
+
 .form .form-grid.--grid-5 {
-  @apply grid-cols-5;
+    @apply grid-cols-5;
 }
+
 .form-group {
-  @apply flex flex-col;
+    @apply flex flex-col;
 }
+
 .form-group label {
-  @apply mb-2 text-sm font-semibold text-[var(--color-text-secondary)];
+    @apply mb-2 text-sm font-semibold text-[var(--color-text-secondary)];
 }
+
 .form-group input,
 .form-group textarea,
 .form-group select {
-  @apply w-full rounded-md border border-[var(--color-border-light)] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
+    @apply w-full rounded-md border border-[var(--color-border-light)] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
 }
+
 .form-group textarea {
-  @apply resize-y;
+    @apply resize-y;
 }
+
 .form-search-row {
-  @apply mb-6 flex flex-col items-center gap-4 md:flex-row;
+    @apply mb-6 flex flex-col items-center gap-4 md:flex-row;
 }
 
 .action-container {
-  @apply mt-6 flex flex-wrap justify-center gap-3 border-t-[var(--color-border-light)] py-4 md:justify-start;
+    @apply mt-6 flex flex-wrap justify-center gap-3 border-t-[var(--color-border-light)] py-4 md:justify-start;
 }
 
 .btn {
-  @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
+    @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
 }
+
 .btn-primary {
-  @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-opacity-50;
+    @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-opacity-50;
 }
+
 .btn-secondary {
-  @apply bg-[var(--color-secondary-light)] text-gray-800 hover:bg-[var(--color-secondary-medium)] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+    @apply bg-[var(--color-secondary-light)] text-gray-800 hover:bg-[var(--color-secondary-medium)] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
 }
+
 .btn-remove {
-  @apply bg-[var(--color-danger)] text-white flex justify-center my-4 mx-auto;
+    @apply bg-[var(--color-danger)] text-white flex justify-center my-4 mx-auto;
 }
+
 .btn-table {
-  @apply rounded bg-[var(--color-primary)] px-2 py-1 text-xs text-white hover:bg-[var(--color-primary-hover)];
+    @apply rounded bg-[var(--color-primary)] px-2 py-1 text-xs text-white hover:bg-[var(--color-primary-hover)];
 }
 
 .table-section {
-  @apply rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
+    @apply rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
+
 .table-wrapper {
-  @apply overflow-x-auto;
+    @apply overflow-x-auto;
 }
 
 .data-table {
-  @apply w-full border-collapse text-sm;
+    @apply w-full border-collapse text-sm;
 }
+
 .data-table thead {
-  @apply bg-[var(--color-primary-hover)] text-white;
+    @apply bg-[var(--color-primary-hover)] text-white;
 }
+
 .data-table thead th {
-  @apply whitespace-nowrap border-[var(--color-primary-dark)] px-4 py-2 text-center;
+    @apply whitespace-nowrap border-[var(--color-primary-dark)] px-4 py-2 text-center;
 }
+
 .data-table tbody tr:hover {
-  @apply bg-[var(--color-bg-main)];
+    @apply bg-[var(--color-bg-main)];
 }
+
 .data-table tbody td {
-  @apply whitespace-nowrap border-[var(--color-border-light)] px-4 py-2 text-center;
+    @apply whitespace-nowrap border-[var(--color-border-light)] px-4 py-2 text-center;
 }
 
 .section-title {
-  @apply mb-6 text-center text-2xl font-bold text-[var(--color-text-primary)];
+    @apply mb-6 text-center text-2xl font-bold text-[var(--color-text-primary)];
 }
+
 .section-subtitle {
-  @apply mb-4 text-xl font-semibold text-[var(--color-text-secondary)];
+    @apply mb-4 text-xl font-semibold text-[var(--color-text-secondary)];
 }
 
 .pagination {
-  @apply mx-[15px] my-[10px] mt-6;
+    @apply mx-[15px] my-[10px] mt-6;
 }
 
 .text-danger {
-  @apply text-xs mt-2 text-[var(--color-text-danger)];
+    @apply text-xs mt-2 text-[var(--color-text-danger)];
 }
 
 :root {
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-light: #dbeafe;
-  --color-secondary: #f3f4f6;
-  --color-secondary-light: #e5e7eb;
-  --color-secondary-medium: #d1d5db;
-  --color-secondary-dark: #374151;
-  --color-secondary-darker: #1f2937;
-  --color-danger: #ef4444;
-  --color-danger-hover: #dc2626;
-  --color-success: #10b981;
-  --color-success-hover: #059669;
-  --color-warning: #f59e0b;
-  --color-warning-hover: #d97706;
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-border-light: #d1d5db;
-  --color-border-medium: #9ca3af;
-  --color-border-primary: #3b82f6;
-  --color-bg-main: #f9fafb;
-  --color-bg-card: #ffffff;
-  --color-bg-overlay: rgba(75, 85, 99, 0.75);
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-muted: #6b7280;
-  --color-text-white: #ffffff;
-  --color-text-danger: #ef4444;
-  --color-focus-blue: #3b82f6;
-  --color-focus-indigo: #6366f1;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-primary-dark: #1d4ed8;
+    --color-primary-light: #dbeafe;
+    --color-secondary: #f3f4f6;
+    --color-secondary-light: #e5e7eb;
+    --color-secondary-medium: #d1d5db;
+    --color-secondary-dark: #374151;
+    --color-secondary-darker: #1f2937;
+    --color-danger: #ef4444;
+    --color-danger-hover: #dc2626;
+    --color-success: #10b981;
+    --color-success-hover: #059669;
+    --color-warning: #f59e0b;
+    --color-warning-hover: #d97706;
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-border-light: #d1d5db;
+    --color-border-medium: #9ca3af;
+    --color-border-primary: #3b82f6;
+    --color-bg-main: #f9fafb;
+    --color-bg-card: #ffffff;
+    --color-bg-overlay: rgba(75, 85, 99, 0.75);
+    --color-text-primary: #111827;
+    --color-text-secondary: #374151;
+    --color-text-muted: #6b7280;
+    --color-text-white: #ffffff;
+    --color-text-danger: #ef4444;
+    --color-focus-blue: #3b82f6;
+    --color-focus-indigo: #6366f1;
 }

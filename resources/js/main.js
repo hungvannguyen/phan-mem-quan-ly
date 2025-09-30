@@ -20,6 +20,13 @@ $(document).on("change", ".per-page-select", function (event) {
     loadTableData(url.toString());
 });
 
+// Function to view diploma blanks from specific import
+function viewDiplomaBlanks(importId) {
+    if (importId) {
+        window.location.href = '/diploma-blanks?import_id=' + importId;
+    }
+}
+
 // Function to load table data via AJAX
 function loadTableData(url) {
     $.ajax({
