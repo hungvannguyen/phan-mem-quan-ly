@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\DiplomaBlank;
 use App\Models\DiplomaBlankImport;
 use App\Enums\ImportStatus;
+use App\Enums\DiplomaBlankStatus;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
@@ -109,7 +110,7 @@ class ProcessDiplomaBlankImportJob implements ShouldQueue
             $diplomaBlanks[] = [
                 'serial_number' => $serialNumber,
                 'type_id' => $typeId,
-                'status' => 'available', // Trạng thái mặc định là có sẵn
+                'status' => DiplomaBlankStatus::IN_STOCK->value, // Trạng thái mặc định là trong kho
                 'import_date' => $importDate,
                 'issue_date' => null,
                 'recall_date' => null,

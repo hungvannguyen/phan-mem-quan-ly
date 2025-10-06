@@ -88,20 +88,20 @@
                                     <button type="button" class="btn-action btn-view" title="Xem chi tiết"
                                         data-import-id="{{ $import->id }}"
                                         onclick="viewImport({{ $import->id }})">
-                                        <i class="fas fa-eye"></i>
+                                        Xem
                                     </button>
 
                                     <button type="button" class="btn-action btn-blanks" title="Xem phôi được tạo"
                                         data-import-id="{{ $import->id }}"
                                         onclick="viewDiplomaBlanks({{ $import->id }})">
-                                        <i class="fas fa-list-alt"></i>
+                                        Phôi
                                     </button>
 
                                     @if ($import->status === App\Enums\ImportStatus::PENDING)
                                         <button type="button" class="btn-action btn-start" title="Bắt đầu xử lý"
                                             data-import-id="{{ $import->id }}"
                                             onclick="startImport({{ $import->id }})">
-                                            <i class="fas fa-play"></i>
+                                            Bắt đầu
                                         </button>
                                     @endif
 
@@ -109,7 +109,7 @@
                                         <button type="button" class="btn-action btn-pause" title="Tạm dừng"
                                             data-import-id="{{ $import->id }}"
                                             onclick="pauseImport({{ $import->id }})">
-                                            <i class="fas fa-pause"></i>
+                                            Tạm dừng
                                         </button>
                                     @endif
 
@@ -117,14 +117,14 @@
                                         <button type="button" class="btn-action btn-retry" title="Thử lại"
                                             data-import-id="{{ $import->id }}"
                                             onclick="retryImport({{ $import->id }})">
-                                            <i class="fas fa-redo"></i>
+                                            Thử lại
                                         </button>
                                     @endif
 
                                     <button type="button" class="btn-action btn-delete" title="Xóa"
                                         data-import-id="{{ $import->id }}"
                                         onclick="deleteImport({{ $import->id }})">
-                                        <i class="fas fa-trash"></i>
+                                        Xóa
                                     </button>
                                 </div>
                             </td>

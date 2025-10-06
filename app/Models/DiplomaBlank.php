@@ -41,7 +41,7 @@ class DiplomaBlank extends Model
     {
         return [
             'serial_number' => 'string',
-            'status' => 'string',
+            'status' => \App\Enums\DiplomaBlankStatus::class,
             'import_date' => 'datetime',
             'issue_date' => 'datetime',
             'recall_date' => 'datetime',

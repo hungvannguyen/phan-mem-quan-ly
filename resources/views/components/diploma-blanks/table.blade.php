@@ -51,35 +51,15 @@
                             </td>
                             <td class="td">
                                 @php
-                                    $statusClass = match ($blank->status) {
-                                        'InStock' => 'status-pending',
-                                        'Issued' => 'status-completed',
-                                        'Damaged' => 'status-failed',
-                                        'Recalled' => 'status-processing',
-                                        default => 'status-unknown',
-                                    };
+                                    $status =
+                                        $blank->status instanceof \App\Enums\DiplomaBlankStatus
+                                            ? $blank->status
+                                            : \App\Enums\DiplomaBlankStatus::tryFrom($blank->status);
+                                    $statusClass = $status ? $status->getBadgeClass() : 'status-unknown';
+                                    $statusText = $status ? $status->getLabel() : 'Không xác định';
                                 @endphp
                                 <span class="status-badge {{ $statusClass }}">
-                                    @switch($blank->status)
-                                        @case('InStock')
-                                            Trong kho
-                                        @break
-
-                                        @case('Issued')
-                                            Đã cấp
-                                        @break
-
-                                        @case('Damaged')
-                                            Hư hỏng
-                                        @break
-
-                                        @case('Recalled')
-                                            Thu hồi
-                                        @break
-
-                                        @default
-                                            {{ $blank->status }}
-                                    @endswitch
+                                    {{ $statusText }}
                                 </span>
                             </td>
                             <td class="td">
@@ -132,22 +112,29 @@
                             <td class="td">
                                 <div class="action-buttons">
                                     <button type="button" class="btn-action btn-view" title="Xem chi tiết">
-                                        <i class="fas fa-eye"></i>
+                                        Xem
                                     </button>
 
-                                    @if ($blank->status === 'InStock')
+                                    @php
+                                        $currentStatus =
+                                            $blank->status instanceof \App\Enums\DiplomaBlankStatus
+                                                ? $blank->status
+                                                : \App\Enums\DiplomaBlankStatus::tryFrom($blank->status);
+                                    @endphp
+
+                                    @if ($currentStatus && $currentStatus->canIssue())
                                         <button type="button" class="btn-action btn-start" title="Cấp phôi">
-                                            <i class="fas fa-paper-plane"></i>
+                                            Cấp phôi
                                         </button>
-                                    @elseif ($blank->status === 'Issued')
+                                    @elseif ($currentStatus && $currentStatus->canRecall())
                                         <button type="button" class="btn-action btn-pause" title="Thu hồi phôi">
-                                            <i class="fas fa-undo"></i>
+                                            Thu hồi
                                         </button>
                                     @endif
 
-                                    @if ($blank->status !== 'Damaged')
+                                    @if ($currentStatus && $currentStatus->canMarkAsDamaged())
                                         <button type="button" class="btn-action btn-delete" title="Báo hư hỏng">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Báo hỏng
                                         </button>
                                     @endif
                                 </div>
