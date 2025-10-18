@@ -51,33 +51,30 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
             // Bắt đầu transaction
             DB::beginTransaction();
 
-            $oldFromNumber = intval($this->import->from_number);
-            $oldToNumber = intval($this->import->to_number);
-            $newFromNumber = intval($this->updateData['from_number']);
-            $newToNumber = intval($this->updateData['to_number']);
+            // Lấy thông tin hiện tại của import (đã được cập nhật)
+            $newFromNumber = intval($this->import->from_number);
+            $newToNumber = intval($this->import->to_number);
+            $newPrefix = $this->import->prefix ?? '';
+            $newSuffix = $this->import->suffix ?? '';
 
-            $oldPrefix = $this->import->prefix ?? '';
-            $oldSuffix = $this->import->suffix ?? '';
-            $newPrefix = $this->updateData['prefix'] ?? '';
-            $newSuffix = $this->updateData['suffix'] ?? '';
-
-            // Tính toán số lượng cũ và mới
-            $oldQuantity = $oldToNumber - $oldFromNumber + 1;
+            // Tính số lượng mới
             $newQuantity = $newToNumber - $newFromNumber + 1;
 
-            // Xử lý thay đổi prefix/suffix
-            if ($oldPrefix !== $newPrefix || $oldSuffix !== $newSuffix) {
-                $this->updatePrefixSuffix($oldPrefix, $oldSuffix, $newPrefix, $newSuffix, $oldFromNumber, $oldToNumber);
-            }
+            // Đếm số diploma blanks hiện có
+            $currentCount = $this->import->diplomaBlanks()->count();
 
-            // Xử lý thay đổi số lượng
-            if ($newQuantity > $oldQuantity) {
-                // Tăng số phôi - thêm phôi mới từ last_processed_serial + 1
-                $this->addDiplomaBlanks($newFromNumber, $newToNumber, $newPrefix, $newSuffix, $oldQuantity);
-            } elseif ($newQuantity < $oldQuantity) {
-                // Giảm số phôi - xóa từ last_processed_serial đến phần được giảm
-                $this->removeDiplomaBlanks($newFromNumber, $newToNumber, $newPrefix, $newSuffix, $oldQuantity - $newQuantity);
-            }
+            Log::info("UpdateDiplomaBlankImportJob details", [
+                'import_id' => $this->import->id,
+                'new_from' => $newFromNumber,
+                'new_to' => $newToNumber,
+                'new_quantity' => $newQuantity,
+                'current_count' => $currentCount,
+                'prefix' => $newPrefix,
+                'suffix' => $newSuffix
+            ]);
+
+            // Đồng bộ diploma blanks với thông tin mới
+            $this->syncDiplomaBlanks($newFromNumber, $newToNumber, $newPrefix, $newSuffix, $currentCount, $newQuantity);
 
             // Cập nhật thông tin import
             $this->import->update([
@@ -114,7 +111,109 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
     }
 
     /**
-     * Cập nhật prefix/suffix cho các phôi hiện có
+     * Đồng bộ diploma blanks với thông tin import mới
+     */
+    private function syncDiplomaBlanks(int $fromNumber, int $toNumber, string $prefix, string $suffix, int $currentCount, int $newQuantity): void
+    {
+        // Tạo danh sách serial numbers cần có
+        $expectedSerials = [];
+        for ($i = $fromNumber; $i <= $toNumber; $i++) {
+            $expectedSerials[] = $prefix . $i . $suffix;
+        }
+
+        // Lấy danh sách serial hiện có
+        $existingSerials = $this->import->diplomaBlanks()->pluck('serial_number')->toArray();
+
+        // Tìm serial cần thêm
+        $serialsToAdd = array_diff($expectedSerials, $existingSerials);
+
+        // Tìm serial cần xóa (không còn trong danh sách mới)
+        $serialsToRemove = array_diff($existingSerials, $expectedSerials);
+
+        Log::info("Sync diploma blanks", [
+            'expected_count' => count($expectedSerials),
+            'existing_count' => count($existingSerials),
+            'to_add' => count($serialsToAdd),
+            'to_remove' => count($serialsToRemove),
+            'first_5_to_add' => array_slice($serialsToAdd, 0, 5)
+        ]);
+
+        // Thêm diploma blanks mới
+        if (!empty($serialsToAdd)) {
+            $this->addMissingDiplomaBlanks($serialsToAdd);
+        }
+
+        // Xóa diploma blanks không cần thiết
+        if (!empty($serialsToRemove)) {
+            $this->removeUnwantedDiplomaBlanks($serialsToRemove);
+        }
+
+        // Cập nhật processed_count và last_processed_serial
+        $finalCount = $this->import->diplomaBlanks()->count();
+        $lastSerial = !empty($expectedSerials) ? end($expectedSerials) : null;
+
+        $this->import->update([
+            'processed_count' => $finalCount,
+            'last_processed_serial' => $lastSerial,
+            'total_quantity' => $newQuantity
+        ]);
+
+        Log::info("Sync completed", [
+            'final_count' => $finalCount,
+            'last_serial' => $lastSerial
+        ]);
+    }
+
+    /**
+     * Thêm các diploma blanks bị thiếu
+     */
+    private function addMissingDiplomaBlanks(array $serialsToAdd): void
+    {
+        $diplomaBlanks = [];
+        $batchSize = 100;
+
+        foreach ($serialsToAdd as $serialNumber) {
+            $diplomaBlanks[] = [
+                'serial_number' => $serialNumber,
+                'type_id' => $this->import->type_id,
+                'import_id' => $this->import->id,
+                'status' => DiplomaBlankStatus::IN_STOCK->value,
+                'import_date' => $this->import->import_date,
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+
+            // Batch insert mỗi 100 records
+            if (count($diplomaBlanks) >= $batchSize) {
+                DiplomaBlank::insert($diplomaBlanks);
+                Log::info("Added " . count($diplomaBlanks) . " diploma blanks");
+                $diplomaBlanks = [];
+            }
+        }
+
+        // Insert các records còn lại
+        if (!empty($diplomaBlanks)) {
+            DiplomaBlank::insert($diplomaBlanks);
+            Log::info("Added " . count($diplomaBlanks) . " final diploma blanks");
+        }
+    }
+
+    /**
+     * Xóa các diploma blanks không cần thiết
+     */
+    private function removeUnwantedDiplomaBlanks(array $serialsToRemove): void
+    {
+        // Chỉ xóa những diploma blanks có status IN_STOCK
+        $deletedCount = $this->import->diplomaBlanks()
+            ->whereIn('serial_number', $serialsToRemove)
+            ->where('status', DiplomaBlankStatus::IN_STOCK->value)
+            ->delete();
+
+        Log::info("Removed {$deletedCount} unwanted diploma blanks");
+    }
+
+    /**
+     * Cập nhật prefix/suffix cho các phôi hiện có (DEPRECATED)
      */
     private function updatePrefixSuffix(string $oldPrefix, string $oldSuffix, string $newPrefix, string $newSuffix, int $fromNumber, int $toNumber): void
     {

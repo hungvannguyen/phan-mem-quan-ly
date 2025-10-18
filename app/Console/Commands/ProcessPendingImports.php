@@ -50,14 +50,31 @@ class ProcessPendingImports extends Command
 
         foreach ($processingImports as $import) {
             try {
-                // Dispatch job bất đồng bộ vào queue
-                ProcessDiplomaBlankImportJob::dispatch($import);
+                // Kiểm tra xem có phải là update import hay tạo mới
+                $isUpdate = $this->isUpdateImport($import);
+
+                if ($isUpdate) {
+                    // Dispatch UpdateDiplomaBlankImportJob với dữ liệu từ import
+                    $updateData = [
+                        'prefix' => $import->prefix,
+                        'suffix' => $import->suffix,
+                        'from_number' => $import->from_number,
+                        'to_number' => $import->to_number,
+                    ];
+
+                    \App\Jobs\UpdateDiplomaBlankImportJob::dispatch($import, $updateData);
+
+                    $this->line("✓ Dispatched UpdateDiplomaBlankImportJob for Import ID: {$import->id}");
+                    Log::info("Dispatched UpdateDiplomaBlankImportJob for import ID: {$import->id}");
+                } else {
+                    // Dispatch job bất đồng bộ vào queue cho tạo mới
+                    ProcessDiplomaBlankImportJob::dispatch($import);
+
+                    $this->line("✓ Dispatched ProcessDiplomaBlankImportJob for Import ID: {$import->id}");
+                    Log::info("Dispatched ProcessDiplomaBlankImportJob for import ID: {$import->id}");
+                }
 
                 $dispatchedCount++;
-
-                $this->line("✓ Dispatched job for Import ID: {$import->id} - {$import->document_reference}");
-
-                Log::info("Dispatched ProcessDiplomaBlankImportJob for import ID: {$import->id}");
             } catch (\Exception $e) {
                 $this->error("✗ Failed to dispatch job for Import ID: {$import->id} - Error: {$e->getMessage()}");
 
@@ -74,6 +91,16 @@ class ProcessPendingImports extends Command
         $this->displayStatistics();
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Kiểm tra xem import có phải là update hay tạo mới
+     * Import update sẽ có diploma blanks đã tồn tại
+     */
+    private function isUpdateImport(DiplomaBlankImport $import): bool
+    {
+        // Nếu import đã có diploma blanks thì đây là update
+        return $import->diplomaBlanks()->exists();
     }
 
     /**

@@ -287,7 +287,7 @@ class DiplomaBlankImportController extends Controller
     }
 
     /**
-     * Cập nhật thông tin import bằng background job
+     * Cập nhật thông tin import - đặt về PROCESSING cho schedule xử lý
      */
     public function updateImport(Request $request, DiplomaBlankImport $import)
     {
@@ -317,10 +317,19 @@ class DiplomaBlankImportController extends Controller
                 return back()->with('error', 'Không có thay đổi nào để cập nhật!');
             }
 
-            // Dispatch job để xử lý update trong background
-            \App\Jobs\UpdateDiplomaBlankImportJob::dispatch($import, $validated);
+            // Lưu thông tin update vào import và đặt trạng thái về PROCESSING
+            // Schedule sẽ tự động phát hiện và dispatch UpdateDiplomaBlankImportJob
+            $import->update([
+                'prefix' => $validated['prefix'],
+                'suffix' => $validated['suffix'],
+                'from_number' => $validated['from_number'],
+                'to_number' => $validated['to_number'],
+                'status' => ImportStatus::PROCESSING->value,
+                'started_at' => now(),
+                'error_message' => null, // Clear previous errors
+            ]);
 
-            return back()->with('success', 'Đã bắt đầu quá trình cập nhật Import #' . $import->id . '. Quá trình sẽ chạy trong background và có thể mất vài phút. Vui lòng kiểm tra lại sau.');
+            return back()->with('success', 'Đã cập nhật thông tin Import #' . $import->id . ' và đặt trạng thái PROCESSING. Schedule sẽ tự động xử lý cập nhật trong vài phút tới.');
         } catch (\Exception $e) {
             return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
