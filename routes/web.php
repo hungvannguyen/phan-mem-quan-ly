@@ -33,6 +33,11 @@ Route::get(
     [DiplomaBlankController::class, 'indexByImport']
 )->middleware('auth')->name('diploma-blanks.list-by-import');
 
+Route::post(
+    '/diploma-blanks/{diplomaBlankId}/mark-damaged',
+    [DiplomaBlankController::class, 'markAsDamaged']
+)->middleware('auth')->name('diploma-blanks.mark-damaged');
+
 Route::get(
     '/diploma-blank-management/create',
     [DiplomaBlankImportController::class, 'create']

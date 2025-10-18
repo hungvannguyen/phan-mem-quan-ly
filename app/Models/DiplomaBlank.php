@@ -31,6 +31,9 @@ class DiplomaBlank extends Model
         'recall_date',
         'issue_reason',
         'recall_reason',
+        'damage_reason_id',
+        'damage_description',
+        'damage_date',
     ];
 
     /**
@@ -48,6 +51,8 @@ class DiplomaBlank extends Model
             'recall_date' => 'datetime',
             'issue_reason' => 'string',
             'recall_reason' => 'string',
+            'damage_date' => 'datetime',
+            'damage_description' => 'string',
         ];
     }
 
@@ -81,6 +86,14 @@ class DiplomaBlank extends Model
     public function degree()
     {
         return $this->hasOne(Degree::class, 'diploma_blank_id', 'diploma_blank_id');
+    }
+
+    /**
+     * Get the damage reason for this diploma blank.
+     */
+    public function damageReason()
+    {
+        return $this->belongsTo(DamageReason::class, 'damage_reason_id', 'id');
     }
 
     /**

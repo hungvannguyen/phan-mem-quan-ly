@@ -1,5 +1,5 @@
 {{-- Table component cho DiplomaBlank --}}
-@props(['diplomaBlanks', 'importId' => null])
+@props(['diplomaBlanks', 'importId' => null, 'damageReasons' => []])
 
 <div class="data-table-container">
     <div class="table-header">
@@ -24,12 +24,13 @@
                         <th class="th">Ngày thu hồi</th>
                         <th class="th">Lý do cấp</th>
                         <th class="th">Lý do thu hồi</th>
+                        <th class="th">Thông tin hư hỏng</th>
                         <th class="th">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr id="loading" class="loading-overlay hidden">
-                        <td colspan="9" class="loading-cell">
+                        <td colspan="10" class="loading-cell">
                             <div class="spinner"></div>
                             <span class="loading-text">Đang tải dữ liệu...</span>
                         </td>
@@ -112,6 +113,36 @@
                                 </div>
                             </td>
                             <td class="td">
+                                <div class="damage-info">
+                                    @php
+                                        $isDamaged = $blank->status instanceof \App\Enums\DiplomaBlankStatus
+                                            ? $blank->status === \App\Enums\DiplomaBlankStatus::DAMAGED
+                                            : $blank->status === 'Damaged';
+                                    @endphp
+                                    
+                                    @if ($isDamaged && $blank->damageReason)
+                                        <div class="damage-details">
+                                            <strong class="damage-reason">{{ $blank->damageReason->name }}</strong>
+                                            @if ($blank->damage_date)
+                                                <small class="damage-date text-muted d-block">
+                                                    {{ $blank->damage_date->format('d/m/Y') }}
+                                                </small>
+                                            @endif
+                                            @if ($blank->damage_description)
+                                                <small class="damage-description text-muted d-block" 
+                                                    title="{{ $blank->damage_description }}">
+                                                    {{ Str::limit($blank->damage_description, 30) }}
+                                                </small>
+                                            @endif
+                                        </div>
+                                    @elseif ($isDamaged)
+                                        <span class="text-warning">Hư hỏng (chưa có chi tiết)</span>
+                                    @else
+                                        <span class="text-muted">--</span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="td">
                                 <div class="action-buttons">
                                     <button type="button" class="btn-action btn-view" title="Xem chi tiết">
                                         Xem
@@ -135,7 +166,8 @@
                                     @endif
 
                                     @if ($currentStatus && $currentStatus->canMarkAsDamaged())
-                                        <button type="button" class="btn-action btn-delete" title="Báo hư hỏng">
+                                        <button type="button" class="btn-action btn-delete" title="Báo hư hỏng"
+                                            onclick="showMarkDamagedModal({{ $blank->diploma_blank_id }}, '{{ $blank->serial_number }}')">
                                             Báo hỏng
                                         </button>
                                     @endif
@@ -197,4 +229,102 @@
             </div>
         </div>
     @endif
+
+    <!-- Modal báo hỏng phôi văn bằng -->
+    <div id="markDamagedModal" class="modal" style="display: none;">
+        <div class="modal__dialog">
+            <div class="modal__overlay" onclick="hideMarkDamagedModal()"></div>
+            <div class="modal__container">
+                <div class="modal__content">
+                    <div class="modal__header">
+                        <div class="modal__title-wrapper">
+                            <h3 class="modal__title">Báo hỏng phôi văn bằng</h3>
+                        </div>
+                        <button type="button" class="btn-close" onclick="hideMarkDamagedModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal__body">
+                        <form id="markDamagedForm" method="POST" action="">
+                            @csrf
+                            <div class="form-group">
+                                <label for="markDamaged_serial_number">Số sê-ri:</label>
+                                <input type="text" id="markDamaged_serial_number" name="serial_number" readonly
+                                    class="form-input readonly">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="damage_reason_id">Lý do hư hỏng: <span class="required">*</span></label>
+                                <select id="damage_reason_id" name="damage_reason_id" class="form-select" required>
+                                    <option value="">-- Chọn lý do hư hỏng --</option>
+                                    @foreach ($damageReasons as $reason)
+                                        <option value="{{ $reason->id }}">{{ $reason->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="damage_description">Mô tả chi tiết (tùy chọn):</label>
+                                <textarea id="damage_description" name="damage_description" class="form-textarea"
+                                    placeholder="Mô tả chi tiết về tình trạng hư hỏng..." rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal__footer">
+                        <button type="button" class="modal__footer--action-secondary"
+                            onclick="hideMarkDamagedModal()">
+                            <i class="fas fa-times"></i>
+                            Hủy bỏ
+                        </button>
+                        <button type="button" class="modal__footer--action-primary" onclick="submitMarkDamaged()">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Báo hỏng
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMarkDamagedModal(diplomaBlankId, serialNumber) {
+            document.getElementById('markDamaged_serial_number').value = serialNumber;
+            document.getElementById('markDamagedForm').action = `/diploma-blanks/${diplomaBlankId}/mark-damaged`;
+            document.getElementById('markDamagedModal').style.display = 'block';
+
+            // Reset form
+            document.getElementById('damage_reason_id').value = '';
+            document.getElementById('damage_description').value = '';
+        }
+
+        function hideMarkDamagedModal() {
+            document.getElementById('markDamagedModal').style.display = 'none';
+        }
+
+        function submitMarkDamaged() {
+            const form = document.getElementById('markDamagedForm');
+            const reasonSelect = document.getElementById('damage_reason_id');
+
+            if (!reasonSelect.value) {
+                alert('Vui lòng chọn lý do hư hỏng');
+                return;
+            }
+
+            if (confirm('Bạn có chắc chắn muốn báo hỏng phôi văn bằng này?')) {
+                form.submit();
+            }
+        }
+
+        // Đóng modal khi click overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('markDamagedModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideMarkDamagedModal();
+                    }
+                });
+            }
+        });
+    </script>
 </div>

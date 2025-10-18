@@ -1824,3 +1824,24 @@
   --color-focus-blue: #3b82f6;
   --color-focus-indigo: #6366f1;
 }
+
+/* Damage Info Styles */
+.damage-info {
+  @apply text-sm;
+}
+
+.damage-details {
+  @apply space-y-1;
+}
+
+.damage-reason {
+  @apply text-red-600 font-medium block;
+}
+
+.damage-date {
+  @apply text-xs text-gray-500;
+}
+
+.damage-description {
+  @apply text-xs text-gray-600 italic;
+}

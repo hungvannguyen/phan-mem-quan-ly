@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\DiplomaBlank;
 use App\Models\DiplomaBlankType;
+use App\Models\DamageReason;
+use App\Enums\DiplomaBlankStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class DiplomaBlankController extends Controller
 {
@@ -15,7 +18,7 @@ class DiplomaBlankController extends Controller
     public function indexByImport(Request $request, $importId)
     {
 
-        $query = DiplomaBlank::with(['type', 'import']);
+        $query = DiplomaBlank::with(['type', 'import', 'damageReason']);
 
         // Lọc theo import_id - sử dụng relationship chặt chẽ
         $query->where('import_id', $importId);
@@ -46,9 +49,10 @@ class DiplomaBlankController extends Controller
             ->paginate($perPage);
 
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
+        $damageReasons = DamageReason::orderBy('name')->get();
 
         if ($request->ajax()) {
-            return view('components.diploma-blanks.table', compact('diplomaBlanks'))->render();
+            return view('components.diploma-blanks.table', compact('diplomaBlanks', 'damageReasons'))->render();
         }
 
         // Get current import info
@@ -61,6 +65,7 @@ class DiplomaBlankController extends Controller
         return view('diploma-blanks-list', [
             'diplomaBlanks' => $diplomaBlanks,
             'diplomaBlankTypes' => $diplomaBlankTypes,
+            'damageReasons' => $damageReasons,
             'currentImport' => $currentImport,
             'importId' => $importId,
         ]);
@@ -313,8 +318,55 @@ class DiplomaBlankController extends Controller
             'recall_reason' => $request->recall_reason,
         ]);
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->back()
             ->with('success', 'Phôi văn bằng đã được đánh dấu là hư hỏng.');
+    }
+
+    /**
+     * Mark a diploma blank as damaged with reason
+     */
+    public function markAsDamaged(Request $request, $diplomaBlankId)
+    {
+        $request->validate([
+            'damage_reason_id' => 'required|exists:damage_reasons,id',
+            'damage_description' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $diplomaBlank = DiplomaBlank::findOrFail($diplomaBlankId);
+
+            // Kiểm tra xem phôi có thể báo hỏng không
+            $currentStatus = $diplomaBlank->status instanceof DiplomaBlankStatus
+                ? $diplomaBlank->status
+                : DiplomaBlankStatus::tryFrom($diplomaBlank->status);
+
+            if (!$currentStatus || !$currentStatus->canMarkAsDamaged()) {
+                return redirect()->back()
+                    ->with('error', 'Phôi văn bằng này không thể báo hỏng với trạng thái hiện tại.');
+            }
+
+            // Cập nhật thông tin hư hỏng
+            $diplomaBlank->damage_reason_id = $request->damage_reason_id;
+            $diplomaBlank->damage_description = $request->damage_description;
+            $diplomaBlank->damage_date = now();
+            $diplomaBlank->status = DiplomaBlankStatus::DAMAGED;
+            $diplomaBlank->save();
+
+            // Log hoạt động
+            Log::info('Diploma blank marked as damaged', [
+                'diploma_blank_id' => $diplomaBlankId,
+                'serial_number' => $diplomaBlank->serial_number,
+                'damage_reason_id' => $request->damage_reason_id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Phôi văn bằng đã được báo hỏng thành công.');
+        } catch (\Exception $e) {
+            Log::error('Error marking diploma blank as damaged: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi báo hỏng phôi văn bằng. Vui lòng thử lại.');
+        }
     }
 
     /**

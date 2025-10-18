@@ -171,7 +171,7 @@
                     </div>
 
                     <!-- Include table component -->
-                    <x-diploma-blanks.table :diplomaBlanks="$diplomaBlanks" :importId="$importId ?? null" />
+                    <x-diploma-blanks.table :diplomaBlanks="$diplomaBlanks" :importId="$importId ?? null" :damageReasons="$damageReasons" />
                 @else
                     <div class="empty-results">
                         <div class="empty-icon">
