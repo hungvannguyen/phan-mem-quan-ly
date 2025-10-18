@@ -148,6 +148,12 @@ Route::post(
     [DiplomaManagementController::class, 'update']
 )->middleware('auth')->name('student.update');
 
+// Degree routes
+Route::post(
+    "degrees/store",
+    [DiplomaManagementController::class, 'storeDegree']
+)->middleware('auth')->name('degrees.store');
+
 // Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');

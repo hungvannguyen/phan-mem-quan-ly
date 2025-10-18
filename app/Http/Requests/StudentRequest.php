@@ -36,6 +36,12 @@ class StudentRequest extends FormRequest
             'date_of_birth' => 'required|date',
             'class_name' => 'nullable|string|max:100',
             'major_id' => 'required|exists:majors,major_id',
+            'place_of_birth' => 'nullable|string|max:255',
+            'gender' => 'nullable|integer|in:0,1',
+            'nation' => 'nullable|string|max:100',
+            'nationality' => 'nullable|string|max:100',
+            'number_in_the_book' => 'nullable|string|max:100',
+            'status' => 'required|integer|in:0,1,2',
         ];
     }
 
@@ -60,17 +66,24 @@ class StudentRequest extends FormRequest
             'major_id.required' => 'Vui lòng chọn ngành đào tạo.',
             'major_id.exists' => 'Ngành đào tạo không tồn tại.',
 
-            // Các thông báo cho trường tạm thời comment
-            // 'place_of_birth.string' => 'Nơi sinh phải là một chuỗi ký tự.',
-            // 'place_of_birth.max' => 'Nơi sinh không được vượt quá :max ký tự.',
-            // 'gender.integer' => 'Giới tính không hợp lệ.',
-            // 'nation.string' => 'Dân tộc phải là một chuỗi ký tự.',
-            // 'nation.max' => 'Dân tộc không được vượt quá :max ký tự.',
-            // 'nationality.string' => 'Quốc tịch phải là một chuỗi ký tự.',
-            // 'nationality.max' => 'Quốc tịch không được vượt quá :max ký tự.',
-            // 'number_in_the_book.string' => 'Số vào sổ phải là một chuỗi ký tự.',
-            // 'number_in_the_book.max' => 'Số vào sổ không được vượt quá :max ký tự.',
-            // 'status.integer' => 'Trạng thái không hợp lệ.',
+            'place_of_birth.string' => 'Nơi sinh phải là một chuỗi ký tự.',
+            'place_of_birth.max' => 'Nơi sinh không được vượt quá :max ký tự.',
+
+            'gender.integer' => 'Giới tính không hợp lệ.',
+            'gender.in' => 'Giới tính phải là Nam hoặc Nữ.',
+
+            'nation.string' => 'Dân tộc phải là một chuỗi ký tự.',
+            'nation.max' => 'Dân tộc không được vượt quá :max ký tự.',
+
+            'nationality.string' => 'Quốc tịch phải là một chuỗi ký tự.',
+            'nationality.max' => 'Quốc tịch không được vượt quá :max ký tự.',
+
+            'number_in_the_book.string' => 'Số sổ gốc phải là một chuỗi ký tự.',
+            'number_in_the_book.max' => 'Số sổ gốc không được vượt quá :max ký tự.',
+
+            'status.required' => 'Vui lòng chọn trạng thái học tập.',
+            'status.integer' => 'Trạng thái không hợp lệ.',
+            'status.in' => 'Trạng thái phải là Đang học, Đã tốt nghiệp hoặc Bỏ học.',
         ];
     }
 }

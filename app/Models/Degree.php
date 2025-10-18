@@ -30,6 +30,8 @@ class Degree extends Model
         'graduation_year',
         'ranking',
         'decision_number',
+        'major_name',
+        'notes',
     ];
 
     /**
@@ -46,6 +48,8 @@ class Degree extends Model
             'graduation_year' => 'integer',
             'ranking' => 'string',
             'decision_number' => 'string',
+            'major_name' => 'string',
+            'notes' => 'string',
         ];
     }
 

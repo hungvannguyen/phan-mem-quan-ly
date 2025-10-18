@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('content')
-    <main class="diploma-management">
+    <main class="management-page">
         {{-- Hiển thị thông báo --}}
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -27,17 +27,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <div class="diploma-form-section">
+
+        <div class="form-section">
             <!-- Page Header -->
-            <div class="diploma-page-header">
-                <h1 class="diploma-page-title">Quản lý Sinh viên và Văn bằng</h1>
-                <p class="diploma-page-subtitle">Tìm kiếm và quản lý thông tin sinh viên cùng văn bằng đã cấp</p>
+            <div class="page">
+                <h1 class="page-title">Quản lý Sinh viên và Văn bằng</h1>
+                <p class="page-subtitle">Tìm kiếm và quản lý thông tin sinh viên cùng văn bằng đã cấp</p>
             </div>
 
             <!-- Search Form -->
-            <div class="diploma-search-card">
-                <form class="diploma-search-form" method="GET" action="{{ route('diploma-management') }}">
-                    <div class="search-form-grid">
+            <div class="search-card">
+                <form class="search-form" method="GET" action="{{ route('diploma-management') }}">
+                    <div class="form-grid">
                         <div class="form-field">
                             <label for="full_name" class="field-label">Họ và tên sinh viên</label>
                             <input type="text" id="full_name" name="full_name" class="field-input"
@@ -113,21 +114,26 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="diploma-actions">
+            <div class="page-actions">
                 <a href="{{ route('student.create') }}" class="action-btn action-btn-primary">
+                    <i class="fas fa-plus"></i>
                     Thêm sinh viên mới
                 </a>
                 <button type="button" class="action-btn action-btn-warning">
+                    <i class="fas fa-certificate"></i>
                     Cấp văn bằng
                 </button>
                 <button type="button" class="action-btn action-btn-info">
+                    <i class="fas fa-print"></i>
                     In danh sách
                 </button>
                 <button type="button" class="action-btn action-btn-success">
+                    <i class="fas fa-file-excel"></i>
                     Xuất Excel
                 </button>
             </div>
         </div>
+
         <div class="table-section">
             <div class="table-wrapper" id="table-data">
                 @include('components.students.table')
