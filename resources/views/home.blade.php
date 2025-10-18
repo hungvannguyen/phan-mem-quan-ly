@@ -1,5 +1,5 @@
 @extends('layouts.default')
 
 @section('content')
-	<h1> Chào </h1>
+    <h1> Xin Chào </h1>
 @endsection
