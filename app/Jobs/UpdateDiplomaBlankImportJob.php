@@ -121,24 +121,20 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
         $batchSize = 100;
         $processed = 0;
 
-        for ($num = $fromNumber; $num <= $toNumber; $num += $batchSize) {
-            $endNum = min($num + $batchSize - 1, $toNumber);
+        // Sử dụng relationship thay vì match pattern - an toàn hơn
+        $diplomaBlanks = $this->import->diplomaBlanks()->get();
 
-            $updates = [];
-            for ($i = $num; $i <= $endNum; $i++) {
-                $oldSerial = $oldPrefix . $i . $oldSuffix;
-                $newSerial = $newPrefix . $i . $newSuffix;
+        foreach ($diplomaBlanks->chunk($batchSize) as $chunk) {
+            foreach ($chunk as $diplomaBlank) {
+                // Extract số từ serial cũ
+                $oldSerial = $diplomaBlank->serial_number;
+                $numberPart = str_replace([$oldPrefix, $oldSuffix], '', $oldSerial);
 
-                $updates[] = [
-                    'old_serial' => $oldSerial,
-                    'new_serial' => $newSerial
-                ];
-            }
+                // Tạo serial mới với prefix/suffix mới
+                $newSerial = $newPrefix . $numberPart . $newSuffix;
 
-            // Batch update
-            foreach ($updates as $update) {
-                DiplomaBlank::where('serial_number', $update['old_serial'])
-                    ->update(['serial_number' => $update['new_serial']]);
+                // Cập nhật serial number
+                $diplomaBlank->update(['serial_number' => $newSerial]);
                 $processed++;
             }
 
@@ -163,6 +159,7 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
                 $diplomaBlanks[] = [
                     'serial_number' => $serialNumber,
                     'type_id' => $this->import->type_id,
+                    'import_id' => $this->import->id, // Liên kết với import record
                     'status' => DiplomaBlankStatus::IN_STOCK->value,
                     'import_date' => $this->import->import_date,
                     'created_at' => now(),
@@ -198,34 +195,36 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
      */
     private function removeDiplomaBlanks(int $newFromNumber, int $newToNumber, string $prefix, string $suffix, int $removeCount): void
     {
-        $serialsToRemove = [];
-        $startNum = $newToNumber + 1;
-        $endNum = $newToNumber + $removeCount;
+        // Sử dụng relationship để xóa - an toàn và chính xác hơn
         $batchSize = 100;
 
-        for ($num = $startNum; $num <= $endNum; $num += $batchSize) {
-            $batchEnd = min($num + $batchSize - 1, $endNum);
-            $batchSerials = [];
+        // Lấy các diploma blanks thuộc import này, sắp xếp theo serial descending để xóa từ cuối
+        $diplomaBlanksToRemove = $this->import->diplomaBlanks()
+            ->where('status', DiplomaBlankStatus::IN_STOCK->value)
+            ->orderBy('serial_number', 'desc')
+            ->take($removeCount)
+            ->get();
 
-            for ($i = $num; $i <= $batchEnd; $i++) {
-                $serialNumber = $prefix . $i . $suffix;
-                $batchSerials[] = $serialNumber;
-            }
+        $deletedCount = 0;
 
-            // Chỉ xóa các phôi có status IN_STOCK (chưa được sử dụng)
-            $deletedCount = DiplomaBlank::whereIn('serial_number', $batchSerials)
-                ->where('status', DiplomaBlankStatus::IN_STOCK->value)
-                ->delete();
+        foreach ($diplomaBlanksToRemove->chunk($batchSize) as $chunk) {
+            $idsToDelete = $chunk->pluck('diploma_blank_id')->toArray();
 
-            Log::info("Removed {$deletedCount} unused diploma blanks from batch");
+            // Xóa batch này
+            $batchDeleted = DiplomaBlank::whereIn('diploma_blank_id', $idsToDelete)->delete();
+            $deletedCount += $batchDeleted;
+
+            Log::info("Removed {$batchDeleted} unused diploma blanks from batch");
         }
 
         // Cập nhật last_processed_serial
         $lastSerial = $prefix . $newToNumber . $suffix;
         $this->import->update([
-            'processed_count' => max(0, $this->import->processed_count - $removeCount),
+            'processed_count' => max(0, $this->import->processed_count - $deletedCount),
             'last_processed_serial' => $lastSerial
         ]);
+
+        Log::info("Total removed: {$deletedCount} diploma blanks from import #{$this->import->id}");
     }
 
     /**

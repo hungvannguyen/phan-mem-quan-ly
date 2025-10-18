@@ -107,6 +107,7 @@ class ProcessDiplomaBlankImportJob implements ShouldQueue
             $diplomaBlanks[] = [
                 'serial_number' => $serialNumber,
                 'type_id' => $typeId,
+                'import_id' => $this->import->id, // Liên kết với import record
                 'status' => DiplomaBlankStatus::IN_STOCK->value, // Trạng thái mặc định là trong kho
                 'import_date' => $importDate,
                 'issue_date' => null,

@@ -6,6 +6,7 @@ use App\Enums\ImportStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DiplomaBlankImport extends Model
 {
@@ -47,6 +48,14 @@ class DiplomaBlankImport extends Model
     public function diplomaBlankType(): BelongsTo
     {
         return $this->belongsTo(DiplomaBlankType::class, 'type_id', 'type_id');
+    }
+
+    /**
+     * Relationship với DiplomaBlank - lấy tất cả phôi được tạo từ import này
+     */
+    public function diplomaBlanks(): HasMany
+    {
+        return $this->hasMany(DiplomaBlank::class, 'import_id', 'id');
     }
 
     /**

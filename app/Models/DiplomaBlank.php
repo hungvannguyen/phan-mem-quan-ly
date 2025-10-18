@@ -24,6 +24,7 @@ class DiplomaBlank extends Model
     protected $fillable = [
         'serial_number',
         'type_id',
+        'import_id',
         'status',
         'import_date',
         'issue_date',
@@ -64,6 +65,14 @@ class DiplomaBlank extends Model
     public function type()
     {
         return $this->belongsTo(DiplomaBlankType::class, 'type_id', 'type_id');
+    }
+
+    /**
+     * Get the import record that created this diploma blank.
+     */
+    public function import()
+    {
+        return $this->belongsTo(DiplomaBlankImport::class, 'import_id', 'id');
     }
 
     /**
