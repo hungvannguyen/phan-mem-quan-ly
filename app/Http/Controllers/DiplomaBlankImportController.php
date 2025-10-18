@@ -8,6 +8,7 @@ use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 
 class DiplomaBlankImportController extends Controller
@@ -131,8 +132,8 @@ class DiplomaBlankImportController extends Controller
             'total_quantity' => $totalQuantity,
             'prefix' => $request->prefix,
             'suffix' => $request->suffix,
-            'from_number' => str_pad($fromNum, 5, '0', STR_PAD_LEFT),
-            'to_number' => str_pad($toNum, 5, '0', STR_PAD_LEFT),
+            'from_number' => (string)$fromNum,
+            'to_number' => (string)$toNum,
             'status' => ImportStatus::PENDING->value,
             'processed_count' => 0,
         ]);
@@ -149,8 +150,8 @@ class DiplomaBlankImportController extends Controller
      */
     public function show(DiplomaBlankImport $import)
     {
-        // Chuyển hướng đến trang diploma-blanks với filter theo import_id
-        return redirect()->route('diploma-blanks.index', ['import_id' => $import->id]);
+        // Chuyển hướng đến trang diploma-blanks-list với import ID
+        return redirect()->route('diploma-blanks.list-by-import', $import->id);
     }
 
     /**
@@ -170,12 +171,9 @@ class DiplomaBlankImportController extends Controller
             'started_at' => now(),
         ]);
 
-        // TODO: Dispatch job để xử lý import trong background
-        // ProcessDiplomaBlankImport::dispatch($import);
-
         return response()->json([
             'success' => true,
-            'message' => 'Đã bắt đầu xử lý import.',
+            'message' => 'Đã bắt đầu xử lý import. Job sẽ được schedule xử lý trong background.',
             'data' => [
                 'status' => $import->status->getLabel(),
                 'status_class' => $this->getStatusClass($import->status),
@@ -287,6 +285,70 @@ class DiplomaBlankImportController extends Controller
             'synced_count' => 0
         ]);
     }
+
+    /**
+     * Cập nhật thông tin import bằng background job
+     */
+    public function updateImport(Request $request, DiplomaBlankImport $import)
+    {
+        // Validate request
+        $validated = $request->validate([
+            'prefix' => 'nullable|string|max:10',
+            'suffix' => 'nullable|string|max:10',
+            'from_number' => 'required|string|max:20',
+            'to_number' => 'required|string|max:20',
+        ]);
+
+        try {
+            // Chỉ cho phép update import đã hoàn thành
+            if ($import->status !== ImportStatus::COMPLETED) {
+                return back()->with('error', 'Chỉ có thể cập nhật import đã hoàn thành!');
+            }
+
+            // Kiểm tra xem có thay đổi gì không
+            $hasChanges = (
+                ($import->prefix ?? '') !== ($validated['prefix'] ?? '') ||
+                ($import->suffix ?? '') !== ($validated['suffix'] ?? '') ||
+                $import->from_number !== $validated['from_number'] ||
+                $import->to_number !== $validated['to_number']
+            );
+
+            if (!$hasChanges) {
+                return back()->with('error', 'Không có thay đổi nào để cập nhật!');
+            }
+
+            // Dispatch job để xử lý update trong background
+            \App\Jobs\UpdateDiplomaBlankImportJob::dispatch($import, $validated);
+
+            return back()->with('success', 'Đã bắt đầu quá trình cập nhật Import #' . $import->id . '. Quá trình sẽ chạy trong background và có thể mất vài phút. Vui lòng kiểm tra lại sau.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Kiểm tra trạng thái cập nhật import
+     */
+    public function checkUpdateStatus(DiplomaBlankImport $import): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'import' => [
+                'id' => $import->id,
+                'status' => $import->status->value,
+                'status_label' => $import->getStatusText(),
+                'status_class' => $import->getStatusBadgeClass(),
+                'processed_count' => $import->processed_count,
+                'total_quantity' => $import->total_quantity,
+                'completion_percentage' => $import->getCompletionPercentage(),
+                'last_processed_serial' => $import->last_processed_serial,
+                'error_message' => $import->error_message,
+                'updated_at' => $import->updated_at?->format('d/m/Y H:i:s')
+            ]
+        ]);
+    }
+
+
 
     /**
      * Helper method để lấy CSS class cho status

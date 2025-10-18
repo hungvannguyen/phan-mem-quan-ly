@@ -129,10 +129,7 @@ class DiplomaBlankImport extends Model
         $fromNum = intval($this->from_number);
         $nextNum = $fromNum + $this->processed_count;
 
-        // Định dạng số theo độ dài của from_number
-        $paddedNum = str_pad($nextNum, strlen($this->from_number), '0', STR_PAD_LEFT);
-
-        return ($this->prefix ?? '') . $paddedNum . ($this->suffix ?? '');
+        return ($this->prefix ?? '') . $nextNum . ($this->suffix ?? '');
     }
 
     /**
@@ -206,5 +203,43 @@ class DiplomaBlankImport extends Model
     public function getStatusBadgeClass(): string
     {
         return $this->status?->getBadgeClass() ?? 'badge-secondary';
+    }
+
+    /**
+     * Kiểm tra xem import có thể được cập nhật không
+     */
+    public function canBeUpdated(): bool
+    {
+        return $this->status === ImportStatus::COMPLETED;
+    }
+
+    /**
+     * Tính toán số lượng phôi sẽ thay đổi khi update
+     */
+    public function calculateQuantityChange(string $newFromNumber, string $newToNumber): int
+    {
+        $currentQuantity = intval($this->to_number) - intval($this->from_number) + 1;
+        $newQuantity = intval($newToNumber) - intval($newFromNumber) + 1;
+
+        return $newQuantity - $currentQuantity;
+    }
+
+    /**
+     * Lấy danh sách serial numbers hiện tại của import này
+     */
+    public function getCurrentSerialNumbers(): array
+    {
+        $serialNumbers = [];
+        $fromNum = intval($this->from_number);
+        $toNum = intval($this->to_number);
+        $prefix = $this->prefix ?? '';
+        $suffix = $this->suffix ?? '';
+
+        for ($num = $fromNum; $num <= $toNum; $num++) {
+            $paddedNum = str_pad($num, strlen($this->from_number), '0', STR_PAD_LEFT);
+            $serialNumbers[] = $prefix . $paddedNum . $suffix;
+        }
+
+        return $serialNumbers;
     }
 }

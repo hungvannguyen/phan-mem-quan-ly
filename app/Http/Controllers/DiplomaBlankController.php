@@ -100,6 +100,83 @@ class DiplomaBlankController extends Controller
     }
 
     /**
+     * Display diploma blanks for a specific import ID.
+     */
+    public function indexByImport(Request $request, $importId)
+    {
+        $query = DiplomaBlank::with(['type']);
+
+        // Lọc theo import_id từ route parameter
+        $import = \App\Models\DiplomaBlankImport::find($importId);
+
+        if (!$import) {
+            abort(404, 'Import không tồn tại.');
+        }
+
+        $prefix = $import->prefix ?? '';
+        $suffix = $import->suffix ?? '';
+
+        // Filter records có serial number trong range của import này
+        $query->where(function ($q) use ($prefix, $suffix, $import) {
+            if (!empty($prefix) && !empty($suffix)) {
+                $q->where('serial_number', 'like', $prefix . '%' . $suffix);
+            } elseif (!empty($prefix)) {
+                $q->where('serial_number', 'like', $prefix . '%');
+            } elseif (!empty($suffix)) {
+                $q->where('serial_number', 'like', '%' . $suffix);
+            }
+
+            // Additional filter by type_id
+            $q->where('type_id', $import->type_id);
+
+            // Filter by import_date
+            $q->whereDate('import_date', '=', $import->import_date);
+        });
+
+        // Apply other filters from request (tìm kiếm, status, etc.)
+        if ($request->filled('serial_number')) {
+            $query->where('serial_number', 'like', '%' . $request->serial_number . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('issue_date_from')) {
+            $query->whereDate('issue_date', '>=', $request->issue_date_from);
+        }
+
+        if ($request->filled('issue_date_to')) {
+            $query->whereDate('issue_date', '<=', $request->issue_date_to);
+        }
+
+        // Get per_page from request, default to 15
+        $perPage = $request->get('per_page', 15);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 15;
+
+        $diplomaBlanks = $query->orderBy('created_at', 'desc')->paginate($perPage);
+
+        // Append all query parameters to pagination links
+        $diplomaBlanks->appends($request->query());
+
+        $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
+
+        // Get current import info
+        $currentImport = \App\Models\DiplomaBlankImport::with('diplomaBlankType')->find($importId);
+
+        if ($request->ajax()) {
+            return view('components.diploma-blanks.table', compact('diplomaBlanks'))->render();
+        }
+
+        return view('diploma-blanks-list', [
+            'diplomaBlanks' => $diplomaBlanks,
+            'diplomaBlankTypes' => $diplomaBlankTypes,
+            'currentImport' => $currentImport,
+            'importId' => $importId, // Pass importId to view for URL generation
+        ]);
+    }
+
+    /**
      * Show the form for importing diploma blanks.
      */
     public function import()
@@ -156,8 +233,7 @@ class DiplomaBlankController extends Controller
         $existingSerials = [];
 
         for ($i = $fromNumber; $i <= $toNumber; $i++) {
-            $paddedNumber = str_pad($i, strlen($request->from_number), '0', STR_PAD_LEFT);
-            $serial = $request->from_prefix . $paddedNumber . $request->from_suffix;
+            $serial = $request->from_prefix . $i . $request->from_suffix;
             $serialNumbers[] = $serial;
         }
 
@@ -208,8 +284,7 @@ class DiplomaBlankController extends Controller
         $serialNumbers = [];
 
         for ($i = $fromNumber; $i <= $toNumber; $i++) {
-            $paddedNumber = str_pad($i, strlen($request->from_number), '0', STR_PAD_LEFT);
-            $serial = $request->from_prefix . $paddedNumber . $request->from_suffix;
+            $serial = $request->from_prefix . $i . $request->from_suffix;
             $serialNumbers[] = $serial;
         }
 

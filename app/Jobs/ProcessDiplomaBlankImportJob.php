@@ -35,8 +35,8 @@ class ProcessDiplomaBlankImportJob implements ShouldQueue
     public function handle(): void
     {
         // Kiểm tra trạng thái import trước khi xử lý
-        if ($this->import->status !== ImportStatus::PENDING) {
-            Log::info("Import ID {$this->import->id} is not in PENDING status, skipping...");
+        if ($this->import->status !== ImportStatus::PROCESSING) {
+            Log::info("Import ID {$this->import->id} is not in PROCESSING status, skipping...");
             return;
         }
 
@@ -94,11 +94,8 @@ class ProcessDiplomaBlankImportJob implements ShouldQueue
         $processedCount = 0;
 
         for ($num = $fromNum; $num <= $toNum; $num++) {
-            // Format số với leading zeros giống với from_number
-            $paddedNum = str_pad($num, strlen($this->import->from_number), '0', STR_PAD_LEFT);
-
-            // Tạo serial number
-            $serialNumber = $prefix . $paddedNum . $suffix;
+            // Giữ nguyên format số như đã nhập, không thêm leading zeros
+            $serialNumber = $prefix . $num . $suffix;
 
             // Kiểm tra xem serial number đã tồn tại chưa
             $existingBlank = DiplomaBlank::where('serial_number', $serialNumber)->first();
@@ -142,7 +139,7 @@ class ProcessDiplomaBlankImportJob implements ShouldQueue
         }
 
         // Cập nhật tiến trình cuối cùng
-        $lastSerial = $prefix . str_pad($toNum, strlen($this->import->from_number), '0', STR_PAD_LEFT) . $suffix;
+        $lastSerial = $prefix . $toNum . $suffix;
         $this->import->updateProgress($processedCount, $lastSerial);
 
         Log::info("Created {$processedCount} diploma blanks for import ID: {$this->import->id}");

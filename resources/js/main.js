@@ -23,7 +23,7 @@ $(document).on("change", ".per-page-select", function (event) {
 // Function to view diploma blanks from specific import
 function viewDiplomaBlanks(importId) {
     if (importId) {
-        window.location.href = '/diploma-blanks?import_id=' + importId;
+        window.location.href = '/diploma-blanks-list/' + importId;
     }
 }
 

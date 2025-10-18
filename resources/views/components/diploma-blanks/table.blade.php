@@ -1,4 +1,6 @@
 {{-- Table component cho DiplomaBlank --}}
+@props(['diplomaBlanks', 'importId' => null])
+
 <div class="data-table-container">
     <div class="table-header">
         <h3 class="table-title">Danh sách Phôi Văn Bằng</h3>
@@ -180,10 +182,17 @@
             </p>
             <div class="empty-actions">
                 @if (request()->hasAny(['serial_number', 'type_id', 'status', 'import_date_from', 'import_date_to']))
-                    <a href="{{ route('diploma-blanks.index') }}" class="btn-secondary">
-                        <i class="fas fa-times"></i>
-                        Xóa bộ lọc
-                    </a>
+                    @if ($importId)
+                        <a href="{{ route('diploma-blanks.list-by-import', $importId) }}" class="btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Xóa bộ lọc
+                        </a>
+                    @else
+                        <a href="{{ route('diploma-blanks.index') }}" class="btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Xóa bộ lọc
+                        </a>
+                    @endif
                 @endif
             </div>
         </div>

@@ -34,6 +34,11 @@ Route::get(
 )->middleware('auth')->name('diploma-blanks.index');
 
 Route::get(
+    '/diploma-blanks-list/{importId}',
+    [DiplomaBlankController::class, 'indexByImport']
+)->middleware('auth')->name('diploma-blanks.list-by-import');
+
+Route::get(
     '/diploma-blank-management/create',
     [DiplomaBlankImportController::class, 'create']
 )->middleware('auth')->name('diploma-blank-import.create');
@@ -77,6 +82,18 @@ Route::post(
     '/diploma-blank-management/sync',
     [DiplomaBlankImportController::class, 'sync']
 )->middleware('auth')->name('diploma-blank-import.sync');
+
+Route::put(
+    '/diploma-blank-management/{import}/update',
+    [DiplomaBlankImportController::class, 'updateImport']
+)->middleware('auth')->name('diploma-blank-import.update')
+    ->where('import', '[0-9]+');
+
+Route::get(
+    '/diploma-blank-management/{import}/status',
+    [DiplomaBlankImportController::class, 'checkUpdateStatus']
+)->middleware('auth')->name('diploma-blank-import.status')
+    ->where('import', '[0-9]+');
 
 Route::get(
     '/diploma-blank-management/import',

@@ -15,14 +15,14 @@ class ProcessPendingImports extends Command
      *
      * @var string
      */
-    protected $signature = 'imports:process-pending {--limit=5 : Maximum number of imports to process per run}';
+    protected $signature = 'imports:process-processing {--limit=5 : Maximum number of imports to process per run}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Process pending DiplomaBlankImport records by dispatching ProcessDiplomaBlankImportJob';
+    protected $description = 'Process PROCESSING DiplomaBlankImport records by dispatching ProcessDiplomaBlankImportJob';
 
     /**
      * Execute the console command.
@@ -31,26 +31,26 @@ class ProcessPendingImports extends Command
     {
         $limit = (int) $this->option('limit');
 
-        $this->info('Scanning for pending DiplomaBlankImport records...');
+        $this->info('Scanning for PROCESSING DiplomaBlankImport records...');
 
-        // Lấy các import đang pending
-        $pendingImports = DiplomaBlankImport::where('status', ImportStatus::PENDING)
+        // Lấy các import đang processing
+        $processingImports = DiplomaBlankImport::where('status', ImportStatus::PROCESSING)
             ->orderBy('created_at', 'asc') // FIFO - First In, First Out
             ->limit($limit)
             ->get();
 
-        if ($pendingImports->isEmpty()) {
-            $this->info('No pending imports found.');
+        if ($processingImports->isEmpty()) {
+            $this->info('No processing imports found.');
             return Command::SUCCESS;
         }
 
-        $this->info("Found {$pendingImports->count()} pending import(s). Dispatching jobs...");
+        $this->info("Found {$processingImports->count()} processing import(s). Dispatching to queue...");
 
         $dispatchedCount = 0;
 
-        foreach ($pendingImports as $import) {
+        foreach ($processingImports as $import) {
             try {
-                // Dispatch job để xử lý import
+                // Dispatch job bất đồng bộ vào queue
                 ProcessDiplomaBlankImportJob::dispatch($import);
 
                 $dispatchedCount++;
@@ -68,7 +68,7 @@ class ProcessPendingImports extends Command
             }
         }
 
-        $this->info("Successfully dispatched {$dispatchedCount} job(s).");
+        $this->info("Successfully dispatched {$dispatchedCount} job(s) to queue.");
 
         // Log thống kê
         $this->displayStatistics();
