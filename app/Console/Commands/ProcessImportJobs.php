@@ -8,21 +8,21 @@ use App\Enums\ImportStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-class ProcessPendingImports extends Command
+class ProcessImportJobs extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'imports:process-processing {--limit=5 : Maximum number of imports to process per run}';
+    protected $signature = 'imports:process-jobs {--limit=5 : Maximum number of imports to process per run}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Process PROCESSING DiplomaBlankImport records by dispatching ProcessDiplomaBlankImportJob';
+    protected $description = 'Process PROCESSING DiplomaBlankImport records by dispatching appropriate import jobs';
 
     /**
      * Execute the console command.
@@ -44,7 +44,7 @@ class ProcessPendingImports extends Command
             return Command::SUCCESS;
         }
 
-        $this->info("Found {$processingImports->count()} processing import(s). Dispatching to queue...");
+        $this->info("Found {$processingImports->count()} processing import(s). Dispatching appropriate jobs...");
 
         $dispatchedCount = 0;
 

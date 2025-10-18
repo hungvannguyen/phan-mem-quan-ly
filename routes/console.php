@@ -9,8 +9,8 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Schedule để xử lý các DiplomaBlankImport đang ở trạng thái PROCESSING
-Schedule::command('imports:process-processing --limit=5')
+Schedule::command('imports:process-jobs --limit=5')
     ->everyMinute()
     ->withoutOverlapping() // Không cho phép chạy đồng thời
     ->runInBackground() // Chạy trong background
-    ->appendOutputTo(storage_path('logs/processing-imports.log'));
+    ->appendOutputTo(storage_path('logs/import-jobs.log'));
