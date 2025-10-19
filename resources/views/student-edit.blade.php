@@ -163,10 +163,30 @@
             box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
         }
 
+        /* Degree Header Layout */
+        .degree-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .degree-actions {
+            flex-shrink: 0;
+            display: flex;
+            gap: 0.5rem;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .grid-cols-2 {
                 grid-template-columns: 1fr;
+            }
+
+            .degree-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
             }
         }
     </style>
@@ -411,23 +431,38 @@
                         @foreach ($degrees as $index => $degree)
                             <div class="degree-card">
                                 <div class="degree-header">
-                                    <h3>
-                                        Văn bằng #{{ $index + 1 }}
-                                        @if ($degree->degree_type)
-                                            <span class="degree-type-badge">
-                                                {{ $degree->degree_type == 'bachelor'
-                                                    ? 'Cử nhân'
-                                                    : ($degree->degree_type == 'master'
-                                                        ? 'Thạc sĩ'
-                                                        : ($degree->degree_type == 'doctor'
-                                                            ? 'Tiến sĩ'
-                                                            : 'Chứng chỉ')) }}
-                                            </span>
-                                        @endif
-                                    </h3>
-                                    <small>
-                                        Cấp ngày: {{ $degree->granting_date?->format('d/m/Y') ?? 'Chưa cập nhật' }}
-                                    </small>
+                                    <div>
+                                        <h3>
+                                            Văn bằng #{{ $index + 1 }}
+                                            @if ($degree->degree_type)
+                                                <span class="degree-type-badge">
+                                                    {{ $degree->degree_type == 'bachelor'
+                                                        ? 'Cử nhân'
+                                                        : ($degree->degree_type == 'master'
+                                                            ? 'Thạc sĩ'
+                                                            : ($degree->degree_type == 'doctor'
+                                                                ? 'Tiến sĩ'
+                                                                : 'Chứng chỉ')) }}
+                                                </span>
+                                            @endif
+                                        </h3>
+                                        <small>
+                                            Cấp ngày: {{ $degree->granting_date?->format('d/m/Y') ?? 'Chưa cập nhật' }}
+                                        </small>
+                                    </div>
+                                    <div class="degree-actions">
+                                        <button type="button" onclick="openEditDegreeModal({{ $degree->degree_id }})"
+                                            class="inline-flex items-center rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                            <i class="fas fa-edit mr-1"></i>
+                                            Sửa
+                                        </button>
+                                        <button type="button"
+                                            onclick="confirmDeleteDegree({{ $degree->degree_id }}, '{{ $degree->registration_number }}')"
+                                            class="inline-flex items-center rounded border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                            <i class="fas fa-trash mr-1"></i>
+                                            Xóa
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="degree-details">
@@ -446,6 +481,42 @@
                                     <div class="detail-item">
                                         <span class="label">Số quyết định:</span>
                                         <span class="value">{{ $degree->decision_number ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Chuyên ngành:</span>
+                                        <span class="value">
+                                            @if ($degree->major)
+                                                {{ $degree->major->major_name }}
+                                            @elseif($degree->major_name)
+                                                {{ $degree->major_name }}
+                                            @else
+                                                N/A
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Mã phôi:</span>
+                                        <span class="value">
+                                            @if ($degree->diplomaBlank)
+                                                <code
+                                                    class="rounded bg-gray-100 px-2 py-1 text-sm">{{ $degree->diplomaBlank->serial_number }}</code>
+                                            @else
+                                                <span class="text-gray-500">N/A</span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Loại phôi:</span>
+                                        <span class="value">
+                                            @if ($degree->diplomaBlank && $degree->diplomaBlank->type)
+                                                <span
+                                                    class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                                    {{ $degree->diplomaBlank->type->type_name }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-500">N/A</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -522,63 +593,127 @@
                 </button>
             </div>
 
-            <form id="addDegreeForm" onsubmit="handleAddDegree(event)" class="space-y-4">
+            <form id="addDegreeForm" method="POST" action="{{ route('degrees.store') }}" class="space-y-4">
+                @csrf
+                <input type="hidden" name="student_id" value="{{ $student->student_id }}">
+
+                {{-- Display validation errors --}}
+                @if ($errors->any())
+                    <div class="rounded-md border border-red-200 bg-red-50 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Có lỗi xảy ra:</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-inside list-disc space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="field-group">
                         <label for="degree_type" class="field-label required">Loại văn bằng</label>
                         <select name="degree_type" id="degree_type" class="field-input" required>
                             <option value="">Chọn loại văn bằng</option>
-                            <option value="bachelor">Cử nhân</option>
-                            <option value="master">Thạc sĩ</option>
-                            <option value="doctor">Tiến sĩ</option>
-                            <option value="certificate">Chứng chỉ</option>
+                            <option value="bachelor" {{ old('degree_type') == 'bachelor' ? 'selected' : '' }}>Cử nhân
+                            </option>
+                            <option value="master" {{ old('degree_type') == 'master' ? 'selected' : '' }}>Thạc sĩ</option>
+                            <option value="doctor" {{ old('degree_type') == 'doctor' ? 'selected' : '' }}>Tiến sĩ</option>
+                            <option value="certificate" {{ old('degree_type') == 'certificate' ? 'selected' : '' }}>Chứng
+                                chỉ</option>
                         </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="diploma_blank_type_id" class="field-label required">Loại phôi văn bằng</label>
+                        <select name="diploma_blank_type_id" id="diploma_blank_type_id" class="field-input" required
+                            onchange="loadAvailableDiplomaBlanks()">
+                            <option value="">Chọn loại phôi văn bằng</option>
+                            @foreach ($diplomaBlankTypes as $type)
+                                <option value="{{ $type->type_id }}"
+                                    {{ old('diploma_blank_type_id') == $type->type_id ? 'selected' : '' }}>
+                                    {{ $type->type_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="selected_blank_info" class="field-label">Phôi văn bằng được chọn</label>
+                        <div id="selected_blank_display" class="field-input bg-gray-50 text-gray-700"
+                            style="min-height: 42px; display: flex; align-items: center; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
+                            <span id="blank_placeholder">Chọn loại phôi để xem phôi được gán tự động</span>
+                        </div>
+                        <input type="hidden" name="diploma_blank_id" id="diploma_blank_id"
+                            value="{{ old('diploma_blank_id') }}" required>
+                        <div id="diploma_blank_info" class="mt-2 hidden text-sm text-gray-600">
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            <span id="blank_info_text"></span>
+                        </div>
                     </div>
 
                     <div class="field-group">
                         <label for="registration_number" class="field-label required">Số đăng ký</label>
                         <input type="text" name="registration_number" id="registration_number" class="field-input"
-                            placeholder="Nhập số đăng ký" required>
+                            placeholder="Nhập số đăng ký" value="{{ old('registration_number') }}" required>
                     </div>
 
                     <div class="field-group">
                         <label for="graduation_year" class="field-label required">Năm tốt nghiệp</label>
                         <input type="number" name="graduation_year" id="graduation_year" class="field-input"
-                            placeholder="Ví dụ: 2024" min="1990" max="{{ date('Y') }}" required>
+                            placeholder="Ví dụ: 2024" min="1990" max="{{ date('Y') }}"
+                            value="{{ old('graduation_year') }}" required>
                     </div>
 
                     <div class="field-group">
                         <label for="granting_date" class="field-label required">Ngày cấp</label>
-                        <input type="date" name="granting_date" id="granting_date" class="field-input" required>
+                        <input type="date" name="granting_date" id="granting_date" class="field-input"
+                            value="{{ old('granting_date') }}" required>
                     </div>
 
                     <div class="field-group">
                         <label for="ranking" class="field-label">Xếp loại</label>
                         <select name="ranking" id="ranking" class="field-input">
                             <option value="">Chọn xếp loại</option>
-                            <option value="Xuất sắc">Xuất sắc</option>
-                            <option value="Giỏi">Giỏi</option>
-                            <option value="Khá">Khá</option>
-                            <option value="Trung bình">Trung bình</option>
+                            <option value="Xuất sắc" {{ old('ranking') == 'Xuất sắc' ? 'selected' : '' }}>Xuất sắc
+                            </option>
+                            <option value="Giỏi" {{ old('ranking') == 'Giỏi' ? 'selected' : '' }}>Giỏi</option>
+                            <option value="Khá" {{ old('ranking') == 'Khá' ? 'selected' : '' }}>Khá</option>
+                            <option value="Trung bình" {{ old('ranking') == 'Trung bình' ? 'selected' : '' }}>Trung bình
+                            </option>
                         </select>
                     </div>
 
                     <div class="field-group">
                         <label for="decision_number" class="field-label">Số quyết định</label>
                         <input type="text" name="decision_number" id="decision_number" class="field-input"
-                            placeholder="Nhập số quyết định">
+                            placeholder="Nhập số quyết định" value="{{ old('decision_number') }}">
                     </div>
                 </div>
 
                 <div class="field-group">
-                    <label for="major_name" class="field-label">Chuyên ngành</label>
-                    <input type="text" name="major_name" id="major_name" class="field-input"
-                        placeholder="Nhập tên chuyên ngành">
+                    <label for="major_id" class="field-label">Chuyên ngành</label>
+                    <select name="major_id" id="major_id" class="field-input">
+                        <option value="">Chọn chuyên ngành</option>
+                        @foreach ($majors as $major)
+                            <option value="{{ $major->major_id }}"
+                                {{ old('major_id', $student->major_id) == $major->major_id ? 'selected' : '' }}>
+                                {{ $major->major_name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="field-group">
                     <label for="notes" class="field-label">Ghi chú</label>
-                    <textarea name="notes" id="notes" rows="3" class="field-input" placeholder="Nhập ghi chú (tùy chọn)"></textarea>
+                    <textarea name="notes" id="notes" rows="3" class="field-input" placeholder="Nhập ghi chú (tùy chọn)">{{ old('notes') }}</textarea>
                 </div>
 
                 <div class="flex justify-end space-x-3 border-t pt-4">
@@ -588,6 +723,117 @@
                     </button>
                     <button type="submit" class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">
                         <i class="fas fa-save mr-2"></i>Lưu văn bằng
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Degree Modal -->
+    <div id="editDegreeModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-edit mr-2 text-blue-600"></i>
+                    Chỉnh sửa văn bằng
+                </h3>
+                <button type="button" onclick="closeEditDegreeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="editDegreeForm" method="POST" action="" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="student_id" value="{{ $student->student_id }}">
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="field-group">
+                        <label for="edit_degree_type" class="field-label required">Loại văn bằng</label>
+                        <select name="degree_type" id="edit_degree_type" class="field-input" required>
+                            <option value="">Chọn loại văn bằng</option>
+                            <option value="bachelor">Cử nhân</option>
+                            <option value="master">Thạc sĩ</option>
+                            <option value="doctor">Tiến sĩ</option>
+                            <option value="certificate">Chứng chỉ</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_registration_number" class="field-label required">Số đăng ký</label>
+                        <input type="text" name="registration_number" id="edit_registration_number"
+                            class="field-input" placeholder="Nhập số đăng ký" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_graduation_year" class="field-label required">Năm tốt nghiệp</label>
+                        <input type="number" name="graduation_year" id="edit_graduation_year" class="field-input"
+                            placeholder="Ví dụ: 2024" min="1990" max="{{ date('Y') }}" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_granting_date" class="field-label required">Ngày cấp</label>
+                        <input type="date" name="granting_date" id="edit_granting_date" class="field-input" required>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_ranking" class="field-label">Xếp loại</label>
+                        <select name="ranking" id="edit_ranking" class="field-input">
+                            <option value="">Chọn xếp loại</option>
+                            <option value="Xuất sắc">Xuất sắc</option>
+                            <option value="Giỏi">Giỏi</option>
+                            <option value="Khá">Khá</option>
+                            <option value="Trung bình">Trung bình</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_decision_number" class="field-label">Số quyết định</label>
+                        <input type="text" name="decision_number" id="edit_decision_number" class="field-input"
+                            placeholder="Nhập số quyết định">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="edit_major_id" class="field-label">Chuyên ngành</label>
+                    <select name="major_id" id="edit_major_id" class="field-input">
+                        <option value="">Chọn chuyên ngành</option>
+                        @foreach ($majors as $major)
+                            <option value="{{ $major->major_id }}">{{ $major->major_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="edit_notes" class="field-label">Ghi chú</label>
+                    <textarea name="notes" id="edit_notes" rows="3" class="field-input" placeholder="Nhập ghi chú (tùy chọn)"></textarea>
+                </div>
+
+                <div class="rounded-md border border-blue-200 bg-blue-50 p-3">
+                    <div class="flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        <span class="text-sm font-medium text-blue-800">Thông tin phôi văn bằng</span>
+                    </div>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <div><strong>Mã phôi:</strong> <code id="edit_diploma_serial"
+                                class="rounded bg-blue-100 px-2 py-1">-</code></div>
+                        <div class="mt-1"><strong>Loại phôi:</strong> <span id="edit_diploma_type"
+                                class="inline-flex items-center rounded-full bg-blue-200 px-2 py-0.5 text-xs font-medium text-blue-800">-</span>
+                        </div>
+                        <div class="mt-2 text-xs text-blue-600">
+                            <i class="fas fa-lock mr-1"></i>
+                            Không thể thay đổi phôi văn bằng sau khi đã cấp
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <button type="button" onclick="closeEditDegreeModal()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>Cập nhật văn bằng
                     </button>
                 </div>
             </form>
@@ -609,6 +855,11 @@
             const requiredFields = form.querySelectorAll('input[required], select[required]');
             const statusSelect = document.getElementById('status');
             const currentDegreeCount = {{ $degrees->count() }};
+
+            // Open modal if there are validation errors
+            @if ($errors->any())
+                openAddDegreeModal();
+            @endif
 
             // Handle status change warnings
             if (statusSelect) {
@@ -691,6 +942,74 @@
         }
 
         // Add Degree Modal Functions
+        function loadAvailableDiplomaBlanks() {
+            const typeSelect = document.getElementById('diploma_blank_type_id');
+            const blankIdInput = document.getElementById('diploma_blank_id');
+            const displayDiv = document.getElementById('selected_blank_display');
+            const placeholderSpan = document.getElementById('blank_placeholder');
+            const infoDiv = document.getElementById('diploma_blank_info');
+
+            if (!typeSelect.value) {
+                // Reset when no type selected
+                placeholderSpan.textContent = 'Chọn loại phôi để xem phôi được gán tự động';
+                blankIdInput.value = '';
+                infoDiv.classList.add('hidden');
+                return;
+            }
+
+            // Show loading
+            placeholderSpan.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tìm phôi cũ nhất...';
+
+            fetch(`/api/diploma-blanks/available/${typeSelect.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.blank) {
+                        // Show selected blank info
+                        placeholderSpan.innerHTML = `
+                            <div class="flex items-center justify-between w-full">
+                                <div>
+                                    <strong class="text-green-600">${data.blank.serial_number}</strong>
+                                    <span class="text-gray-500 ml-2">Ngày nhập: ${data.blank.import_date}</span>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            </div>
+                        `;
+
+                        // Set hidden input value
+                        blankIdInput.value = data.blank.diploma_blank_id;
+
+                        // Show success message
+                        document.getElementById('blank_info_text').textContent = data.message;
+                        infoDiv.classList.remove('hidden');
+                    } else {
+                        // No blank available
+                        placeholderSpan.innerHTML = `
+                            <div class="flex items-center text-red-600">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                Không có phôi khả dụng cho loại này
+                            </div>
+                        `;
+                        blankIdInput.value = '';
+                        document.getElementById('blank_info_text').textContent =
+                            data.message || 'Không có phôi khả dụng cho loại này';
+                        infoDiv.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    placeholderSpan.innerHTML = `
+                        <div class="flex items-center text-red-600">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            Lỗi tải dữ liệu phôi
+                        </div>
+                    `;
+                    blankIdInput.value = '';
+                    document.getElementById('blank_info_text').textContent =
+                        'Có lỗi xảy ra khi tải thông tin phôi';
+                    infoDiv.classList.remove('hidden');
+                });
+        }
+
         function openAddDegreeModal() {
             document.getElementById('addDegreeModal').style.display = 'flex';
         }
@@ -699,59 +1018,105 @@
             document.getElementById('addDegreeModal').style.display = 'none';
             // Reset form
             document.getElementById('addDegreeForm').reset();
+
+            // Reset diploma blank display
+            document.getElementById('blank_placeholder').textContent = 'Chọn loại phôi để xem phôi được gán tự động';
+            document.getElementById('diploma_blank_id').value = '';
+
+            // Hide info
+            document.getElementById('diploma_blank_info').classList.add('hidden');
         }
 
-        // Handle add degree form submission
-        function handleAddDegree(event) {
-            event.preventDefault();
+        // Edit Degree Modal Functions
+        function openEditDegreeModal(degreeId) {
+            // Get degree data from PHP and populate form
+            const degrees = @json($degrees);
+            const degree = degrees.find(d => d.degree_id == degreeId);
 
-            const form = event.target;
-            const formData = new FormData(form);
+            if (!degree) {
+                alert('Không tìm thấy thông tin văn bằng!');
+                return;
+            }
 
-            // Add student ID
-            formData.append('student_id', {{ $student->id }});
+            // Update form action
+            document.getElementById('editDegreeForm').action = `/degrees/${degreeId}/update`;
 
-            // Show loading
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang lưu...';
-            submitBtn.disabled = true;
+            // Populate form fields
+            document.getElementById('edit_degree_type').value = degree.degree_type || '';
+            document.getElementById('edit_registration_number').value = degree.registration_number || '';
+            document.getElementById('edit_graduation_year').value = degree.graduation_year || '';
+            document.getElementById('edit_granting_date').value = degree.granting_date ? degree.granting_date.split('T')[
+                0] : '';
+            document.getElementById('edit_ranking').value = degree.ranking || '';
+            document.getElementById('edit_decision_number').value = degree.decision_number || '';
+            document.getElementById('edit_major_id').value = degree.major_id || '';
+            document.getElementById('edit_notes').value = degree.notes || '';
 
-            fetch('{{ route('degrees.store') }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showNotification('Thêm văn bằng thành công!', 'success');
-                        closeAddDegreeModal();
-                        // Reload page to show new degree
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        showNotification(data.message || 'Có lỗi xảy ra!', 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('Có lỗi xảy ra khi thêm văn bằng!', 'error');
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                });
+            // Update diploma blank info
+            if (degree.diploma_blank) {
+                document.getElementById('edit_diploma_serial').textContent = degree.diploma_blank.serial_number || '-';
+                document.getElementById('edit_diploma_type').textContent =
+                    (degree.diploma_blank.type && degree.diploma_blank.type.type_name) || '-';
+            } else {
+                document.getElementById('edit_diploma_serial').textContent = '-';
+                document.getElementById('edit_diploma_type').textContent = '-';
+            }
+
+            // Show modal
+            document.getElementById('editDegreeModal').style.display = 'flex';
+        }
+
+        function closeEditDegreeModal() {
+            document.getElementById('editDegreeModal').style.display = 'none';
+            // Reset form
+            document.getElementById('editDegreeForm').reset();
+        }
+
+        // Delete Degree Functions
+        function confirmDeleteDegree(degreeId, registrationNumber) {
+            if (confirm(
+                    `⚠️ Bạn có chắc muốn xóa văn bằng "${registrationNumber}"?\n\nLưu ý: Văn bằng sẽ được xóa mềm và có thể khôi phục sau này.`
+                    )) {
+                deleteDegree(degreeId);
+            }
+        }
+
+        function deleteDegree(degreeId) {
+            // Create form for DELETE request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/degrees/${degreeId}/delete`;
+
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            // Add method spoofing for DELETE
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            // Submit form
+            document.body.appendChild(form);
+            form.submit();
         }
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
-            const modal = document.getElementById('addDegreeModal');
-            if (event.target === modal) {
+            const addModal = document.getElementById('addDegreeModal');
+            const editModal = document.getElementById('editDegreeModal');
+
+            if (event.target === addModal) {
                 closeAddDegreeModal();
+            }
+
+            if (event.target === editModal) {
+                closeEditDegreeModal();
             }
         });
     </script>

@@ -8,6 +8,7 @@ use App\Models\Major;
 use App\Models\Degree;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class DiplomaManagementController extends Controller
 {
@@ -86,10 +87,13 @@ class DiplomaManagementController extends Controller
         // Get all majors for dropdown
         $majors = Major::orderBy('major_name')->get();
 
-        // Get degrees issued to this student
-        $degrees = $student->degrees()->get();
+        // Get all diploma blank types for dropdown
+        $diplomaBlankTypes = \App\Models\DiplomaBlankType::orderBy('type_name')->get();
 
-        return view('student-edit', compact('student', 'majors', 'degrees'));
+        // Get degrees issued to this student with all relationships
+        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type'])->get();
+
+        return view('student-edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
     }
 
     public function update(StudentRequest $request, Student $student)
@@ -105,12 +109,112 @@ class DiplomaManagementController extends Controller
         $validated = $request->validate([
             'student_id' => 'required|exists:students,student_id',
             'degree_type' => 'required|string|in:bachelor,master,doctor,certificate',
+            'diploma_blank_id' => 'required|exists:diploma_blanks,diploma_blank_id',
             'registration_number' => 'required|string|max:255|unique:degrees,registration_number',
             'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
             'granting_date' => 'required|date|before_or_equal:today',
             'ranking' => 'nullable|string|max:100',
             'decision_number' => 'nullable|string|max:255',
-            'major_name' => 'nullable|string|max:255',
+            'major_id' => 'nullable|exists:majors,major_id',
+            'notes' => 'nullable|string',
+        ]);
+
+        try {
+            DB::transaction(function () use ($validated) {
+                // Check if student exists and has graduated status
+                $student = Student::findOrFail($validated['student_id']);
+
+                if ($student->status->value !== 1) {
+                    throw new \Exception('Chỉ có thể cấp văn bằng cho sinh viên đã tốt nghiệp!');
+                }
+
+                // Check diploma blank availability and lock it
+                $diplomaBlank = \App\Models\DiplomaBlank::where('diploma_blank_id', $validated['diploma_blank_id'])
+                    ->where('status', \App\Enums\DiplomaBlankStatus::IN_STOCK)
+                    ->whereDoesntHave('degree') // Not already assigned
+                    ->lockForUpdate() // Lock for atomic update
+                    ->first();
+
+                if (!$diplomaBlank) {
+                    throw new \Exception('Phôi văn bằng không khả dụng hoặc đã được sử dụng!');
+                }
+
+                // If major_id is provided, get major_name from Major model
+                if (!empty($validated['major_id'])) {
+                    $major = Major::find($validated['major_id']);
+                    if ($major) {
+                        $validated['major_name'] = $major->major_name;
+                    }
+                }
+
+                // Create the degree
+                $degree = Degree::create($validated);
+
+                // Update diploma blank status to ISSUED
+                $diplomaBlank->update([
+                    'status' => \App\Enums\DiplomaBlankStatus::ISSUED,
+                    'issue_date' => $validated['granting_date'],
+                    'issue_reason' => "Cấp văn bằng cho sinh viên: {$student->full_name}"
+                ]);
+            });
+
+            // Redirect back to student page with success message
+            return redirect()->route('student', ['student' => $validated['student_id']])
+                ->with('success', 'Thêm văn bằng thành công!');
+        } catch (\Exception $e) {
+            // Redirect back to student page with error message
+            return redirect()->route('student', ['student' => $validated['student_id']])
+                ->with('error', 'Có lỗi xảy ra khi thêm văn bằng: ' . $e->getMessage());
+        }
+    }
+
+    public function getAvailableDiplomaBlanks($typeId)
+    {
+        try {
+            // Get the oldest available diploma blank for the specified type
+            $oldestBlank = \App\Models\DiplomaBlank::where('type_id', $typeId)
+                ->where('status', \App\Enums\DiplomaBlankStatus::IN_STOCK)
+                ->whereDoesntHave('degree') // Not assigned to any degree
+                ->orderBy('import_date', 'asc') // Oldest first by import date
+                ->orderBy('serial_number', 'asc') // Then by serial number
+                ->first(['diploma_blank_id', 'serial_number', 'import_date']);
+
+            if ($oldestBlank) {
+                return response()->json([
+                    'success' => true,
+                    'blank' => [
+                        'diploma_blank_id' => $oldestBlank->diploma_blank_id,
+                        'serial_number' => $oldestBlank->serial_number,
+                        'import_date' => $oldestBlank->import_date ? $oldestBlank->import_date->format('d/m/Y') : 'N/A'
+                    ],
+                    'message' => "Sẽ sử dụng phôi {$oldestBlank->serial_number} (cũ nhất khả dụng)"
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không có phôi khả dụng cho loại này'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi tải danh sách phôi'
+            ], 500);
+        }
+    }
+
+    public function updateDegree(Request $request, Degree $degree)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,student_id',
+            'degree_type' => 'required|string|in:bachelor,master,doctor,certificate',
+            'registration_number' => 'required|string|max:255|unique:degrees,registration_number,' . $degree->degree_id . ',degree_id',
+            'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
+            'granting_date' => 'required|date|before_or_equal:today',
+            'ranking' => 'nullable|string|max:100',
+            'decision_number' => 'nullable|string|max:255',
+            'major_id' => 'nullable|exists:majors,major_id',
             'notes' => 'nullable|string',
         ]);
 
@@ -118,26 +222,59 @@ class DiplomaManagementController extends Controller
             // Check if student exists and has graduated status
             $student = Student::findOrFail($validated['student_id']);
 
-            if ($student->status !== 1) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Chỉ có thể cấp văn bằng cho sinh viên đã tốt nghiệp!'
-                ], 400);
+            if ($student->status->value !== 1) {
+                return redirect()->route('student', ['student' => $validated['student_id']])
+                    ->with('error', 'Chỉ có thể cập nhật văn bằng cho sinh viên đã tốt nghiệp!');
             }
 
-            // Create the degree
-            $degree = Degree::create($validated);
+            // If major_id is provided, get major_name from Major model
+            if (!empty($validated['major_id'])) {
+                $major = Major::find($validated['major_id']);
+                if ($major) {
+                    $validated['major_name'] = $major->major_name;
+                }
+            }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Thêm văn bằng thành công!',
-                'degree' => $degree
-            ]);
+            // Update the degree (không thay đổi diploma_blank_id)
+            $degree->update($validated);
+
+            // Redirect back to student page with success message
+            return redirect()->route('student', ['student' => $validated['student_id']])
+                ->with('success', 'Cập nhật văn bằng thành công!');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Có lỗi xảy ra khi thêm văn bằng: ' . $e->getMessage()
-            ], 500);
+            // Redirect back to student page with error message
+            return redirect()->route('student', ['student' => $validated['student_id']])
+                ->with('error', 'Có lỗi xảy ra khi cập nhật văn bằng: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteDegree(Degree $degree)
+    {
+        try {
+            $student = Student::findOrFail($degree->student_id);
+
+            // Soft delete the degree
+            $degree->delete();
+
+            // If degree had a diploma blank, revert its status to IN_STOCK
+            if ($degree->diploma_blank_id) {
+                $diplomaBlank = \App\Models\DiplomaBlank::find($degree->diploma_blank_id);
+                if ($diplomaBlank) {
+                    $diplomaBlank->update([
+                        'status' => \App\Enums\DiplomaBlankStatus::IN_STOCK->value,
+                        'issue_date' => null,
+                        'issue_reason' => null
+                    ]);
+                }
+            }
+
+            // Redirect back to student page with success message
+            return redirect()->route('student', ['student' => $degree->student_id])
+                ->with('success', 'Xóa văn bằng thành công! Phôi văn bằng đã được trả về kho.');
+        } catch (\Exception $e) {
+            // Redirect back to student page with error message
+            return redirect()->route('student', ['student' => $degree->student_id])
+                ->with('error', 'Có lỗi xảy ra khi xóa văn bằng: ' . $e->getMessage());
         }
     }
 }

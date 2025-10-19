@@ -171,6 +171,22 @@ Route::post(
     [DiplomaManagementController::class, 'storeDegree']
 )->middleware('auth')->name('degrees.store');
 
+Route::put(
+    "degrees/{degree}/update",
+    [DiplomaManagementController::class, 'updateDegree']
+)->middleware('auth')->name('degrees.update');
+
+Route::delete(
+    "degrees/{degree}/delete",
+    [DiplomaManagementController::class, 'deleteDegree']
+)->middleware('auth')->name('degrees.delete');
+
+// API route for getting available diploma blanks
+Route::get(
+    "api/diploma-blanks/available/{typeId}",
+    [DiplomaManagementController::class, 'getAvailableDiplomaBlanks']
+)->middleware('auth')->name('api.diploma-blanks.available');
+
 // Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');

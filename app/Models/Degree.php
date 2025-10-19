@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Degree extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The primary key associated with the table.
@@ -30,6 +31,7 @@ class Degree extends Model
         'graduation_year',
         'ranking',
         'decision_number',
+        'major_id',
         'major_name',
         'notes',
     ];
@@ -67,6 +69,14 @@ class Degree extends Model
     public function diplomaBlank()
     {
         return $this->belongsTo(DiplomaBlank::class, 'diploma_blank_id', 'diploma_blank_id');
+    }
+
+    /**
+     * Get the major for this degree.
+     */
+    public function major()
+    {
+        return $this->belongsTo(Major::class, 'major_id', 'major_id');
     }
 
     /**
