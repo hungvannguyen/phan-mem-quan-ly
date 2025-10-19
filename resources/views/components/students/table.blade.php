@@ -111,8 +111,8 @@
                                     title="Chỉnh sửa thông tin sinh viên">
                                     Sửa
                                 </a>
-                                
-                                <button class="btn-action btn-delete" 
+
+                                <button class="btn-action btn-delete"
                                     onclick="confirmDeleteStudent('{{ $student->student_id }}', '{{ $student->full_name }}')"
                                     title="Xóa sinh viên">
                                     Xóa

@@ -149,7 +149,9 @@
 
     <script>
         function confirmDeleteStudent(studentId, studentName) {
-            if (confirm(`Bạn có chắc chắn muốn xóa sinh viên "${studentName}" không?\n\nLưu ý: Việc xóa sinh viên sẽ đồng thời xóa tất cả văn bằng đã cấp và trả lại các phôi văn bằng về kho.`)) {
+            if (confirm(
+                    `Bạn có chắc chắn muốn xóa sinh viên "${studentName}" không?\n\nLưu ý: Việc xóa sinh viên sẽ đồng thời xóa tất cả văn bằng đã cấp và trả lại các phôi văn bằng về kho.`
+                    )) {
                 deleteStudent(studentId);
             }
         }
