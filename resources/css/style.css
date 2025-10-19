@@ -2,9 +2,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 .navbar {
   @apply mx-auto my-[20px] container max-w-[1500px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 }
+
 .navbar-menu {
   @apply grid w-full grid-cols-6 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
 }
@@ -20,12 +22,15 @@
 .not-found {
   @apply flex h-screen flex-col items-center justify-center bg-[var(--color-secondary)];
 }
+
 .not-found-code {
   @apply mb-4 text-9xl font-bold text-[var(--color-primary-hover)];
 }
+
 .not-found-message {
   @apply mb-8 text-2xl text-[var(--color-text-secondary)];
 }
+
 .not-found-button {
   @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
 }
@@ -33,12 +38,15 @@
 .loading-overlay {
   @apply absolute inset-0 flex h-full w-full items-center justify-center bg-[var(--color-bg-card)];
 }
+
 .loading-overlay td {
   @apply border-none py-4 text-center;
 }
+
 .loading-overlay .spinner {
   @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-t-transparent align-middle;
 }
+
 .loading-overlay .loading-text {
   @apply ml-2;
 }
@@ -46,42 +54,55 @@
 .modal {
   @apply fixed inset-0 z-10 overflow-y-auto;
 }
+
 .modal__dialog {
   @apply flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0;
 }
+
 .modal__overlay {
   @apply fixed inset-0 bg-[var(--color-bg-overlay)] transition-opacity;
 }
+
 .modal__container {
   @apply relative inline-block transform overflow-hidden rounded-lg bg-[var(--color-bg-card)] text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle;
 }
+
 .modal__content {
   @apply bg-[var(--color-bg-card)] px-4 pb-4 pt-5 sm:p-6 sm:pb-4;
 }
+
 .modal__header {
   @apply sm:flex sm:items-start;
 }
+
 .modal__title-wrapper {
   @apply mx-auto my-4;
 }
+
 .modal__title {
   @apply text-center text-[30px] font-medium leading-6 text-[var(--color-text-primary)];
 }
+
 .modal__body {
   @apply mt-2;
 }
+
 .modal__body .form__grid {
   @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
 }
+
 .modal__body .form-group {
   @apply mb-4 sm:mb-0;
 }
+
 .modal__footer {
   @apply bg-[var(--color-bg-main)] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6;
 }
+
 .modal__footer--action-primary {
   @apply inline-flex w-full justify-center rounded-md border border-transparent bg-[var(--color-primary)] px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-[var(--color-primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-blue)] focus:ring-offset-2 sm:ml-3 sm:w-auto;
 }
+
 .modal__footer--action-secondary {
   @apply mt-3 inline-flex w-full justify-center rounded-md border-[var(--color-border-light)] bg-[var(--color-bg-card)] px-4 py-2 text-base font-medium text-[var(--color-text-secondary)] shadow-sm hover:bg-[var(--color-bg-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus-indigo)] focus:ring-offset-2 sm:ml-3 sm:mt-0 sm:w-auto;
 }
@@ -93,36 +114,47 @@
 .students-data-table {
   @apply w-full border-collapse;
 }
+
 .students-data-table .table-header-row {
   @apply bg-gray-50 border-b-2 border-gray-200;
 }
+
 .students-data-table .table-header-cell {
   @apply w-auto max-w-full px-4 py-4 text-sm font-semibold text-gray-900 uppercase tracking-wide text-center;
 }
+
 .students-data-table .table-body {
   @apply bg-white divide-y divide-gray-200;
 }
+
 .students-data-table .table-row {
   @apply transition-colors duration-200 hover:bg-gray-50 cursor-pointer border-b border-gray-100;
 }
+
 .students-data-table .table-row:last-child {
   @apply border-b-0;
 }
+
 .students-data-table .table-row:hover {
   @apply bg-blue-50 shadow-sm;
 }
+
 .students-data-table .table-row.selected {
   @apply bg-blue-100 border-blue-200;
 }
+
 .students-data-table .table-cell {
   @apply px-4 py-4 text-sm text-gray-900 whitespace-nowrap border-r border-gray-100 text-center;
 }
+
 .students-data-table .table-cell:last-child {
   @apply border-r-0;
 }
+
 .students-data-table .loading-cell {
   @apply px-4 py-8 text-center text-gray-500;
 }
+
 .students-data-table .empty-cell {
   @apply px-4 py-12 text-center;
 }
@@ -174,6 +206,7 @@
 .nationality {
   @apply text-sm text-gray-800;
 }
+
 .nationality[title="Quốc tịch nước ngoài"] {
   @apply text-blue-600 font-medium;
 }
@@ -193,18 +226,23 @@
 .badge {
   @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
 }
+
 .badge.badge-primary {
   @apply bg-blue-100 text-blue-800;
 }
+
 .badge.badge-success {
   @apply bg-green-100 text-green-800;
 }
+
 .badge.badge-warning {
   @apply bg-yellow-100 text-yellow-800;
 }
+
 .badge.badge-info {
   @apply bg-blue-100 text-blue-800;
 }
+
 .badge.badge-danger {
   @apply bg-red-100 text-red-800;
 }
@@ -347,14 +385,17 @@
     flex-direction: column;
     align-items: stretch;
   }
+
   .btn-table {
     justify-content: center;
     width: 100%;
   }
+
   .major-info {
     font-size: 0.875rem;
   }
 }
+
 .diploma-import-form {
   @apply space-y-8;
 }
@@ -370,6 +411,7 @@
 .breadcrumb-item {
   @apply text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200;
 }
+
 .breadcrumb-item i {
   @apply mr-2;
 }
@@ -393,6 +435,7 @@
 .field-label {
   @apply block text-sm font-medium text-gray-700 mb-2;
 }
+
 .field-label.required::after {
   content: " *";
   @apply text-red-500;
@@ -418,6 +461,7 @@
 .serial-preview {
   @apply bg-gray-50 border border-gray-200 rounded-lg p-4;
 }
+
 .serial-preview .field-label {
   @apply text-sm font-medium text-gray-600 mb-2;
 }
@@ -437,9 +481,11 @@
 .validation-summary {
   @apply bg-blue-50 border border-blue-200 rounded-lg p-4;
 }
+
 .validation-summary h4 {
   @apply text-blue-800 font-semibold mb-3 flex items-center;
 }
+
 .validation-summary h4 i {
   @apply mr-2;
 }
@@ -447,9 +493,11 @@
 .validation-item {
   @apply flex items-center space-x-3 py-2;
 }
+
 .validation-item i {
   @apply text-sm;
 }
+
 .validation-item span {
   @apply text-sm text-gray-700;
 }
@@ -463,6 +511,7 @@
 .btn-cancel {
   @apply px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center;
 }
+
 .btn-primary i,
 .btn-secondary i,
 .btn-cancel i {
@@ -472,6 +521,7 @@
 .btn-primary {
   @apply bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
+
 .btn-primary:disabled {
   @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
 }
@@ -500,16 +550,20 @@
   .serial-fields {
     @apply grid-cols-1;
   }
+
   .form-grid-2 {
     @apply grid-cols-1;
   }
+
   .form-actions {
     @apply flex-col;
   }
+
   .step-number {
     @apply w-6 h-6 text-xs mr-2;
   }
 }
+
 .diploma-blank-import {
   @apply min-h-screen bg-gray-50 py-8;
 }
@@ -541,6 +595,7 @@
 .btn-back {
   @apply inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200;
 }
+
 .btn-back i {
   @apply mr-2;
 }
@@ -556,6 +611,7 @@
 .form-section {
   @apply mb-8 pb-8 border-b border-gray-200;
 }
+
 .form-section:last-child {
   @apply border-b-0 mb-0 pb-0;
 }
@@ -575,6 +631,7 @@
 .section-help {
   @apply flex items-start text-sm text-gray-600 bg-blue-50 p-3 rounded-lg;
 }
+
 .section-help i {
   @apply text-blue-500 mr-2 mt-0.5;
 }
@@ -590,6 +647,7 @@
 .field-label {
   @apply block text-sm font-medium text-gray-700 mb-2;
 }
+
 .field-label.required::after {
   @apply text-red-500 ml-1;
   content: "*";
@@ -599,10 +657,12 @@
 .field-select {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-input:focus,
 .field-select:focus {
   @apply outline-none;
 }
+
 .field-input.error,
 .field-select.error {
   @apply border-red-300 bg-red-50;
@@ -659,9 +719,11 @@
 .validation-value {
   @apply font-semibold text-gray-900;
 }
+
 .validation-value.success {
   @apply text-green-600;
 }
+
 .validation-value.error {
   @apply text-red-600;
 }
@@ -673,6 +735,7 @@
 .btn-validate {
   @apply inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200;
 }
+
 .btn-validate i {
   @apply mr-2;
 }
@@ -680,9 +743,11 @@
 .btn-submit {
   @apply inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200;
 }
+
 .btn-submit:disabled {
   @apply bg-gray-400 cursor-not-allowed hover:bg-gray-400;
 }
+
 .btn-submit i {
   @apply mr-2;
 }
@@ -690,6 +755,7 @@
 .btn-cancel {
   @apply inline-flex items-center px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200;
 }
+
 .btn-cancel i {
   @apply mr-2;
 }
@@ -698,129 +764,170 @@
   .import-form-section {
     @apply px-2;
   }
+
   .diploma-import-form {
     @apply p-4;
   }
+
   .serial-input-group {
     @apply grid-cols-1;
   }
+
   .form-actions {
     @apply flex-col;
   }
+
   .form-actions .btn-validate,
   .form-actions .btn-submit,
   .form-actions .btn-cancel {
     @apply w-full justify-center;
   }
 }
+
 .management-page {
   @apply min-h-screen p-4;
 }
+
 .management-page .form-section {
   @apply max-w-[1500px] mx-auto space-y-6;
 }
+
 .management-page .form-section .page {
   @apply text-center mb-8;
 }
+
 .management-page .form-section .page-title {
   @apply text-3xl font-bold text-gray-900 mb-2;
 }
+
 .management-page .form-section .page-subtitle {
   @apply text-lg text-gray-600 max-w-2xl mx-auto;
 }
+
 .management-page .form-section .search-card {
   @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6;
 }
+
 .management-page .form-section .search-form {
   @apply space-y-6;
 }
+
 .management-page .form-section .search-actions {
   @apply flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200;
 }
+
 .management-page .form-section .form-grid {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
 }
+
 .management-page .form-section .form-field {
   @apply space-y-2;
 }
+
 .management-page .form-section .field-label {
   @apply block text-sm font-semibold text-gray-700;
 }
+
 .management-page .form-section .field-input {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
 }
+
 .management-page .form-section .field-input::placeholder {
   @apply text-gray-400;
 }
+
 .management-page .form-section .field-input:focus {
   @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .management-page .form-section .field-input.is-invalid {
   @apply border-red-300 ring-2 ring-red-200;
 }
+
 .management-page .form-section .field-select {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
 }
+
 .management-page .form-section .field-select:focus {
   @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .management-page .form-section .field-select.is-invalid {
   @apply border-red-300 ring-2 ring-red-200;
 }
+
 .management-page .form-section .invalid-feedback {
   @apply text-sm text-red-600 mt-1;
 }
+
 .management-page .form-section .btn-search {
   @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
 }
+
 .management-page .form-section .btn-search-disabled {
   @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .management-page .form-section .btn-search-disabled:hover {
   @apply bg-gray-300 text-gray-500;
 }
+
 .management-page .form-section .btn-search-enabled {
   @apply bg-blue-600 text-white cursor-pointer opacity-100;
 }
+
 .management-page .form-section .btn-search-enabled:hover {
   @apply bg-blue-700;
 }
+
 .management-page .form-section .btn-search:disabled {
   @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .management-page .form-section .btn-search:disabled:hover {
   @apply bg-gray-300 text-gray-500;
 }
+
 .management-page .form-section .btn-reset {
   @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
 }
+
 .management-page .form-section .page-actions {
   @apply flex flex-wrap gap-3 justify-center md:justify-start;
 }
+
 .management-page .form-section .action-btn {
   @apply inline-flex items-center gap-2 px-4 py-2.5 font-medium rounded-lg transition-all duration-200 shadow-sm no-underline border-0 cursor-pointer focus:ring-2 focus:ring-offset-2 focus:outline-none;
 }
+
 .management-page .form-section .action-btn i {
   @apply text-sm;
 }
+
 .management-page .form-section .action-btn-primary {
   @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
 }
+
 .management-page .form-section .action-btn-warning {
   @apply bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500;
 }
+
 .management-page .form-section .action-btn-info {
   @apply bg-cyan-500 text-white hover:bg-cyan-600 focus:ring-cyan-500;
 }
+
 .management-page .form-section .action-btn-success {
   @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
 }
+
 .management-page .form-section .action-btn-secondary {
   @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-gray-500;
 }
+
 .management-page .table-section {
   @apply max-w-[1500px] mx-auto;
 }
+
 .management-page .table-wrapper {
   @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
 }
@@ -828,13 +935,16 @@
 .data-table-container {
   @apply bg-white rounded-xl shadow-lg overflow-hidden;
 }
+
 .data-table {
   @apply w-full border-collapse;
 }
+
 .data-table th,
 .data-table td {
   @apply px-3 py-3 text-left border-b border-gray-200 align-middle;
 }
+
 .data-table th {
   @apply bg-gray-50 font-semibold text-gray-700 text-sm;
 }
@@ -842,18 +952,23 @@
 .table-header {
   @apply flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50;
 }
+
 .table-title {
   @apply text-gray-900 text-xl font-semibold m-0;
 }
+
 .table-stats {
   @apply flex gap-4;
 }
+
 .table-responsive {
   @apply overflow-x-auto;
 }
+
 .table-row {
   @apply hover:bg-gray-50;
 }
+
 .table-pagination-wrapper {
   @apply p-6 border-t border-gray-200 bg-gray-50;
 }
@@ -893,12 +1008,15 @@
 .progress-container {
   @apply flex flex-col gap-1;
 }
+
 .progress-bar {
   @apply w-full h-2 bg-gray-200 rounded overflow-hidden;
 }
+
 .progress-fill {
   @apply h-full bg-emerald-500 transition-all duration-300 ease-in-out;
 }
+
 .progress-text {
   @apply text-xs text-gray-500 text-center;
 }
@@ -906,18 +1024,23 @@
 .status-badge {
   @apply inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase;
 }
+
 .status-pending {
   @apply bg-yellow-100 text-yellow-800;
 }
+
 .status-processing {
   @apply bg-blue-100 text-blue-800;
 }
+
 .status-completed {
   @apply bg-emerald-100 text-emerald-800;
 }
+
 .status-failed {
   @apply bg-red-100 text-red-800;
 }
+
 .status-unknown {
   @apply bg-gray-100 text-gray-600;
 }
@@ -929,51 +1052,67 @@
 .btn-action {
   @apply px-3 py-2 min-w-0 border-0 rounded-md cursor-pointer flex items-center justify-center text-xs font-medium transition-all duration-200 ease-in-out whitespace-nowrap;
 }
+
 .btn-view {
   @apply bg-gray-100 text-gray-600;
 }
+
 .btn-view:hover {
   @apply bg-gray-200 text-gray-800;
 }
+
 .btn-start {
   @apply bg-emerald-50 text-emerald-700;
 }
+
 .btn-start:hover {
   @apply bg-emerald-100 text-emerald-800;
 }
+
 .btn-pause {
   @apply bg-yellow-100 text-yellow-700;
 }
+
 .btn-pause:hover {
   @apply bg-yellow-200 text-yellow-800;
 }
+
 .btn-retry {
   @apply bg-blue-50 text-blue-700;
 }
+
 .btn-retry:hover {
   @apply bg-blue-100 text-blue-800;
 }
+
 .btn-delete {
   @apply bg-red-50 text-red-700;
 }
+
 .btn-delete:hover {
   @apply bg-red-100 text-red-800;
 }
+
 .btn-blanks {
   @apply bg-indigo-50 text-indigo-700;
 }
+
 .btn-blanks:hover {
   @apply bg-indigo-100 text-indigo-800;
 }
+
 .btn-primary {
   @apply inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
 }
+
 .btn-primary:hover {
   @apply bg-blue-700 no-underline;
 }
+
 .btn-secondary {
   @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg no-underline transition-all duration-200 ease-in-out;
 }
+
 .btn-secondary:hover {
   @apply bg-gray-200 no-underline;
 }
@@ -981,18 +1120,23 @@
 .empty-state {
   @apply text-center p-16 py-32;
 }
+
 .empty-icon {
   @apply mb-4;
 }
+
 .empty-icon i {
   @apply text-6xl text-gray-300;
 }
+
 .empty-title {
   @apply text-gray-900 text-2xl font-semibold mb-2;
 }
+
 .empty-message {
   @apply text-gray-500 mb-8;
 }
+
 .empty-actions {
   @apply flex gap-4 justify-center;
 }
@@ -1028,18 +1172,23 @@
 .pagination-btn {
   @apply inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 text-sm font-medium transition-all duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1;
 }
+
 .pagination-btn.pagination-btn-active {
   @apply text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 border-0;
 }
+
 .pagination-btn.pagination-btn-active:hover {
   @apply transform scale-105;
 }
+
 .pagination-btn.pagination-btn-current {
   @apply text-white bg-blue-600 shadow-sm cursor-default border-0 font-semibold;
 }
+
 .pagination-btn.pagination-btn-disabled {
   @apply text-gray-400 bg-gray-100 cursor-not-allowed border-0;
 }
+
 .pagination-btn i {
   @apply text-xs;
 }
@@ -1066,50 +1215,65 @@
 
 /* Responsive adjustments for pagination */
 @media (max-width: 768px) {
+
   .pagination-wrapper,
   .students-pagination-wrapper {
     @apply flex-col gap-3 p-4;
   }
+
   .pagination-info {
     @apply order-3 text-center;
   }
+
   .pagination-controls {
     @apply order-1;
   }
+
   .pagination-per-page {
     @apply order-2 flex justify-center;
   }
+
   .pagination-container {
     @apply flex-wrap justify-center gap-1 p-2;
   }
+
   .pagination-btn {
     @apply min-w-[2rem] h-8 text-xs;
   }
 }
+
 .pagination-wrapper.pagination-dark {
   @apply bg-gray-800 border-gray-700;
 }
+
 .pagination-wrapper.pagination-dark .pagination-text {
   @apply text-gray-300;
 }
+
 .pagination-wrapper.pagination-dark .per-page-label {
   @apply text-gray-300;
 }
+
 .pagination-wrapper.pagination-dark .pagination-container {
   @apply bg-gray-700 border-gray-600;
 }
+
 .pagination-wrapper.pagination-dark .pagination-btn-active {
   @apply text-gray-200 bg-gray-700 hover:bg-gray-600;
 }
+
 .pagination-wrapper.pagination-minimal {
   @apply bg-transparent border-0 p-4;
 }
+
 .pagination-wrapper.pagination-minimal .pagination-container {
   @apply bg-transparent border-0 shadow-none;
 }
+
 .pagination-wrapper.pagination-compact {
   @apply p-3 gap-2;
 }
+
 .pagination-wrapper.pagination-compact .pagination-btn {
   @apply min-w-[2rem] h-8 px-2 text-xs;
 }
@@ -1121,21 +1285,27 @@
 .form-section {
   @apply max-w-7xl mx-auto space-y-6;
 }
+
 .form-card {
   @apply bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden;
 }
+
 .form-step {
   @apply space-y-6 p-6 border-b border-gray-200;
 }
+
 .form-step:last-child {
   @apply border-b-0;
 }
+
 .form-grid {
   @apply grid grid-cols-1 md:grid-cols-2 gap-6;
 }
+
 .form-field {
   @apply space-y-2;
 }
+
 .form-actions {
   @apply flex flex-col sm:flex-row gap-4 justify-center sm:justify-start p-6 bg-gray-50 border-t border-gray-200;
 }
@@ -1143,9 +1313,11 @@
 .page-header {
   @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 bg-white rounded-xl shadow-lg border border-gray-200 mb-6;
 }
+
 .page-title {
   @apply text-3xl font-bold text-gray-900 m-0;
 }
+
 .page-subtitle {
   @apply text-lg text-gray-600 mt-2;
 }
@@ -1153,6 +1325,7 @@
 .header-content {
   @apply flex-1;
 }
+
 .header-actions {
   @apply flex gap-2;
 }
@@ -1160,15 +1333,19 @@
 .step-header {
   @apply mb-6;
 }
+
 .step-title {
   @apply text-xl font-semibold text-gray-900 flex items-center gap-3 mb-2;
 }
+
 .step-number {
   @apply inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white font-bold rounded-full text-sm;
 }
+
 .step-help {
   @apply flex items-start gap-2 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm;
 }
+
 .step-help i {
   @apply text-blue-600 mt-0.5;
 }
@@ -1180,34 +1357,44 @@
 .field-label {
   @apply block text-sm font-semibold text-gray-700 mb-1;
 }
+
 .field-label.required::after {
   content: " *";
   @apply text-red-500;
 }
+
 .field-input {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 bg-white;
 }
+
 .field-input::placeholder {
   @apply text-gray-400;
 }
+
 .field-input:focus {
   @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .field-input.is-invalid {
   @apply border-red-300 ring-2 ring-red-200;
 }
+
 .field-select {
   @apply w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 cursor-pointer;
 }
+
 .field-select:focus {
   @apply outline-none ring-2 ring-blue-500 border-transparent;
 }
+
 .field-select.is-invalid {
   @apply border-red-300 ring-2 ring-red-200;
 }
+
 .field-error {
   @apply text-sm text-red-600 mt-1 hidden;
 }
+
 .field-error.show {
   @apply block;
 }
@@ -1215,18 +1402,23 @@
 .serial-section {
   @apply space-y-4;
 }
+
 .serial-title {
   @apply text-lg font-semibold text-gray-800 mb-4;
 }
+
 .serial-input-group {
   @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
 }
+
 .serial-field {
   @apply space-y-2;
 }
+
 .serial-input {
   @apply font-mono;
 }
+
 .serial-preview {
   @apply mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg;
 }
@@ -1234,9 +1426,11 @@
 .preview-label {
   @apply block text-sm font-semibold text-gray-700 mb-3;
 }
+
 .preview-range {
   @apply flex items-center gap-4 mt-2;
 }
+
 .preview-value {
   @apply font-mono px-3 py-2 bg-white border border-gray-300 rounded text-gray-800 min-w-20 text-center;
 }
@@ -1248,12 +1442,15 @@
 .validation-info {
   @apply mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg;
 }
+
 .validation-item {
   @apply flex justify-between items-center text-sm;
 }
+
 .validation-label {
   @apply font-semibold text-gray-700;
 }
+
 .validation-value {
   @apply font-mono text-gray-900 bg-white px-2 py-1 rounded border;
 }
@@ -1261,24 +1458,31 @@
 .btn-back {
   @apply inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline font-medium;
 }
+
 .btn-back:hover {
   @apply no-underline text-gray-800;
 }
+
 .btn-submit {
   @apply inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm border-0 cursor-pointer;
 }
+
 .btn-submit:hover {
   @apply bg-green-700;
 }
+
 .btn-submit:disabled {
   @apply bg-gray-300 text-gray-500 cursor-not-allowed opacity-60;
 }
+
 .btn-submit:disabled:hover {
   @apply bg-gray-300;
 }
+
 .btn-cancel {
   @apply inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm no-underline;
 }
+
 .btn-cancel:hover {
   @apply no-underline text-gray-800 bg-gray-200;
 }
@@ -1287,21 +1491,28 @@
   .import-page {
     @apply p-0 bg-white;
   }
+
   .header-actions {
     @apply hidden;
   }
+
   .form-actions {
     @apply hidden;
   }
+
   .btn-back {
     @apply hidden;
   }
 }
-.field-input:focus, .field-select:focus {
+
+.field-input:focus,
+.field-select:focus {
   @apply ring-2 ring-blue-500 ring-opacity-50;
 }
 
-.btn-submit:focus, .btn-cancel:focus, .btn-back:focus {
+.btn-submit:focus,
+.btn-cancel:focus,
+.btn-back:focus {
   @apply outline-none ring-2 ring-offset-2;
 }
 
@@ -1314,10 +1525,12 @@
   from {
     @apply opacity-0;
   }
+
   to {
     @apply opacity-100;
   }
 }
+
 .auth-login-container {
   @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4;
 }
@@ -1325,54 +1538,71 @@
 .auth-login {
   @apply w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl border border-gray-200;
 }
+
 .auth-login-body {
   @apply p-8;
 }
+
 .auth-login-body .title {
   @apply mb-8 text-center text-2xl font-bold text-gray-800;
 }
+
 .auth-login-form {
   @apply space-y-6;
 }
+
 .auth-login .form-group {
   @apply space-y-2;
 }
+
 .auth-login .form-group label {
   @apply block text-sm font-medium text-gray-700;
 }
+
 .auth-login .form-group input {
   @apply w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out;
 }
+
 .auth-login .form-group input:focus {
   @apply bg-white;
 }
+
 .auth-login .form-group input.is-invalid {
   @apply border-red-300 bg-red-50 focus:ring-red-500;
 }
+
 .auth-login .form-check {
   @apply flex items-center gap-2 pt-2;
 }
+
 .auth-login .form-check input {
   @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500;
 }
+
 .auth-login .form-check label {
   @apply text-sm text-gray-600 cursor-pointer;
 }
+
 .auth-login .form-submit {
   @apply pt-4;
 }
+
 .auth-login .form-submit button {
   @apply w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 ease-in-out focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
+
 .auth-login .alert {
   @apply mb-6 p-4 rounded-lg;
 }
+
 .auth-login .alert-danger {
   @apply bg-red-50 border border-red-200 text-red-700;
 }
+
 .auth-login .alert-success {
   @apply bg-green-50 border border-green-200 text-green-700;
 }
+
 .auth-login .invalid-feedback {
   @apply mt-1 text-sm text-red-600;
 }
@@ -1416,9 +1646,11 @@
 .field-input {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-input:hover {
   @apply border-gray-400;
 }
+
 .field-input:disabled {
   @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
@@ -1426,12 +1658,15 @@
 .field-select {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .field-select:hover {
   @apply border-gray-400;
 }
+
 .field-select:disabled {
   @apply bg-gray-50 text-gray-500 cursor-not-allowed;
 }
+
 .field-select option {
   @apply text-gray-900 bg-white;
 }
@@ -1443,6 +1678,7 @@
 .btn-search {
   @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105;
 }
+
 .btn-search i {
   @apply text-sm;
 }
@@ -1450,9 +1686,11 @@
 .btn-reset {
   @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-md shadow-sm border border-gray-300 hover:bg-gray-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 no-underline;
 }
+
 .btn-reset:hover {
   @apply no-underline text-gray-800;
 }
+
 .btn-reset i {
   @apply text-sm;
 }
@@ -1464,9 +1702,11 @@
 .action-btn {
   @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 font-medium text-sm rounded-md shadow-sm border transition-all duration-200 transform hover:scale-105 no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
 }
+
 .action-btn i {
   @apply text-sm;
 }
+
 .action-btn:hover {
   @apply no-underline;
 }
@@ -1491,49 +1731,63 @@
   .search-form-grid {
     @apply grid-cols-1 gap-4;
   }
+
   .search-actions {
     @apply flex-col;
   }
+
   .search-actions .btn-search,
   .search-actions .btn-reset {
     @apply w-full justify-center;
   }
+
   .diploma-actions {
     @apply flex-col;
   }
+
   .diploma-actions .action-btn {
     @apply w-full justify-center;
   }
+
   .diploma-form-section {
     @apply p-4 space-y-6;
   }
+
   .diploma-search-card {
     @apply p-4;
   }
 }
+
 @media (min-width: 1024px) {
   .search-form-grid {
     @apply grid-cols-3;
   }
+
   .form-field:nth-child(1) {
     @apply lg:col-span-1;
   }
+
   .form-field:nth-child(2) {
     @apply lg:col-span-1;
   }
+
   .form-field:nth-child(3) {
     @apply lg:col-span-1;
   }
+
   .form-field:nth-child(4) {
     @apply lg:col-span-1;
   }
+
   .form-field:nth-child(5) {
     @apply lg:col-span-1;
   }
+
   .form-field:nth-child(6) {
     @apply lg:col-span-1;
   }
 }
+
 .field-input:focus,
 .field-select:focus {
   @apply transform scale-105;
@@ -1558,6 +1812,7 @@
 .embryo-management {
   @apply mx-auto mt-10 max-w-[1140px] bg-[var(--color-secondary)] px-4 py-6;
 }
+
 .embryo-management .form-group-full {
   @apply col-span-1 md:col-span-2 lg:col-span-3;
 }
@@ -1565,112 +1820,148 @@
 .student-edit-page {
   @apply mx-auto max-w-7xl bg-gray-100 p-10 rounded-md;
 }
+
 .student-edit-page .page-header {
   @apply mb-8;
 }
+
 .student-edit-page .page-header h1 {
   @apply text-3xl font-bold text-gray-900;
 }
+
 .student-edit-page .page-header p {
   @apply text-gray-600 mt-2;
 }
+
 .student-edit-page .form-field {
   @apply space-y-2;
 }
+
 .student-edit-page .form-field .field-label {
   @apply block text-sm font-medium text-gray-700;
 }
+
 .student-edit-page .form-field .field-input,
 .student-edit-page .form-field .field-select {
   @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
 }
+
 .student-edit-page .form-field .error-message {
   @apply text-red-600 text-sm mt-1;
 }
+
 .student-edit-page .section-card {
   @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6;
 }
+
 .student-edit-page .section-card .section-title {
   @apply text-xl font-semibold text-gray-900 mb-6 flex items-center;
 }
+
 .student-edit-page .section-card .section-title i {
   @apply mr-3;
 }
+
 .student-edit-page .degree-card {
   @apply border border-gray-200 rounded-lg p-4 bg-gray-50;
 }
+
 .student-edit-page .degree-card .degree-header {
   @apply flex items-center justify-between mb-3;
 }
+
 .student-edit-page .degree-card .degree-header h3 {
   @apply font-medium text-gray-900;
 }
+
 .student-edit-page .degree-card .degree-header .degree-type-badge {
   @apply ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full;
 }
+
 .student-edit-page .degree-card .degree-header small {
   @apply text-gray-500;
 }
+
 .student-edit-page .degree-card .degree-details {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm;
 }
+
 .student-edit-page .degree-card .degree-details .detail-item .label {
   @apply font-medium text-gray-700;
 }
+
 .student-edit-page .degree-card .degree-details .detail-item .value {
   @apply ml-2 text-gray-600;
 }
+
 .student-edit-page .empty-state {
   @apply text-center py-8;
 }
+
 .student-edit-page .empty-state .empty-icon {
   @apply inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4;
 }
+
 .student-edit-page .empty-state .empty-icon i {
   @apply text-gray-400 text-xl;
 }
+
 .student-edit-page .empty-state .empty-title {
   @apply text-gray-500 text-lg mb-2;
 }
+
 .student-edit-page .empty-state .empty-description {
   @apply text-gray-400 text-sm;
 }
+
 .student-edit-page .action-section {
   @apply flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-6;
 }
+
 .student-edit-page .action-section .last-updated {
   @apply text-sm text-gray-600;
 }
+
 .student-edit-page .action-section .last-updated i {
   @apply text-blue-500 mr-2;
 }
+
 .student-edit-page .action-section .action-buttons {
   @apply flex gap-3;
 }
+
 .student-edit-page .action-section .action-buttons .btn-cancel {
   @apply px-6 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors duration-200;
 }
+
 .student-edit-page .action-section .action-buttons .btn-save {
   @apply px-6 py-2 text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200;
 }
+
 .student-edit-page .flash-message {
   @apply fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50;
 }
+
 .student-edit-page .flash-message.success {
   @apply bg-green-100 border border-green-400 text-green-700;
 }
+
 .student-edit-page .flash-message.error {
   @apply bg-red-100 border border-red-400 text-red-700;
 }
+
 .student-edit-page .flash-message .message-content {
   @apply flex items-center;
 }
+
 .student-edit-page .flash-message .message-content i {
   @apply mr-2;
 }
+
 .student-edit-page .flash-message .message-content .close-btn {
   @apply ml-3 hover:text-gray-900 cursor-pointer;
 }
+
 .student-edit-page .field-input.error,
 .student-edit-page .field-select.error {
   @apply border-red-500 ring-red-500;
@@ -1680,26 +1971,33 @@
   .student-edit-page .page-header {
     @apply flex flex-col gap-3;
   }
+
   .student-edit-page .section-card {
     @apply p-4;
     @apply grid grid-cols-1 gap-4;
   }
+
   .student-edit-page .degree-card .degree-header {
     @apply flex-col items-start gap-2;
   }
+
   .student-edit-page .degree-card .degree-details {
     @apply grid-cols-1 gap-2;
   }
+
   .student-edit-page .action-section {
     @apply flex-col gap-4 items-stretch;
   }
+
   .student-edit-page .action-section .action-buttons {
     @apply justify-center;
   }
 }
+
 .header {
   @apply min-h-[98px] w-full;
 }
+
 .header img {
   @apply h-full w-full object-cover;
 }
@@ -1707,29 +2005,37 @@
 .form-section {
   @apply mb-6 rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
+
 .form .form-grid {
   @apply mb-6 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 lg:grid-cols-3;
 }
+
 .form .form-grid.--grid-4 {
   @apply grid-cols-4;
 }
+
 .form .form-grid.--grid-5 {
   @apply grid-cols-5;
 }
+
 .form-group {
   @apply flex flex-col;
 }
+
 .form-group label {
   @apply mb-2 text-sm font-semibold text-[var(--color-text-secondary)];
 }
+
 .form-group input,
 .form-group textarea,
 .form-group select {
   @apply w-full rounded-md border border-[var(--color-border-light)] px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-[var(--color-focus-blue)];
 }
+
 .form-group textarea {
   @apply resize-y;
 }
+
 .form-search-row {
   @apply mb-6 flex flex-col items-center gap-4 md:flex-row;
 }
@@ -1741,15 +2047,19 @@
 .btn {
   @apply rounded-md px-4 py-2 font-semibold transition-all duration-200 ease-in-out;
 }
+
 .btn-primary {
   @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-opacity-50;
 }
+
 .btn-secondary {
   @apply bg-[var(--color-secondary-light)] text-gray-800 hover:bg-[var(--color-secondary-medium)] focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
 }
+
 .btn-remove {
   @apply bg-[var(--color-danger)] text-white flex justify-center my-4 mx-auto;
 }
+
 .btn-table {
   @apply rounded bg-[var(--color-primary)] px-2 py-1 text-xs text-white hover:bg-[var(--color-primary-hover)];
 }
@@ -1757,6 +2067,7 @@
 .table-section {
   @apply rounded-md bg-[var(--color-bg-card)] p-6 shadow-md;
 }
+
 .table-wrapper {
   @apply overflow-x-auto;
 }
@@ -1764,15 +2075,19 @@
 .data-table {
   @apply w-full border-collapse text-sm;
 }
+
 .data-table thead {
   @apply bg-[var(--color-primary-hover)] text-white;
 }
+
 .data-table thead th {
   @apply whitespace-nowrap border-[var(--color-primary-dark)] px-4 py-2 text-center;
 }
+
 .data-table tbody tr:hover {
   @apply bg-[var(--color-bg-main)];
 }
+
 .data-table tbody td {
   @apply whitespace-nowrap border-[var(--color-border-light)] px-4 py-2 text-center;
 }
@@ -1780,6 +2095,7 @@
 .section-title {
   @apply mb-6 text-center text-2xl font-bold text-[var(--color-text-primary)];
 }
+
 .section-subtitle {
   @apply mb-4 text-xl font-semibold text-[var(--color-text-secondary)];
 }

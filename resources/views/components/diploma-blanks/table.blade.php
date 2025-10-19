@@ -115,11 +115,12 @@
                             <td class="td">
                                 <div class="damage-info">
                                     @php
-                                        $isDamaged = $blank->status instanceof \App\Enums\DiplomaBlankStatus
-                                            ? $blank->status === \App\Enums\DiplomaBlankStatus::DAMAGED
-                                            : $blank->status === 'Damaged';
+                                        $isDamaged =
+                                            $blank->status instanceof \App\Enums\DiplomaBlankStatus
+                                                ? $blank->status === \App\Enums\DiplomaBlankStatus::DAMAGED
+                                                : $blank->status === 'Damaged';
                                     @endphp
-                                    
+
                                     @if ($isDamaged && $blank->damageReason)
                                         <div class="damage-details">
                                             <strong class="damage-reason">{{ $blank->damageReason->name }}</strong>
@@ -129,7 +130,7 @@
                                                 </small>
                                             @endif
                                             @if ($blank->damage_description)
-                                                <small class="damage-description text-muted d-block" 
+                                                <small class="damage-description text-muted d-block"
                                                     title="{{ $blank->damage_description }}">
                                                     {{ Str::limit($blank->damage_description, 30) }}
                                                 </small>
