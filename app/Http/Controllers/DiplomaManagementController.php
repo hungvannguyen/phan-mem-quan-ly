@@ -248,6 +248,42 @@ class DiplomaManagementController extends Controller
         }
     }
 
+    public function deleteStudent(Student $student)
+    {
+        try {
+            // Get all degrees issued to this student 
+            $degrees = $student->degrees()->get();
+            
+            // Soft delete all degrees first and revert diploma blanks to IN_STOCK
+            foreach ($degrees as $degree) {
+                $degree->delete();
+                
+                if ($degree->diploma_blank_id) {
+                    $diplomaBlank = \App\Models\DiplomaBlank::find($degree->diploma_blank_id);
+                    if ($diplomaBlank) {
+                        $diplomaBlank->update([
+                            'status' => \App\Enums\DiplomaBlankStatus::IN_STOCK->value,
+                            'issue_date' => null,
+                            'issue_reason' => null
+                        ]);
+                    }
+                }
+            }
+
+            // Soft delete the student
+            $student->delete();
+
+            // Redirect back to diploma management with success message
+            return redirect()->route('diploma-management')
+                ->with('success', 'Xóa sinh viên thành công! Tất cả văn bằng và phôi đã được trả về kho.');
+
+        } catch (\Exception $e) {
+            // Redirect back to student page with error message
+            return redirect()->route('student', ['student' => $student->student_id])
+                ->with('error', 'Có lỗi xảy ra khi xóa sinh viên: ' . $e->getMessage());
+        }
+    }
+
     public function deleteDegree(Degree $degree)
     {
         try {

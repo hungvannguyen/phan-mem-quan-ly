@@ -111,6 +111,12 @@
                                     title="Chỉnh sửa thông tin sinh viên">
                                     Sửa
                                 </a>
+                                
+                                <button class="btn-action btn-delete" 
+                                    onclick="confirmDeleteStudent('{{ $student->student_id }}', '{{ $student->full_name }}')"
+                                    title="Xóa sinh viên">
+                                    Xóa
+                                </button>
 
                                 {{-- Hiển thị nút cấp văn bằng dựa trên trạng thái học sinh --}}
                                 @if ($student->status && $student->status->value === 1)

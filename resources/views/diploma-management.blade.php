@@ -140,4 +140,24 @@
             </div>
         </div>
     </main>
+
+    <!-- Hidden form for student deletion -->
+    <form id="deleteStudentForm" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+
+    <script>
+        function confirmDeleteStudent(studentId, studentName) {
+            if (confirm(`Bạn có chắc chắn muốn xóa sinh viên "${studentName}" không?\n\nLưu ý: Việc xóa sinh viên sẽ đồng thời xóa tất cả văn bằng đã cấp và trả lại các phôi văn bằng về kho.`)) {
+                deleteStudent(studentId);
+            }
+        }
+
+        function deleteStudent(studentId) {
+            const form = document.getElementById('deleteStudentForm');
+            form.action = `/student/${studentId}/delete`;
+            form.submit();
+        }
+    </script>
 @endsection

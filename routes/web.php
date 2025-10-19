@@ -165,6 +165,11 @@ Route::post(
     [DiplomaManagementController::class, 'update']
 )->middleware('auth')->name('student.update');
 
+Route::delete(
+    "student/{student:student_id}/delete",
+    [DiplomaManagementController::class, 'deleteStudent']
+)->middleware('auth')->name('student.delete');
+
 // Degree routes
 Route::post(
     "degrees/store",

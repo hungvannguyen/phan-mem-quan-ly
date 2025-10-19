@@ -156,7 +156,7 @@
                                                 : \App\Enums\DiplomaBlankStatus::tryFrom($blank->status);
                                     @endphp
 
-                                    @if ($currentStatus && $currentStatus->canIssue())
+                                    {{-- @if ($currentStatus && $currentStatus->canIssue())
                                         <button type="button" class="btn-action btn-start" title="Cấp phôi">
                                             Cấp phôi
                                         </button>
@@ -164,7 +164,7 @@
                                         <button type="button" class="btn-action btn-pause" title="Thu hồi phôi">
                                             Thu hồi
                                         </button>
-                                    @endif
+                                    @endif --}}
 
                                     @if ($currentStatus && $currentStatus->canMarkAsDamaged())
                                         <button type="button" class="btn-action btn-delete" title="Báo hư hỏng"
