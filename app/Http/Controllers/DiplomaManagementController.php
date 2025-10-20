@@ -92,7 +92,7 @@ class DiplomaManagementController extends Controller
             return view('components.students.table', compact('students'))->render();
         }
 
-        return view('diploma-management', [
+        return view('components.diplomas.management', [
             'students' => $students,
             'majors' => $majors,
         ]);

@@ -62,7 +62,7 @@ class DiplomaBlankController extends Controller
             abort(404, 'Import không tồn tại.');
         }
 
-        return view('diploma-blanks-list', [
+        return view('components.diploma-blanks.list', [
             'diplomaBlanks' => $diplomaBlanks,
             'diplomaBlankTypes' => $diplomaBlankTypes,
             'damageReasons' => $damageReasons,
@@ -197,7 +197,7 @@ class DiplomaBlankController extends Controller
     public function showImportForm()
     {
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
-        return view('diploma-blank-import', compact('diplomaBlankTypes'));
+        return view('components.diploma-blank-imports.import', compact('diplomaBlankTypes'));
     }
 
     /**
