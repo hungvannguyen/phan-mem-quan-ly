@@ -124,19 +124,23 @@
         }
 
         /* Modal Styles */
-        #addDegreeModal, #editDegreeModal {
+        #addDegreeModal,
+        #editDegreeModal {
             z-index: 9999;
         }
 
-        #addDegreeModal.hidden, #editDegreeModal.hidden {
+        #addDegreeModal.hidden,
+        #editDegreeModal.hidden {
             display: none !important;
         }
 
-        #addDegreeModal:not(.hidden), #editDegreeModal:not(.hidden) {
+        #addDegreeModal:not(.hidden),
+        #editDegreeModal:not(.hidden) {
             display: flex !important;
         }
 
-        #addDegreeModal .bg-white, #editDegreeModal .bg-white {
+        #addDegreeModal .bg-white,
+        #editDegreeModal .bg-white {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
@@ -1072,7 +1076,7 @@
 
         function openAddDegreeModal() {
             const modal = document.getElementById('addDegreeModal');
-            
+
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.style.display = 'flex';
