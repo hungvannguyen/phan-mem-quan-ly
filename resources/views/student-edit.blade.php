@@ -270,9 +270,12 @@
                     </x-vietnamese-date-input>
 
                     <div class="form-field">
-                        <label for="class_name" class="field-label">Lớp học</label>
+                        <label for="class_name" class="field-label">Lớp học <span class="text-red-500">*</span></label>
                         <input type="text" id="class_name" name="class_name" class="field-input"
-                            value="{{ old('class_name', $student->class_name) }}">
+                            value="{{ old('class_name', $student->class_name) }}" placeholder="Nhập tên lớp" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: CNTT K65, KTPM K64, TH K63</small>
+                        </div>
                         @error('class_name')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -313,6 +316,19 @@
                     </div>
 
                     <div class="form-field">
+                        <label for="place_of_birth" class="field-label">Nơi sinh <span class="text-red-500">*</span></label>
+                        <input type="text" id="place_of_birth" name="place_of_birth" class="field-input"
+                            value="{{ old('place_of_birth', $student->place_of_birth) }}" placeholder="Nhập nơi sinh"
+                            required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Hà Nội, TP. Hồ Chí Minh, Đà Nẵng</small>
+                        </div>
+                        @error('place_of_birth')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
                         <label for="status" class="field-label">Trạng thái học tập <span
                                 class="text-red-500">*</span></label>
                         <select id="status" name="status" class="field-select" required>
@@ -336,28 +352,40 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="nation" class="field-label">Dân tộc</label>
+                        <label for="nation" class="field-label">Dân tộc <span class="text-red-500">*</span></label>
                         <input type="text" id="nation" name="nation" class="field-input"
-                            value="{{ old('nation', $student->nation) }}" placeholder="Nhập dân tộc">
+                            value="{{ old('nation', $student->nation) }}" placeholder="Nhập dân tộc" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Kinh, Tày, Thái, Mường</small>
+                        </div>
                         @error('nation')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="form-field">
-                        <label for="nationality" class="field-label">Quốc tịch</label>
+                        <label for="nationality" class="field-label">Quốc tịch <span
+                                class="text-red-500">*</span></label>
                         <input type="text" id="nationality" name="nationality" class="field-input"
-                            value="{{ old('nationality', $student->nationality) }}" placeholder="Nhập quốc tịch">
+                            value="{{ old('nationality', $student->nationality) }}" placeholder="Nhập quốc tịch"
+                            required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Việt Nam, Hoa Kỳ, Nhật Bản</small>
+                        </div>
                         @error('nationality')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="form-field">
-                        <label for="number_in_the_book" class="field-label">Số sổ gốc</label>
+                        <label for="number_in_the_book" class="field-label">Số sổ gốc <span
+                                class="text-red-500">*</span></label>
                         <input type="text" id="number_in_the_book" name="number_in_the_book" class="field-input"
                             value="{{ old('number_in_the_book', $student->number_in_the_book) }}"
-                            placeholder="Nhập số sổ gốc">
+                            placeholder="Nhập số sổ gốc" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Số thứ tự trong sổ gốc cấp văn bằng (VD: 001, 002, 123)</small>
+                        </div>
                         @error('number_in_the_book')
                             <span class="error-message">{{ $message }}</span>
                         @enderror

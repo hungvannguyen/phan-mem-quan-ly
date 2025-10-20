@@ -34,13 +34,13 @@ class StudentRequest extends FormRequest
             ],
             'full_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
-            'class_name' => 'nullable|string|max:100',
+            'class_name' => 'required|string|max:100',
             'major_id' => 'required|exists:majors,major_id',
-            'place_of_birth' => 'nullable|string|max:255',
+            'place_of_birth' => 'required|string|max:255',
             'gender' => 'nullable|integer|in:0,1',
-            'nation' => 'nullable|string|max:100',
-            'nationality' => 'nullable|string|max:100',
-            'number_in_the_book' => 'nullable|string|max:100',
+            'nation' => 'required|string|max:100',
+            'nationality' => 'required|string|max:100',
+            'number_in_the_book' => 'required|string|max:100',
             'status' => 'required|integer|in:0,1,2',
         ];
     }
@@ -60,24 +60,29 @@ class StudentRequest extends FormRequest
             'date_of_birth.required' => 'Vui lòng nhập ngày sinh.',
             'date_of_birth.date' => 'Ngày sinh không hợp lệ.',
 
+            'class_name.required' => 'Vui lòng nhập tên lớp.',
             'class_name.string' => 'Tên lớp phải là một chuỗi ký tự.',
             'class_name.max' => 'Tên lớp không được vượt quá :max ký tự.',
 
             'major_id.required' => 'Vui lòng chọn ngành đào tạo.',
             'major_id.exists' => 'Ngành đào tạo không tồn tại.',
 
+            'place_of_birth.required' => 'Vui lòng nhập nơi sinh.',
             'place_of_birth.string' => 'Nơi sinh phải là một chuỗi ký tự.',
             'place_of_birth.max' => 'Nơi sinh không được vượt quá :max ký tự.',
 
             'gender.integer' => 'Giới tính không hợp lệ.',
             'gender.in' => 'Giới tính phải là Nam hoặc Nữ.',
 
+            'nation.required' => 'Vui lòng nhập dân tộc.',
             'nation.string' => 'Dân tộc phải là một chuỗi ký tự.',
             'nation.max' => 'Dân tộc không được vượt quá :max ký tự.',
 
+            'nationality.required' => 'Vui lòng nhập quốc tịch.',
             'nationality.string' => 'Quốc tịch phải là một chuỗi ký tự.',
             'nationality.max' => 'Quốc tịch không được vượt quá :max ký tự.',
 
+            'number_in_the_book.required' => 'Vui lòng nhập số sổ gốc.',
             'number_in_the_book.string' => 'Số sổ gốc phải là một chuỗi ký tự.',
             'number_in_the_book.max' => 'Số sổ gốc không được vượt quá :max ký tự.',
 

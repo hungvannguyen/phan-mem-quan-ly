@@ -31,9 +31,42 @@ class DiplomaManagementController extends Controller
             $query->where('class_name', 'like', '%' . $request->class_name . '%');
         }
 
-        // Tìm kiếm theo ngày sinh - chỉ khi có input
+        // Tìm kiếm theo ngày sinh - chỉ khi có input (flexible search)
         if ($request->filled('date_of_birth')) {
-            $query->whereDate('date_of_birth', $request->date_of_birth);
+            $dateOfBirth = $request->date_of_birth;
+
+            // Parse flexible date search format
+            if (strpos($dateOfBirth, 'ngay:') === 0) {
+                $day = substr($dateOfBirth, 5);
+                $query->whereDay('date_of_birth', $day);
+            } elseif (strpos($dateOfBirth, 'thang:') === 0) {
+                $month = substr($dateOfBirth, 6);
+                $query->whereMonth('date_of_birth', $month);
+            } elseif (strpos($dateOfBirth, 'nam:') === 0) {
+                $year = substr($dateOfBirth, 4);
+                $query->whereYear('date_of_birth', $year);
+            } elseif (strpos($dateOfBirth, 'thang_nam:') === 0) {
+                $monthYear = substr($dateOfBirth, 10);
+                [$month, $year] = explode('/', $monthYear);
+                $query->whereMonth('date_of_birth', $month)
+                    ->whereYear('date_of_birth', $year);
+            } elseif (strpos($dateOfBirth, 'ngay_thang:') === 0) {
+                $dayMonth = substr($dateOfBirth, 11);
+                [$day, $month] = explode('/', $dayMonth);
+                $query->whereDay('date_of_birth', $day)
+                    ->whereMonth('date_of_birth', $month);
+            } elseif (strpos($dateOfBirth, 'ngay_cu_the:') === 0) {
+                $fullDate = substr($dateOfBirth, 12);
+                [$day, $month, $year] = explode('/', $fullDate);
+                $query->whereDate('date_of_birth', sprintf('%04d-%02d-%02d', $year, $month, $day));
+            } else {
+                // Fallback: try to parse as regular date
+                try {
+                    $query->whereDate('date_of_birth', $dateOfBirth);
+                } catch (\Exception $e) {
+                    // Invalid date format, ignore this filter
+                }
+            }
         }
 
         // Tìm kiếm theo ngành - chỉ khi có input
