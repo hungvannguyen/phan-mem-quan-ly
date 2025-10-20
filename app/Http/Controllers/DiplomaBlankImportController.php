@@ -65,7 +65,7 @@ class DiplomaBlankImportController extends Controller
         // Lấy danh sách loại phôi để hiển thị trong dropdown
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
-        return view('components.diploma-blanks.management', compact('diplomaBlankImports', 'diplomaBlankTypes'));
+        return view('components.diploma-blank-imports.management', compact('diplomaBlankImports', 'diplomaBlankTypes'));
     }
 
     /**

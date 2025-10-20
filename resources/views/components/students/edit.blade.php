@@ -124,11 +124,19 @@
         }
 
         /* Modal Styles */
-        #addDegreeModal {
+        #addDegreeModal, #editDegreeModal {
             z-index: 9999;
         }
 
-        #addDegreeModal .bg-white {
+        #addDegreeModal.hidden, #editDegreeModal.hidden {
+            display: none !important;
+        }
+
+        #addDegreeModal:not(.hidden), #editDegreeModal:not(.hidden) {
+            display: flex !important;
+        }
+
+        #addDegreeModal .bg-white, #editDegreeModal .bg-white {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
@@ -1063,11 +1071,18 @@
         }
 
         function openAddDegreeModal() {
-            document.getElementById('addDegreeModal').style.display = 'flex';
+            const modal = document.getElementById('addDegreeModal');
+            
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
         }
 
         function closeAddDegreeModal() {
-            document.getElementById('addDegreeModal').style.display = 'none';
+            const modal = document.getElementById('addDegreeModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
             // Reset form
             document.getElementById('addDegreeForm').reset();
 
@@ -1129,11 +1144,15 @@
             }
 
             // Show modal
-            document.getElementById('editDegreeModal').style.display = 'flex';
+            const editModal = document.getElementById('editDegreeModal');
+            editModal.classList.remove('hidden');
+            editModal.style.display = 'flex';
         }
 
         function closeEditDegreeModal() {
-            document.getElementById('editDegreeModal').style.display = 'none';
+            const editModal = document.getElementById('editDegreeModal');
+            editModal.classList.add('hidden');
+            editModal.style.display = 'none';
             // Reset form
             document.getElementById('editDegreeForm').reset();
         }

@@ -106,7 +106,7 @@
                 <a href="{{ route('diploma-blank-import.create') }}" class="action-btn action-btn-primary">
                     Nhập phôi mới
                 </a>
-                <button type="button" class="action-btn action-btn-warning">
+                {{-- <button type="button" class="action-btn action-btn-warning">
                     Nhập từ Excel
                 </button>
                 <button type="button" class="action-btn action-btn-info">
@@ -117,7 +117,7 @@
                 </button>
                 <button type="button" class="action-btn action-btn-secondary">
                     Đồng bộ dữ liệu
-                </button>
+                </button> --}}
             </div>
         </div>
 

@@ -183,15 +183,12 @@
                 <a href="{{ route('student.create') }}" class="action-btn action-btn-primary">
                     Thêm sinh viên mới
                 </a>
-                <button type="button" class="action-btn action-btn-warning">
-                    Cấp văn bằng
-                </button>
-                <button type="button" class="action-btn action-btn-info">
+                {{-- <button type="button" class="action-btn action-btn-info">
                     In danh sách
                 </button>
                 <button type="button" class="action-btn action-btn-success">
                     Xuất Excel
-                </button>
+                </button> --}}
             </div>
         </div>
 
@@ -468,7 +465,7 @@
                         e.preventDefault();
                         alert('Lỗi ngày tháng: ' + errorMsg +
                             '\n\nVí dụ hợp lệ:\n- Ngày: 15\n- Năm: 2024\n- Tháng/Năm: 03/2024\n- Ngày/Tháng: 15/03\n- Đầy đủ: 15/03/2024'
-                            );
+                        );
                         return false;
                     }
                 }
