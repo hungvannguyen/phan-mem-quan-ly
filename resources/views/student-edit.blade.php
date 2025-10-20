@@ -189,6 +189,27 @@
                 gap: 0.75rem;
             }
         }
+
+        .date-display {
+            margin-top: 0.25rem;
+            padding: 0.5rem;
+            background-color: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #15803d;
+            font-weight: 500;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        input[type="date"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     </style>
     <div class="student-edit-page">
         <!-- Page Header -->
@@ -239,6 +260,14 @@
                         <label for="date_of_birth" class="field-label">Ngày sinh <span class="text-red-500">*</span></label>
                         <input type="date" id="date_of_birth" name="date_of_birth" class="field-input"
                             value="{{ old('date_of_birth', $student->date_of_birth?->format('Y-m-d')) }}" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Định dạng: ngày/tháng/năm (VD: 15/06/1995)</small>
+                        </div>
+                        @if ($student->date_of_birth)
+                            <div class="date-display mt-1 text-sm text-green-600">
+                                ✓ Ngày sinh hiện tại: {{ $student->date_of_birth->format('d/m/Y') }}
+                            </div>
+                        @endif
                         @error('date_of_birth')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -1076,7 +1105,7 @@
         function confirmDeleteDegree(degreeId, registrationNumber) {
             if (confirm(
                     `⚠️ Bạn có chắc muốn xóa văn bằng "${registrationNumber}"?\n\nLưu ý: Văn bằng sẽ được xóa mềm và có thể khôi phục sau này.`
-                    )) {
+                )) {
                 deleteDegree(degreeId);
             }
         }

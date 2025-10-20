@@ -54,6 +54,27 @@
         .field-description {
             margin-top: 0.5rem;
         }
+
+        .date-display {
+            margin-top: 0.25rem;
+            padding: 0.5rem;
+            background-color: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #15803d;
+            font-weight: 500;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        input[type="date"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     </style>
 
     <div class="student-edit-page">
@@ -87,6 +108,9 @@
                                 class="text-red-500">*</span></label>
                         <input type="text" id="student_code" name="student_code" class="field-input"
                             value="{{ old('student_code') }}" placeholder="Nhập mã sinh viên" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Mã sinh viên phải là duy nhất trong hệ thống</small>
+                        </div>
                         @error('student_code')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -105,6 +129,9 @@
                         <label for="date_of_birth" class="field-label">Ngày sinh <span class="text-red-500">*</span></label>
                         <input type="date" id="date_of_birth" name="date_of_birth" class="field-input"
                             value="{{ old('date_of_birth') }}" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Định dạng: ngày/tháng/năm (VD: 15/06/1995)</small>
+                        </div>
                         @error('date_of_birth')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
@@ -149,7 +176,7 @@
                             @endif
                         </select>
                         @error('major_id')
-                            <span class="error-message">{{ $message }}</span>
+                            <span class="error-message">{{ $message }}</span>xx
                         @enderror
                     </div>
 
@@ -301,6 +328,41 @@
                 statusSelect.value = '0';
             }
 
+            // Enhance date input experience
+            const dateInput = document.getElementById('date_of_birth');
+            if (dateInput) {
+                // Add event listener to show Vietnamese format when focused
+                dateInput.addEventListener('focus', function() {
+                    if (!this.value) {
+                        // Show current date as placeholder
+                        const today = new Date();
+                        const year = today.getFullYear() - 20; // Default to 20 years ago
+                        const month = String(today.getMonth() + 1).padStart(2, '0');
+                        const day = String(today.getDate()).padStart(2, '0');
+                        this.setAttribute('placeholder', `${day}/${month}/${year}`);
+                    }
+                });
+
+                // Show formatted display when date is selected
+                dateInput.addEventListener('change', function() {
+                    if (this.value) {
+                        const date = new Date(this.value);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+
+                        // Create or update display element
+                        let displayElement = this.parentNode.querySelector('.date-display');
+                        if (!displayElement) {
+                            displayElement = document.createElement('div');
+                            displayElement.className = 'date-display mt-1 text-sm text-green-600';
+                            this.parentNode.insertBefore(displayElement, this.nextSibling);
+                        }
+                        displayElement.textContent = `✓ Ngày sinh: ${day}/${month}/${year}`;
+                    }
+                });
+            }
+
             // Handle status change information
             if (statusSelect) {
                 statusSelect.addEventListener('change', function() {
@@ -317,22 +379,6 @@
                         showNotification('⚠️ Sinh viên bỏ học sẽ không thể được cấp văn bằng.', 'warning');
                     }
                 });
-            }
-
-            // Generate student code suggestion
-            const studentCodeInput = document.getElementById('student_code');
-            const generateCodeBtn = document.createElement('button');
-            generateCodeBtn.type = 'button';
-            generateCodeBtn.className = 'btn btn-secondary btn-sm mt-2';
-            generateCodeBtn.innerHTML = '<i class="fas fa-magic mr-1"></i>Tự động tạo mã';
-            generateCodeBtn.onclick = function() {
-                const year = new Date().getFullYear().toString().substr(-2);
-                const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-                studentCodeInput.value = `SV${year}${random}`;
-            };
-
-            if (studentCodeInput && !studentCodeInput.value) {
-                studentCodeInput.parentNode.appendChild(generateCodeBtn);
             }
 
             // Form validation
