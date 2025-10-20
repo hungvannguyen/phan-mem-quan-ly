@@ -57,11 +57,8 @@
                                 placeholder="Nhập tên lớp" value="{{ request('class_name') }}">
                         </div>
 
-                        <div class="form-field">
-                            <label for="date_of_birth" class="field-label">Ngày sinh</label>
-                            <input type="date" id="date_of_birth" name="date_of_birth" class="field-input"
-                                value="{{ request('date_of_birth') }}">
-                        </div>
+                        <x-vietnamese-date-input id="date_of_birth" name="date_of_birth" label="Ngày sinh" :required="false"
+                            value="{{ request('date_of_birth') }}" />
 
                         <div class="form-field">
                             <label for="major_id" class="field-label">Ngành đào tạo</label>
@@ -102,11 +99,9 @@
                     <!-- Search Actions -->
                     <div class="search-actions">
                         <button type="submit" class="btn-search">
-                            <i class="fas fa-search"></i>
                             Tìm kiếm
                         </button>
                         <a href="{{ route('diploma-management') }}" class="btn-reset">
-                            <i class="fas fa-times"></i>
                             Xóa bộ lọc
                         </a>
                     </div>
@@ -116,19 +111,15 @@
             <!-- Action Buttons -->
             <div class="page-actions">
                 <a href="{{ route('student.create') }}" class="action-btn action-btn-primary">
-                    <i class="fas fa-plus"></i>
                     Thêm sinh viên mới
                 </a>
                 <button type="button" class="action-btn action-btn-warning">
-                    <i class="fas fa-certificate"></i>
                     Cấp văn bằng
                 </button>
                 <button type="button" class="action-btn action-btn-info">
-                    <i class="fas fa-print"></i>
                     In danh sách
                 </button>
                 <button type="button" class="action-btn action-btn-success">
-                    <i class="fas fa-file-excel"></i>
                     Xuất Excel
                 </button>
             </div>
@@ -151,7 +142,7 @@
         function confirmDeleteStudent(studentId, studentName) {
             if (confirm(
                     `Bạn có chắc chắn muốn xóa sinh viên "${studentName}" không?\n\nLưu ý: Việc xóa sinh viên sẽ đồng thời xóa tất cả văn bằng đã cấp và trả lại các phôi văn bằng về kho.`
-                    )) {
+                )) {
                 deleteStudent(studentId);
             }
         }

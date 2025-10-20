@@ -68,8 +68,13 @@
                                 </select>
                             </div>
 
-                            <x-vietnamese-date-input id="import_date" name="import_date" label="Ngày cấp" :required="true"
-                                value="{{ old('import_date', date('Y-m-d')) }}" />
+                            <x-vietnamese-date-input 
+                                id="import_date"
+                                name="import_date" 
+                                label="Ngày cấp"
+                                :required="true"
+                                value="{{ old('import_date', date('Y-m-d')) }}"
+                            />
                         </div>
 
                         <div class="form-field">

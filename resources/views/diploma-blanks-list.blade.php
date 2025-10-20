@@ -49,7 +49,7 @@
                                     </span>
                                     @if ($currentImport->status === \App\Enums\ImportStatus::PROCESSING)
                                         <span id="processing-indicator" class="ml-2 text-blue-600">
-                                            <i class="fas fa-spinner fa-spin"></i> Đang cập nhật...
+                                            Đang cập nhật...
                                         </span>
                                     @endif
                                 </div>
@@ -64,19 +64,19 @@
                     @if ($currentImport)
                         @if ($currentImport->status === \App\Enums\ImportStatus::COMPLETED)
                             <button onclick="openUpdateImportModal()" class="btn-secondary me-2">
-                                <i class="fas fa-edit"></i> Cập nhật Import
+                                Cập nhật Import
                             </button>
                         @elseif ($currentImport->status === \App\Enums\ImportStatus::PROCESSING)
                             <button disabled class="btn-secondary me-2 cursor-not-allowed opacity-50">
-                                <i class="fas fa-spinner fa-spin"></i> Đang cập nhật...
+                                Đang cập nhật...
                             </button>
                         @endif
                         <a href="{{ route('diploma-blank-management') }}" class="btn-back">
-                            <i class="fas fa-arrow-left"></i> Quay lại danh sách Import
+                            Quay lại danh sách Import
                         </a>
                     @else
                         <a href="{{ route('diploma-blank-import.create') }}" class="btn-primary">
-                            <i class="fas fa-plus"></i> Nhập phôi mới
+                            Nhập phôi mới
                         </a>
                     @endif
                 </div>
@@ -128,30 +128,24 @@
                         </select>
                     </div>
 
-                    <div class="form-field">
-                        <label for="import_date_from" class="field-label">Ngày nhập từ</label>
-                        <input type="date" id="import_date_from" name="import_date_from" class="field-input"
-                            value="{{ request('import_date_from') }}">
-                    </div>
+                    <x-vietnamese-date-input id="import_date_from" name="import_date_from" label="Ngày nhập từ"
+                        :required="false" value="{{ request('import_date_from') }}" />
 
-                    <div class="form-field">
-                        <label for="import_date_to" class="field-label">Ngày nhập đến</label>
-                        <input type="date" id="import_date_to" name="import_date_to" class="field-input"
-                            value="{{ request('import_date_to') }}">
-                    </div>
+                    <x-vietnamese-date-input id="import_date_to" name="import_date_to" label="Ngày nhập đến"
+                        :required="false" value="{{ request('import_date_to') }}" />
                 </div>
 
                 <div class="search-actions">
                     <button type="submit" class="btn-search">
-                        <i class="fas fa-search"></i> Tìm kiếm
+                        Tìm kiếm
                     </button>
                     @if (isset($importId))
                         <a href="{{ route('diploma-blanks.list-by-import', $importId) }}" class="btn-reset">
-                            <i class="fas fa-undo"></i> Đặt lại
+                            Đặt lại
                         </a>
                     @else
                         <a href="{{ route('diploma-blanks.index') }}" class="btn-reset">
-                            <i class="fas fa-undo"></i> Đặt lại
+                            Đặt lại
                         </a>
                     @endif
                 </div>
@@ -175,13 +169,12 @@
                 @else
                     <div class="empty-results">
                         <div class="empty-icon">
-                            <i class="fas fa-search-minus"></i>
+                            🔍
                         </div>
                         <h3>Không tìm thấy kết quả</h3>
                         <p>Không có phôi văn bằng nào phù hợp với tiêu chí tìm kiếm của bạn.</p>
                         @if ($currentImport && $currentImport->status->value == 0)
                             <p class="text-info">
-                                <i class="fas fa-info-circle"></i>
                                 Import này đang ở trạng thái PENDING. Các phôi sẽ được tạo tự động trong vài phút.
                             </p>
                         @endif

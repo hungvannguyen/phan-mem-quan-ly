@@ -87,7 +87,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="button" onclick="history.back()" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                        Quay lại
                     </button>
                 </div>
             </div>
@@ -99,7 +99,6 @@
             <!-- Student Information Section -->
             <div class="section-card">
                 <h2 class="section-title">
-                    <i class="fas fa-user-plus text-blue-600"></i>
                     Thông tin cơ bản
                 </h2>
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -125,17 +124,12 @@
                         @enderror
                     </div>
 
-                    <div class="form-field">
-                        <label for="date_of_birth" class="field-label">Ngày sinh <span class="text-red-500">*</span></label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="field-input"
-                            value="{{ old('date_of_birth') }}" required>
-                        <div class="field-description">
-                            <small class="text-gray-600">Định dạng: ngày/tháng/năm (VD: 15/06/1995)</small>
-                        </div>
+                    <x-vietnamese-date-input id="date_of_birth" name="date_of_birth" label="Ngày sinh" :required="true"
+                        value="{{ old('date_of_birth') }}" description="Định dạng: ngày/tháng/năm (VD: 15/06/1995)">
                         @error('date_of_birth')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </x-vietnamese-date-input>
 
                     <div class="form-field">
                         <label for="gender" class="field-label">Giới tính <span class="text-red-500">*</span></label>
@@ -176,7 +170,7 @@
                             @endif
                         </select>
                         @error('major_id')
-                            <span class="error-message">{{ $message }}</span>xx
+                            <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -197,7 +191,6 @@
                         @enderror
                         <div class="field-description">
                             <small class="text-gray-600">
-                                <i class="fas fa-info-circle"></i>
                                 Mặc định sinh viên mới sẽ có trạng thái "Đang học"
                             </small>
                         </div>
@@ -226,7 +219,6 @@
             <!-- Additional Information Section -->
             <div class="section-card">
                 <h2 class="section-title">
-                    <i class="fas fa-file-alt text-green-600"></i>
                     Thông tin bổ sung
                 </h2>
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -239,7 +231,6 @@
                         @enderror
                         <div class="field-description">
                             <small class="text-gray-600">
-                                <i class="fas fa-info-circle"></i>
                                 Số thứ tự trong sổ gốc cấp văn bằng
                             </small>
                         </div>
@@ -257,7 +248,6 @@
 
                 <!-- Status Information -->
                 <div class="alert-info">
-                    <i class="fas fa-lightbulb"></i>
                     <div>
                         <strong>Lưu ý:</strong> Sinh viên mới tạo sẽ có trạng thái "Đang học" theo mặc định.
                         Bạn có thể thay đổi trạng thái sau khi tạo hồ sơ thành công.
@@ -268,15 +258,14 @@
             <!-- Action Buttons -->
             <div class="action-section">
                 <div class="last-updated">
-                    <i class="fas fa-plus-circle"></i>
                     Tạo hồ sơ sinh viên mới
                 </div>
                 <div class="action-buttons">
                     <button type="button" onclick="history.back()" class="btn-cancel">
-                        <i class="fas fa-times mr-2"></i>Hủy
+                        Hủy
                     </button>
                     <button type="submit" class="btn-save" id="submitBtn">
-                        <i class="fas fa-user-plus mr-2"></i>Tạo sinh viên
+                        Tạo sinh viên
                     </button>
                 </div>
             </div>
@@ -285,10 +274,9 @@
         @if (session('success'))
             <div class="flash-message success" id="success-message">
                 <div class="flash-content">
-                    <i class="fas fa-check-circle mr-2"></i>
                     <span>{{ session('success') }}</span>
                     <button onclick="document.getElementById('success-message').remove()" class="flash-close">
-                        <i class="fas fa-times"></i>
+                        ×
                     </button>
                 </div>
             </div>
@@ -297,10 +285,9 @@
         @if (session('error'))
             <div class="flash-message error" id="error-message">
                 <div class="flash-content">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
                     <span>{{ session('error') }}</span>
                     <button onclick="document.getElementById('error-message').remove()" class="flash-close">
-                        <i class="fas fa-times"></i>
+                        ×
                     </button>
                 </div>
             </div>
@@ -328,41 +315,6 @@
                 statusSelect.value = '0';
             }
 
-            // Enhance date input experience
-            const dateInput = document.getElementById('date_of_birth');
-            if (dateInput) {
-                // Add event listener to show Vietnamese format when focused
-                dateInput.addEventListener('focus', function() {
-                    if (!this.value) {
-                        // Show current date as placeholder
-                        const today = new Date();
-                        const year = today.getFullYear() - 20; // Default to 20 years ago
-                        const month = String(today.getMonth() + 1).padStart(2, '0');
-                        const day = String(today.getDate()).padStart(2, '0');
-                        this.setAttribute('placeholder', `${day}/${month}/${year}`);
-                    }
-                });
-
-                // Show formatted display when date is selected
-                dateInput.addEventListener('change', function() {
-                    if (this.value) {
-                        const date = new Date(this.value);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-
-                        // Create or update display element
-                        let displayElement = this.parentNode.querySelector('.date-display');
-                        if (!displayElement) {
-                            displayElement = document.createElement('div');
-                            displayElement.className = 'date-display mt-1 text-sm text-green-600';
-                            this.parentNode.insertBefore(displayElement, this.nextSibling);
-                        }
-                        displayElement.textContent = `✓ Ngày sinh: ${day}/${month}/${year}`;
-                    }
-                });
-            }
-
             // Handle status change information
             if (statusSelect) {
                 statusSelect.addEventListener('change', function() {
@@ -385,7 +337,7 @@
             form.addEventListener('submit', function(e) {
                 let isValid = true;
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo...';
+                submitBtn.innerHTML = 'Đang tạo...';
 
                 requiredFields.forEach(field => {
                     if (!field.value.trim()) {
@@ -402,7 +354,7 @@
                 if (!isValid) {
                     e.preventDefault();
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i>Tạo sinh viên';
+                    submitBtn.innerHTML = 'Tạo sinh viên';
                     alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
                 }
             });
@@ -416,7 +368,7 @@
                 <div class="flash-content">
                     <span>${message}</span>
                     <button onclick="this.parentElement.parentElement.remove()" class="flash-close">
-                        <i class="fas fa-times"></i>
+                        ×
                     </button>
                 </div>
             `;

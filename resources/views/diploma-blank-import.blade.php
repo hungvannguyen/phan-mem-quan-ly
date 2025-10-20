@@ -80,12 +80,10 @@
                                 <div class="field-error" id="document_reference_error"></div>
                             </div>
 
-                            <div class="form-field">
-                                <label for="issue_date" class="field-label required">Ngày cấp</label>
-                                <input type="date" id="issue_date" name="issue_date" class="field-input"
-                                    value="{{ old('issue_date', date('Y-m-d')) }}" required>
+                            <x-vietnamese-date-input id="issue_date" name="issue_date" label="Ngày cấp" :required="true"
+                                value="{{ old('issue_date', date('Y-m-d')) }}">
                                 <div class="field-error" id="issue_date_error"></div>
-                            </div>
+                            </x-vietnamese-date-input>
                         </div>
                     </div>
 
@@ -97,7 +95,6 @@
                                 Thông tin Serial
                             </h3>
                             <div class="step-help">
-                                <i class="fas fa-info-circle"></i>
                                 <span>Serial có thể có định dạng: [Cố định 1][Số chạy], [Cố định 1][Số chạy][Cố định 2],
                                     hoặc [Số chạy][Cố định 2]</span>
                             </div>
@@ -128,9 +125,8 @@
 
                                 <div class="serial-field">
                                     <label for="to_number" class="field-label required">Đến số</label>
-                                    <input type="text" id="to_number" name="to_number"
-                                        class="field-input serial-input" placeholder="VD: 00100"
-                                        value="{{ old('to_number') }}" required>
+                                    <input type="text" id="to_number" name="to_number" class="field-input serial-input"
+                                        placeholder="VD: 00100" value="{{ old('to_number') }}" required>
                                     <div class="field-error" id="to_number_error"></div>
                                 </div>
 
@@ -168,11 +164,9 @@
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <button type="submit" class="btn-submit">
-                            <i class="fas fa-save"></i>
                             Nhập phôi vào hệ thống
                         </button>
                         <a href="{{ route('diploma-blank-management') }}" class="btn-cancel">
-                            <i class="fas fa-times"></i>
                             Hủy bỏ
                         </a>
                     </div>

@@ -256,13 +256,9 @@
                         @enderror
                     </div>
 
-                    <div class="form-field">
-                        <label for="date_of_birth" class="field-label">Ngày sinh <span class="text-red-500">*</span></label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="field-input"
-                            value="{{ old('date_of_birth', $student->date_of_birth?->format('Y-m-d')) }}" required>
-                        <div class="field-description">
-                            <small class="text-gray-600">Định dạng: ngày/tháng/năm (VD: 15/06/1995)</small>
-                        </div>
+                    <x-vietnamese-date-input id="date_of_birth" name="date_of_birth" label="Ngày sinh" :required="true"
+                        value="{{ old('date_of_birth', $student->date_of_birth?->format('Y-m-d')) }}"
+                        description="Định dạng: ngày/tháng/năm (VD: 15/06/1995)">
                         @if ($student->date_of_birth)
                             <div class="date-display mt-1 text-sm text-green-600">
                                 ✓ Ngày sinh hiện tại: {{ $student->date_of_birth->format('d/m/Y') }}
@@ -271,7 +267,7 @@
                         @error('date_of_birth')
                             <span class="error-message">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </x-vietnamese-date-input>
 
                     <div class="form-field">
                         <label for="class_name" class="field-label">Lớp học</label>
@@ -702,9 +698,8 @@
                     </div>
 
                     <div class="field-group">
-                        <label for="granting_date" class="field-label required">Ngày cấp</label>
-                        <input type="date" name="granting_date" id="granting_date" class="field-input"
-                            value="{{ old('granting_date') }}" required>
+                        <x-vietnamese-date-input id="granting_date" name="granting_date" label="Ngày cấp"
+                            :required="true" value="{{ old('granting_date') }}" inputClass="field-input" />
                     </div>
 
                     <div class="field-group">
@@ -801,8 +796,8 @@
                     </div>
 
                     <div class="field-group">
-                        <label for="edit_granting_date" class="field-label required">Ngày cấp</label>
-                        <input type="date" name="granting_date" id="edit_granting_date" class="field-input" required>
+                        <x-vietnamese-date-input id="edit_granting_date" name="granting_date" label="Ngày cấp"
+                            :required="true" value="" inputClass="field-input" />
                     </div>
 
                     <div class="field-group">
@@ -1074,8 +1069,22 @@
             document.getElementById('edit_degree_type').value = degree.degree_type || '';
             document.getElementById('edit_registration_number').value = degree.registration_number || '';
             document.getElementById('edit_graduation_year').value = degree.graduation_year || '';
-            document.getElementById('edit_granting_date').value = degree.granting_date ? degree.granting_date.split('T')[
-                0] : '';
+
+            // Set granting date for both hidden input and display input
+            const grantingDate = degree.granting_date ? degree.granting_date.split('T')[0] : '';
+            document.getElementById('edit_granting_date').value = grantingDate;
+
+            // Format and set display input
+            if (grantingDate) {
+                const displayInput = document.getElementById('edit_granting_date_display');
+                if (displayInput) {
+                    const date = new Date(grantingDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
             document.getElementById('edit_ranking').value = degree.ranking || '';
             document.getElementById('edit_decision_number').value = degree.decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';

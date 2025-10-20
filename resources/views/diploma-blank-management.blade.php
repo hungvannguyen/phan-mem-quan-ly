@@ -79,33 +79,22 @@
                             </select>
                         </div>
 
-                        <div class="form-field">
-                            <label for="import_date_from" class="field-label">Ngày nhập từ</label>
-                            <input type="date" id="import_date_from" name="import_date_from" class="field-input"
-                                value="{{ request('import_date_from') }}">
-                        </div>
+                        <x-vietnamese-date-input id="import_date_from" name="import_date_from" label="Ngày nhập từ"
+                            :required="false" value="{{ request('import_date_from') }}" />
 
-                        <div class="form-field">
-                            <label for="import_date_to" class="field-label">Ngày nhập đến</label>
-                            <input type="date" id="import_date_to" name="import_date_to" class="field-input"
-                                value="{{ request('import_date_to') }}">
-                        </div>
+                        <x-vietnamese-date-input id="import_date_to" name="import_date_to" label="Ngày nhập đến"
+                            :required="false" value="{{ request('import_date_to') }}" />
 
-                        <div class="form-field">
-                            <label for="issue_date_from" class="field-label">Ngày ban hành từ</label>
-                            <input type="date" id="issue_date_from" name="issue_date_from" class="field-input"
-                                value="{{ request('issue_date_from') }}">
-                        </div>
+                        <x-vietnamese-date-input id="issue_date_from" name="issue_date_from" label="Ngày ban hành từ"
+                            :required="false" value="{{ request('issue_date_from') }}" />
                     </div>
 
                     <!-- Search Actions -->
                     <div class="search-actions">
                         <button type="submit" class="btn-search" id="search-btn" disabled>
-                            <i class="fas fa-search"></i>
                             Tìm kiếm
                         </button>
                         <a href="{{ route('diploma-blank-management') }}" class="btn-reset">
-                            <i class="fas fa-times"></i>
                             Xóa bộ lọc
                         </a>
                     </div>
@@ -115,23 +104,18 @@
             <!-- Action Buttons -->
             <div class="page-actions">
                 <a href="{{ route('diploma-blank-import.create') }}" class="action-btn action-btn-primary">
-                    <i class="fas fa-plus"></i>
                     Nhập phôi mới
                 </a>
                 <button type="button" class="action-btn action-btn-warning">
-                    <i class="fas fa-upload"></i>
                     Nhập từ Excel
                 </button>
                 <button type="button" class="action-btn action-btn-info">
-                    <i class="fas fa-print"></i>
                     In lịch sử nhập
                 </button>
                 <button type="button" class="action-btn action-btn-success">
-                    <i class="fas fa-file-excel"></i>
                     Xuất Excel
                 </button>
                 <button type="button" class="action-btn action-btn-secondary">
-                    <i class="fas fa-sync"></i>
                     Đồng bộ dữ liệu
                 </button>
             </div>
