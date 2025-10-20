@@ -84,10 +84,35 @@ class DatabaseSeeder extends Seeder
             $majors->push($major);
         }
 
-        // Create students
-        Student::factory(50)->create()->each(function ($student) use ($majors) {
-            $student->update(['major_id' => $majors->random()->major_id]);
+        // Create students with different statuses
+        $allStudents = collect();
+
+        // Create graduated students (30 students)
+        $graduatedStudents = Student::factory(30)->create()->each(function ($student) use ($majors) {
+            $student->update([
+                'major_id' => $majors->random()->major_id,
+                'status' => \App\Enums\StudentStatus::Graduate, // Đã tốt nghiệp
+            ]);
         });
+        $allStudents = $allStudents->merge($graduatedStudents);
+
+        // Create studying students (15 students)
+        $studyingStudents = Student::factory(15)->create()->each(function ($student) use ($majors) {
+            $student->update([
+                'major_id' => $majors->random()->major_id,
+                'status' => \App\Enums\StudentStatus::Studying, // Đang học
+            ]);
+        });
+        $allStudents = $allStudents->merge($studyingStudents);
+
+        // Create dropout students (5 students)
+        $dropoutStudents = Student::factory(5)->create()->each(function ($student) use ($majors) {
+            $student->update([
+                'major_id' => $majors->random()->major_id,
+                'status' => \App\Enums\StudentStatus::DropOut, // Bỏ học
+            ]);
+        });
+        $allStudents = $allStudents->merge($dropoutStudents);
 
         // Create diploma blank types directly to avoid duplicates
         $universityType = DiplomaBlankType::create([
@@ -145,12 +170,12 @@ class DatabaseSeeder extends Seeder
                 ]);
             });
 
-        // Create degrees using issued diploma blanks
-        $students = Student::all();
-        $issuedBlanks->each(function ($blank, $index) use ($students) {
-            if ($index < $students->count()) {
+        // Create degrees only for graduated students using issued diploma blanks
+        $graduatedStudentsOnly = Student::where('status', \App\Enums\StudentStatus::Graduate)->get();
+        $issuedBlanks->each(function ($blank, $index) use ($graduatedStudentsOnly) {
+            if ($index < $graduatedStudentsOnly->count()) {
                 Degree::factory()->create([
-                    'student_id' => $students[$index]->student_id,
+                    'student_id' => $graduatedStudentsOnly[$index]->student_id,
                     'diploma_blank_id' => $blank->diploma_blank_id,
                 ]);
 
@@ -178,5 +203,11 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Database seeding completed successfully!');
         $this->command->info('Admin user: admin / password');
         $this->command->info('Diploma manager: diploma_manager / password');
+        $this->command->info('');
+        $this->command->info('Students created:');
+        $this->command->info('- Graduated (có văn bằng): ' . $graduatedStudents->count());
+        $this->command->info('- Studying (chưa tốt nghiệp): ' . $studyingStudents->count());
+        $this->command->info('- Dropout (bỏ học): ' . $dropoutStudents->count());
+        $this->command->info('- Total degrees issued: ' . $graduatedStudentsOnly->count());
     }
 }

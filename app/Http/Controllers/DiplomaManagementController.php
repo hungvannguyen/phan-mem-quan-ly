@@ -102,7 +102,7 @@ class DiplomaManagementController extends Controller
     {
         $majors = Major::orderBy('major_name')->get();
 
-        return view('student-create', compact('majors'));
+        return view('components.students.create', compact('majors'));
     }
 
     public function save(StudentRequest $request)
@@ -126,7 +126,7 @@ class DiplomaManagementController extends Controller
         // Get degrees issued to this student with all relationships
         $degrees = $student->degrees()->with(['major', 'diplomaBlank.type'])->get();
 
-        return view('student-edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
+        return view('components.students.edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
     }
 
     public function update(StudentRequest $request, Student $student)

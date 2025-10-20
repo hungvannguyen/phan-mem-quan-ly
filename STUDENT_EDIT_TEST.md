@@ -6,7 +6,7 @@
 
 1. Mở trang diploma-management
 2. Click vào nút "Sửa" (icon edit) của một sinh viên bất kỳ
-3. Kiểm tra có chuyển đến trang student-edit không
+3. Kiểm tra có chuyển đến trang student-edit không (view: `components.students.edit`)
 4. Kiểm tra thông tin sinh viên có hiển thị đúng không
 
 ### 2. Test hiển thị thông tin
@@ -70,7 +70,7 @@
 
 - Route đã có sẵn: `/student/{student:student_id}`
 - Method: `DiplomaManagementController@student`
-- View: `student-edit.blade.php`
+- View: `components.students.edit.blade.php`
 - Request validation: `StudentRequest`
 
 ## Nếu gặp lỗi có thể do:
