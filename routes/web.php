@@ -125,6 +125,37 @@ Route::post(
     [DiplomaBlankController::class, 'checkDuplicates']
 )->middleware('auth')->name('diploma-blanks.check-duplicates');
 
+// Diploma Blank Export routes
+Route::get(
+    '/diploma-blank-exports',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'index']
+)->middleware('auth')->name('diploma-blank-exports.index');
+
+Route::get(
+    '/diploma-blank-exports/create',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'create']
+)->middleware('auth')->name('diploma-blank-exports.create');
+
+Route::post(
+    '/diploma-blank-exports/suggested-ranges',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'getSuggestedRanges']
+)->middleware('auth')->name('diploma-blank-exports.suggested-ranges');
+
+Route::post(
+    '/diploma-blank-exports/validate-range',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'validateCustomRange']
+)->middleware('auth')->name('diploma-blank-exports.validate-range');
+
+Route::post(
+    '/diploma-blank-exports/store',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'store']
+)->middleware('auth')->name('diploma-blank-exports.store');
+
+Route::get(
+    '/diploma-blank-exports/{export}',
+    [App\Http\Controllers\DiplomaBlankExportController::class, 'show']
+)->middleware('auth')->name('diploma-blank-exports.show');
+
 Route::get('/certificate-management', function () {
     return view('certificate-management');
 })->middleware('auth')->name('certificate-management');

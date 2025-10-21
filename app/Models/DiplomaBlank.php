@@ -25,6 +25,7 @@ class DiplomaBlank extends Model
         'serial_number',
         'type_id',
         'import_id',
+        'export_id',
         'status',
         'import_date',
         'issue_date',
@@ -94,6 +95,14 @@ class DiplomaBlank extends Model
     public function damageReason()
     {
         return $this->belongsTo(DamageReason::class, 'damage_reason_id', 'id');
+    }
+
+    /**
+     * Get the export record for this diploma blank.
+     */
+    public function export()
+    {
+        return $this->belongsTo(DiplomaBlankExport::class, 'export_id', 'export_id');
     }
 
     /**

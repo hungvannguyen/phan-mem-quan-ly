@@ -109,10 +109,10 @@
                 <button type="button" class="action-btn action-btn-warning">
                     Xuất phôi
                 </button>
-                {{-- <button type="button" class="action-btn action-btn-info">
-                    In lịch sử nhập
-                </button>
-                <button type="button" class="action-btn action-btn-success">
+                <a href="{{ route('diploma-blank-exports.index') }}" class="action-btn action-btn-info">
+                    Lịch sử xuất phôi
+                </a>
+                {{-- <button type="button" class="action-btn action-btn-success">
                     Xuất Excel
                 </button>
                 <button type="button" class="action-btn action-btn-secondary">
@@ -127,6 +127,9 @@
             </div>
         </div>
     </main>
+
+    {{-- Include Modal xuất phôi --}}
+    @include('components.diploma-blank-exports.modal')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
