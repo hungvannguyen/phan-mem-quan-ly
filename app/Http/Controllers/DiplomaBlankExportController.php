@@ -9,6 +9,7 @@ use App\Enums\DiplomaBlankStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class DiplomaBlankExportController extends Controller
@@ -31,76 +32,67 @@ class DiplomaBlankExportController extends Controller
         $typeId = $request->type_id;
         $quantity = $request->quantity;
 
-        // Lấy toàn bộ phôi của loại (để sắp xếp chính xác theo số trong serial)
-        $allBlanks = DiplomaBlank::where('type_id', $typeId)
-            ->get()
-            ->toArray();
+        // ✅ OPTIMIZED: Use indexes to quickly get status counts
+        // Use raw SQL to avoid model casting enum issues
+        $statusCounts = DB::select(
+            'SELECT status, COUNT(*) as count FROM diploma_blanks WHERE type_id = ? GROUP BY status',
+            [$typeId]
+        );
 
-        // Sắp xếp theo logic: prefix -> numeric value -> suffix
-        usort($allBlanks, function ($a, $b) {
-            $serialA = isset($a['serial_number']) ? $a['serial_number'] : '';
-            $serialB = isset($b['serial_number']) ? $b['serial_number'] : '';
-            return $this->compareSerials($serialA, $serialB);
-        });
+        // Convert to associative array
+        $statusCountsArray = [];
+        foreach ($statusCounts as $row) {
+            $statusCountsArray[$row->status] = $row->count;
+        }
 
-        // Đếm tổng phôi khả dụng (InStock)
-        $availableCount = collect($allBlanks)->where('status', DiplomaBlankStatus::IN_STOCK->value)->count();
+        $availableCount = $statusCountsArray['InStock'] ?? 0;
 
         if ($availableCount < $quantity) {
             return response()->json([
                 'success' => false,
                 'message' => "Không đủ phôi trong kho. Yêu cầu: {$quantity}, Có sẵn: " . $availableCount,
-                'available_count' => $availableCount
+                'available_count' => $availableCount,
+                'status_summary' => [
+                    'total' => array_sum($statusCountsArray),
+                    'available' => $availableCount,
+                    'issued_count' => $statusCountsArray['Issued'] ?? 0,
+                    'damaged_count' => $statusCountsArray['Damaged'] ?? 0,
+                    'recalled_count' => $statusCountsArray['Recalled'] ?? 0,
+                ]
             ]);
         }
 
-        // Lấy danh sách N phôi hợp lệ, chỉ lấy phôi IN_STOCK
-        $taken = [];
-        $damaged = [];
-        $issued = [];
-        $recalled = [];
+        // ✅ OPTIMIZED: Only fetch available blanks, ordered by serial
+        $availableBlanks = DiplomaBlank::where('type_id', $typeId)
+            ->where('status', DiplomaBlankStatus::IN_STOCK->value)
+            ->select('serial_number')
+            ->get()
+            ->pluck('serial_number')
+            ->toArray();
 
-        foreach ($allBlanks as $row) {
-            if (count($taken) >= $quantity) break;
+        // Sort by serial number logic
+        usort($availableBlanks, function ($a, $b) {
+            return $this->compareSerials($a, $b);
+        });
 
-            if ($row['status'] === DiplomaBlankStatus::IN_STOCK->value) {
-                $taken[] = $row['serial_number'];
-            } else {
-                // Ghi nhận các phôi không khả dụng để thông báo
-                switch ($row['status']) {
-                    case DiplomaBlankStatus::DAMAGED->value:
-                        $damaged[] = $row['serial_number'];
-                        break;
-                    case DiplomaBlankStatus::ISSUED->value:
-                        $issued[] = $row['serial_number'];
-                        break;
-                    case DiplomaBlankStatus::RECALLED->value:
-                        $recalled[] = $row['serial_number'];
-                        break;
-                }
-            }
-        }
+        // Take only the requested quantity
+        $taken = array_slice($availableBlanks, 0, $quantity);
 
-        // Nếu chưa đủ (dù đã kiểm tra trước) xử lý an toàn
-        if (count($taken) < $quantity) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không đủ phôi khả dụng sau khi bỏ qua phôi hỏng.',
-                'available_count' => $availableCount
-            ]);
-        }
-
-        // Gom các phôi đã lấy thành dải liên tục (tách khi gặp khoảng không liên tục)
+        // Generate continuous ranges from taken serials
         $ranges = $this->rangesFromSerialList($taken);
 
         return response()->json([
             'success' => true,
             'ranges' => $ranges,
-            'damaged_serials' => $damaged,
-            'issued_serials' => $issued,
-            'recalled_serials' => $recalled,
             'total_quantity' => $quantity,
-            'available_count' => $availableCount
+            'available_count' => $availableCount,
+            'status_summary' => [
+                'total' => array_sum($statusCountsArray),
+                'available' => $availableCount,
+                'issued_count' => $statusCountsArray['Issued'] ?? 0,
+                'damaged_count' => $statusCountsArray['Damaged'] ?? 0,
+                'recalled_count' => $statusCountsArray['Recalled'] ?? 0,
+            ]
         ]);
     }
 
@@ -287,7 +279,7 @@ class DiplomaBlankExportController extends Controller
         // Kiểm tra tính khả dụng của các serial
         $availableSerials = DiplomaBlank::where('type_id', $typeId)
             ->whereIn('serial_number', $serials)
-            ->where('status', DiplomaBlankStatus::IN_STOCK)
+            ->where('status', DiplomaBlankStatus::IN_STOCK->value)
             ->pluck('serial_number')
             ->toArray();
 
@@ -343,13 +335,22 @@ class DiplomaBlankExportController extends Controller
         }
 
         $prefix = isset($matches1[1]) ? $matches1[1] : '';
-        $fromNumber = isset($matches1[2]) ? intval($matches1[2]) : 0;
-        $toNumber = isset($matches2[2]) ? intval($matches2[2]) : 0;
+        $fromNumberStr = isset($matches1[2]) ? $matches1[2] : '0';
+        $toNumberStr = isset($matches2[2]) ? $matches2[2] : '0';
         $suffix = isset($matches1[3]) ? $matches1[3] : '';
+
+        // Convert to integers for range iteration
+        $fromNumber = intval($fromNumberStr);
+        $toNumber = intval($toNumberStr);
+
+        // Determine the zero-padding width from the original format
+        $paddingWidth = strlen($fromNumberStr);
 
         $serials = [];
         for ($i = $fromNumber; $i <= $toNumber; $i++) {
-            $serials[] = $prefix . $i . $suffix;
+            // ✅ Preserve leading zeros with proper padding
+            $formattedNumber = str_pad($i, $paddingWidth, '0', STR_PAD_LEFT);
+            $serials[] = $prefix . $formattedNumber . $suffix;
         }
 
         return $serials;
@@ -384,19 +385,32 @@ class DiplomaBlankExportController extends Controller
                 $allSerials = array_merge($allSerials, $rangeSerials);
             }
 
-            // Kiểm tra lại tính khả dụng
-            $availableBlanks = DiplomaBlank::where('type_id', $request->type_id)
+            // Batch check availability với SELECT FOR UPDATE để lock records
+            $availableRecords = DiplomaBlank::where('type_id', $request->type_id)
                 ->whereIn('serial_number', $allSerials)
                 ->where('status', DiplomaBlankStatus::IN_STOCK->value)
-                ->lockForUpdate()
-                ->get();
+                ->lockForUpdate() // Lock để tránh race condition
+                ->get(['diploma_blank_id', 'serial_number', 'status']);
 
-            if ($availableBlanks->count() !== count($allSerials)) {
+            if ($availableRecords->count() !== count($allSerials)) {
                 DB::rollback();
+
+                // Detailed error info for debugging
+                $availableSerials = $availableRecords->pluck('serial_number')->toArray();
+                $missingSerials = array_diff($allSerials, $availableSerials);
+
+                Log::warning('DiplomaBlank export failed - unavailable serials', [
+                    'requested_serials' => $allSerials,
+                    'available_count' => $availableRecords->count(),
+                    'missing_serials' => array_slice($missingSerials, 0, 10), // Log first 10 only
+                    'user_id' => Auth::id(),
+                    'type_id' => $request->type_id
+                ]);
+
                 return redirect()->back()->with('error', 'Một số phôi đã không còn khả dụng. Vui lòng thử lại.');
             }
 
-            // Tạo bản ghi xuất phôi
+            // Tạo bản ghi xuất phôi trước khi cập nhật blanks
             $export = DiplomaBlankExport::create([
                 'type_id' => $request->type_id,
                 'course' => $request->course,
@@ -411,20 +425,45 @@ class DiplomaBlankExportController extends Controller
                 'exported_by' => Auth::user()->user_id,
             ]);
 
-            // Cập nhật trạng thái các phôi
-            foreach ($availableBlanks as $blank) {
-                $blank->update([
-                    'status' => DiplomaBlankStatus::ISSUED->value,
-                    'export_id' => $export->export_id,
-                    'issue_date' => $request->issue_date,
-                    'issue_reason' => "Xuất phôi theo QĐ {$request->decision_number}"
+            // ✅ BATCH UPDATE sử dụng locked records IDs để đảm bảo consistency
+            $lockedIds = $availableRecords->pluck('diploma_blank_id')->toArray();
+            $actualUpdated = 0;
+            $chunkSize = 500; // Chunk size để tránh quá tải database
+            $chunks = array_chunk($lockedIds, $chunkSize);
+
+            foreach ($chunks as $chunk) {
+                $updated = DiplomaBlank::whereIn('diploma_blank_id', $chunk)
+                    ->update([
+                        'status' => DiplomaBlankStatus::ISSUED->value,
+                        'export_id' => $export->export_id,
+                        'issue_date' => $request->issue_date,
+                        'issue_reason' => "Xuất phôi theo QĐ {$request->decision_number}",
+                        'updated_at' => now()
+                    ]);
+
+                $actualUpdated += $updated;
+
+                // Nhỏ delay giữa các batch để không overwhelm database với large exports
+                if (count($chunks) > 1) {
+                    usleep(1000); // 1ms delay between chunks
+                }
+            }
+
+            // Verify actual updated count matches expected
+            if ($actualUpdated !== count($lockedIds)) {
+                Log::error('DiplomaBlank batch update count mismatch', [
+                    'expected' => count($lockedIds),
+                    'actual_updated' => $actualUpdated,
+                    'export_id' => $export->export_id
                 ]);
             }
+
+            $export->update(['quantity_exported' => $actualUpdated]);
 
             DB::commit();
 
             return redirect()->route('diploma-blank-exports.show', $export->export_id)
-                ->with('success', "Xuất phôi thành công! Đã xuất {$export->quantity_exported} phôi.");
+                ->with('success', "Xuất phôi thành công! Đã xuất {$actualUpdated} phôi văn bằng.");
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());

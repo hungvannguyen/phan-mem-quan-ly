@@ -285,6 +285,10 @@
                 return;
             }
 
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm phôi...';
+
             fetch('/diploma-blank-exports/suggested-ranges', {
                     method: 'POST',
                     headers: {
@@ -300,30 +304,63 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // data.ranges: array of {from_serial, to_serial, count}
                         currentRanges = data.ranges || [];
-                        // attach damaged serials if any for display
-                        currentRanges.__damaged = data.damaged_serials || [];
-                        currentRanges.__issued = data.issued_serials || [];
-                        currentRanges.__recalled = data.recalled_serials || [];
                         displayRanges();
+
+                        // ✅ Display optimized summary
                         let msg =
-                            `Đã gợi ý ${currentRanges.length} dải cho ${data.total_quantity} phôi`;
-                        const unavailableCount = (data.damaged_serials || []).length +
-                            (data.issued_serials || []).length +
-                            (data.recalled_serials || []).length;
-                        if (unavailableCount > 0) {
-                            msg += `. Phôi không khả dụng: ${unavailableCount}`;
+                            `✅ Đã gợi ý ${currentRanges.length} dải cho ${data.total_quantity} phôi`;
+
+                        if (data.status_summary) {
+                            const summary = data.status_summary;
+                            msg +=
+                                `\n📊 Tổng quan: ${summary.total} phôi (${summary.available} khả dụng`;
+
+                            const unavailableItems = [];
+                            if (summary.issued_count > 0) unavailableItems.push(
+                                `${summary.issued_count} đã cấp`);
+                            if (summary.damaged_count > 0) unavailableItems.push(
+                                `${summary.damaged_count} lỗi`);
+                            if (summary.recalled_count > 0) unavailableItems.push(
+                                `${summary.recalled_count} thu hồi`);
+
+                            if (unavailableItems.length > 0) {
+                                msg += `, ${unavailableItems.join(', ')}`;
+                            }
+                            msg += ')';
                         }
+
                         showMessage('exportMessage', msg, 'success');
                     } else {
-                        showMessage('exportMessage', data.message, 'danger');
+                        let errorMsg = data.message;
+
+                        // ✅ Show status summary even on error
+                        if (data.status_summary) {
+                            const summary = data.status_summary;
+                            errorMsg +=
+                                `\n📊 Tình trạng phôi: ${summary.total} tổng (${summary.available} khả dụng`;
+
+                            if (summary.issued_count > 0) errorMsg +=
+                                `, ${summary.issued_count} đã cấp`;
+                            if (summary.damaged_count > 0) errorMsg +=
+                                `, ${summary.damaged_count} lỗi`;
+                            if (summary.recalled_count > 0) errorMsg +=
+                                `, ${summary.recalled_count} thu hồi`;
+                            errorMsg += ')';
+                        }
+
+                        showMessage('exportMessage', errorMsg, 'warning');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showMessage('exportMessage', 'Có lỗi xảy ra khi lấy gợi ý dải serial',
                     'danger');
+                })
+                .finally(() => {
+                    // Reset button state
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-magic"></i> Gợi ý dải Serial';
                 });
         });
 
@@ -438,7 +475,7 @@
             serialRanges.style.display = 'block';
             rangesList.innerHTML = '';
 
-            // Render each range. If from == to, show single serial; otherwise show from - to
+            // ✅ OPTIMIZED: Only show the actual ranges, not unavailable serials
             currentRanges.forEach((range, index) => {
                 const rangeItem = document.createElement('div');
                 rangeItem.className = 'range-item';
@@ -465,36 +502,33 @@
                 rangesList.appendChild(rangeItem);
             });
 
-            // If there are unavailable serials, show them below the ranges
-            const damaged = currentRanges.__damaged || [];
-            const issued = currentRanges.__issued || [];
-            const recalled = currentRanges.__recalled || [];
-
-            if (damaged.length > 0) {
-                const damagedSection = document.createElement('div');
-                damagedSection.className = 'mt-2';
-                damagedSection.innerHTML =
-                    `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Phôi hỏng (bỏ qua): <strong>${damaged.join(', ')}</strong></div>`;
-                rangesList.appendChild(damagedSection);
-            }
-
-            if (issued.length > 0) {
-                const issuedSection = document.createElement('div');
-                issuedSection.className = 'mt-2';
-                issuedSection.innerHTML =
-                    `<div class="alert alert-info"><i class="fas fa-check-circle"></i> Phôi đã cấp (bỏ qua): <strong>${issued.join(', ')}</strong></div>`;
-                rangesList.appendChild(issuedSection);
-            }
-
-            if (recalled.length > 0) {
-                const recalledSection = document.createElement('div');
-                recalledSection.className = 'mt-2';
-                recalledSection.innerHTML =
-                    `<div class="alert alert-secondary"><i class="fas fa-undo"></i> Phôi đã thu hồi (bỏ qua): <strong>${recalled.join(', ')}</strong></div>`;
-                rangesList.appendChild(recalledSection);
-            }
-
+            // ✅ Show summary info instead of long lists
             const totalCount = currentRanges.reduce((sum, range) => sum + (range.count || 0), 0);
+
+            if (totalCount > 0) {
+                const summarySection = document.createElement('div');
+                summarySection.className = 'mt-3 p-3 bg-light rounded';
+                summarySection.innerHTML = `
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="text-primary fw-bold">${totalCount}</div>
+                            <small class="text-muted">Phôi sẽ xuất</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-success fw-bold">${currentRanges.length}</div>
+                            <small class="text-muted">Dải serial</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-info fw-bold">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <small class="text-muted">Sẵn sàng xuất</small>
+                        </div>
+                    </div>
+                `;
+                rangesList.appendChild(summarySection);
+            }
+
             document.getElementById('rangesData').value = JSON.stringify(currentRanges);
             exportSubmitBtn.disabled = false;
         }
@@ -512,7 +546,8 @@
         function showMessage(elementId, message, type) {
             const element = document.getElementById(elementId);
             element.className = `alert alert-${type}`;
-            element.textContent = message;
+            // ✅ Support multi-line messages
+            element.innerHTML = message.replace(/\n/g, '<br>');
             element.style.display = 'block';
         }
 
