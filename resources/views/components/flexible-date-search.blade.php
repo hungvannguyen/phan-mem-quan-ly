@@ -165,6 +165,11 @@
                 return '';
             }
 
+            // Check if it's already a backend format (already processed)
+            if (trimmed.includes(':')) {
+                return '';
+            }
+
             // Validate single number (day or month or year)
             if (/^\d{1,2}$/.test(trimmed)) {
                 const num = parseInt(trimmed);
@@ -233,6 +238,11 @@
 
             // Check if it's a display text format (already validated)
             if (trimmed.startsWith('Ngày ') || trimmed.startsWith('Tháng ') || trimmed.startsWith('Năm ')) {
+                return true;
+            }
+
+            // Check if it's already a backend format (already processed)
+            if (trimmed.includes(':')) {
                 return true;
             }
 

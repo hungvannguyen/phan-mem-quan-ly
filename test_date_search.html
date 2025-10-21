@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Test Date Search Fix</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            .test-case {
+                margin: 20px 0;
+                padding: 15px;
+                border: 1px solid #ddd;
+            }
+            .test-case h3 {
+                margin-top: 0;
+            }
+            .result {
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .pass {
+                background-color: #d4edda;
+                color: #155724;
+            }
+            .fail {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Test Date Search Validation Fix</h1>
+
+        <div class="test-case">
+            <h3>Test Case 1: Display Text Formats</h3>
+            <p>These should be valid (no error):</p>
+            <ul>
+                <li>Ngày 15</li>
+                <li>Tháng 3</li>
+                <li>Năm 2024</li>
+                <li>Tháng 3/2024</li>
+            </ul>
+            <div id="test1-result" class="result"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>Test Case 2: Backend Formats</h3>
+            <p>These should be valid (no error):</p>
+            <ul>
+                <li>ngay:15</li>
+                <li>thang:3</li>
+                <li>nam:2024</li>
+                <li>thang_nam:3/2024</li>
+            </ul>
+            <div id="test2-result" class="result"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>Test Case 3: Raw Input Formats</h3>
+            <p>These should be valid (no error):</p>
+            <ul>
+                <li>15</li>
+                <li>2024</li>
+                <li>03/2024</li>
+                <li>15/03</li>
+                <li>15/03/2024</li>
+            </ul>
+            <div id="test3-result" class="result"></div>
+        </div>
+
+        <div class="test-case">
+            <h3>Test Case 4: Invalid Formats</h3>
+            <p>These should be invalid (show error):</p>
+            <ul>
+                <li>abc</li>
+                <li>32</li>
+                <li>13/2024</li>
+                <li>15/13</li>
+                <li>32/03/2024</li>
+            </ul>
+            <div id="test4-result" class="result"></div>
+        </div>
+
+        <script>
+            // Copy the fixed validation functions
+            function getValidationErrorMessage(input) {
+                if (!input || input.trim() === "") return "";
+
+                const trimmed = input.trim();
+                const currentYear = new Date().getFullYear();
+
+                // Check if it's a display text format (already validated)
+                if (
+                    trimmed.startsWith("Ngày ") ||
+                    trimmed.startsWith("Tháng ") ||
+                    trimmed.startsWith("Năm ")
+                ) {
+                    return "";
+                }
+
+                // Check if it's already a backend format (already processed)
+                if (trimmed.includes(":")) {
+                    return "";
+                }
+
+                // Validate single number (day or month or year)
+                if (/^\d{1,2}$/.test(trimmed)) {
+                    const num = parseInt(trimmed);
+                    if (num < 1 || num > 31) {
+                        return "Số phải từ 1-31";
+                    }
+                    return "";
+                }
+
+                // Validate year format (YYYY)
+                if (/^\d{4}$/.test(trimmed)) {
+                    const year = parseInt(trimmed);
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                // Validate month/year format (MM/YYYY)
+                if (/^\d{1,2}\/\d{4}$/.test(trimmed)) {
+                    const [month, year] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                // Validate day/month format (DD/MM)
+                if (/^\d{1,2}\/\d{1,2}$/.test(trimmed)) {
+                    const [day, month] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (day < 1 || day > 31) {
+                        return "Ngày phải từ 1-31";
+                    }
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    return "";
+                }
+
+                // Validate full date format (DD/MM/YYYY)
+                if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmed)) {
+                    const [day, month, year] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (day < 1 || day > 31) {
+                        return "Ngày phải từ 1-31";
+                    }
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                return "Định dạng không hợp lệ. Ví dụ: 15, 2024, 03/2024, 15/03, 15/03/2024";
+            }
+
+            function isValidDateInput(input) {
+                if (!input || input.trim() === "") return true; // Empty is valid (no search criteria)
+
+                const trimmed = input.trim();
+
+                // Check if it's a display text format (already validated)
+                if (
+                    trimmed.startsWith("Ngày ") ||
+                    trimmed.startsWith("Tháng ") ||
+                    trimmed.startsWith("Năm ")
+                ) {
+                    return true;
+                }
+
+                // Check if it's already a backend format (already processed)
+                if (trimmed.includes(":")) {
+                    return true;
+                }
+
+                // Use the error message function for validation
+                return getValidationErrorMessage(input) === "";
+            }
+
+            // Test cases
+            function runTests() {
+                // Test case 1: Display text formats
+                const test1Inputs = [
+                    "Ngày 15",
+                    "Tháng 3",
+                    "Năm 2024",
+                    "Tháng 3/2024",
+                ];
+                let test1Results = [];
+                test1Inputs.forEach((input) => {
+                    const isValid = isValidDateInput(input);
+                    const errorMsg = getValidationErrorMessage(input);
+                    test1Results.push(
+                        `${input}: ${isValid ? "PASS" : "FAIL"} ${errorMsg ? "(" + errorMsg + ")" : ""}`,
+                    );
+                });
+                const test1AllPass = test1Results.every((r) =>
+                    r.includes("PASS"),
+                );
+                document.getElementById("test1-result").innerHTML =
+                    test1Results.join("<br>");
+                document.getElementById("test1-result").className =
+                    "result " + (test1AllPass ? "pass" : "fail");
+
+                // Test case 2: Backend formats
+                const test2Inputs = [
+                    "ngay:15",
+                    "thang:3",
+                    "nam:2024",
+                    "thang_nam:3/2024",
+                ];
+                let test2Results = [];
+                test2Inputs.forEach((input) => {
+                    const isValid = isValidDateInput(input);
+                    const errorMsg = getValidationErrorMessage(input);
+                    test2Results.push(
+                        `${input}: ${isValid ? "PASS" : "FAIL"} ${errorMsg ? "(" + errorMsg + ")" : ""}`,
+                    );
+                });
+                const test2AllPass = test2Results.every((r) =>
+                    r.includes("PASS"),
+                );
+                document.getElementById("test2-result").innerHTML =
+                    test2Results.join("<br>");
+                document.getElementById("test2-result").className =
+                    "result " + (test2AllPass ? "pass" : "fail");
+
+                // Test case 3: Raw input formats
+                const test3Inputs = [
+                    "15",
+                    "2024",
+                    "03/2024",
+                    "15/03",
+                    "15/03/2024",
+                ];
+                let test3Results = [];
+                test3Inputs.forEach((input) => {
+                    const isValid = isValidDateInput(input);
+                    const errorMsg = getValidationErrorMessage(input);
+                    test3Results.push(
+                        `${input}: ${isValid ? "PASS" : "FAIL"} ${errorMsg ? "(" + errorMsg + ")" : ""}`,
+                    );
+                });
+                const test3AllPass = test3Results.every((r) =>
+                    r.includes("PASS"),
+                );
+                document.getElementById("test3-result").innerHTML =
+                    test3Results.join("<br>");
+                document.getElementById("test3-result").className =
+                    "result " + (test3AllPass ? "pass" : "fail");
+
+                // Test case 4: Invalid formats
+                const test4Inputs = [
+                    "abc",
+                    "32",
+                    "13/2024",
+                    "15/13",
+                    "32/03/2024",
+                ];
+                let test4Results = [];
+                test4Inputs.forEach((input) => {
+                    const isValid = isValidDateInput(input);
+                    const errorMsg = getValidationErrorMessage(input);
+                    test4Results.push(
+                        `${input}: ${isValid ? "FAIL (Expected)" : "PASS (Expected)"} ${errorMsg ? "(" + errorMsg + ")" : ""}`,
+                    );
+                });
+                const test4AllPass = test4Results.every((r) =>
+                    r.includes("PASS (Expected)"),
+                );
+                document.getElementById("test4-result").innerHTML =
+                    test4Results.join("<br>");
+                document.getElementById("test4-result").className =
+                    "result " + (test4AllPass ? "pass" : "fail");
+            }
+
+            // Run tests when page loads
+            document.addEventListener("DOMContentLoaded", runTests);
+        </script>
+    </body>
+</html>

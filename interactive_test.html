@@ -1,0 +1,442 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Interactive Date Search Test</title>
+        <meta charset="UTF-8" />
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                line-height: 1.6;
+            }
+            .test-container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .test-section {
+                margin: 30px 0;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            .test-input {
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            .test-button {
+                background: #007cba;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .test-button:hover {
+                background: #005a87;
+            }
+            .test-button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
+            .result {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+            }
+            .success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            .error {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+            .info {
+                background: #d1ecf1;
+                color: #0c5460;
+                border: 1px solid #bee5eb;
+            }
+            .simulation-log {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            .border-red-500 {
+                border-color: #ef4444 !important;
+            }
+            .bg-red-50 {
+                background-color: #fef2f2 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="test-container">
+            <h1>🧪 Interactive Date Search Test</h1>
+            <p>
+                Test the flexible date search functionality to verify the bug
+                fix.
+            </p>
+
+            <div class="test-section">
+                <h2>Manual Test</h2>
+                <p>Try typing these inputs and see the validation behavior:</p>
+                <input
+                    type="text"
+                    id="manualTest"
+                    class="test-input"
+                    placeholder="Type: 15, 2024, 03/2024, 15/03, 15/03/2024"
+                />
+                <div
+                    id="manualTestResult"
+                    class="result info"
+                    style="display: none"
+                ></div>
+                <div
+                    id="manualTestError"
+                    class="result error"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <div class="test-section">
+                <h2>Simulation Test</h2>
+                <p>
+                    Simulate user clicking on suggestions and form submission:
+                </p>
+                <button id="runSimulation" class="test-button">
+                    Run Simulation
+                </button>
+                <div
+                    id="simulationLog"
+                    class="simulation-log"
+                    style="display: none"
+                ></div>
+            </div>
+
+            <div class="test-section">
+                <h2>Form Submission Test</h2>
+                <form id="testForm">
+                    <label for="dateSearch">Date Search Field:</label>
+                    <input
+                        type="text"
+                        id="dateSearch"
+                        name="date_of_birth"
+                        class="test-input"
+                        placeholder="Try different date formats..."
+                    />
+                    <button type="submit" id="submitBtn" class="test-button">
+                        Test Submit
+                    </button>
+                </form>
+                <div id="formResult" class="result" style="display: none"></div>
+            </div>
+        </div>
+
+        <script>
+            // Copy the fixed validation functions
+            function getValidationErrorMessage(input) {
+                if (!input || input.trim() === "") return "";
+
+                const trimmed = input.trim();
+                const currentYear = new Date().getFullYear();
+
+                // Check if it's a display text format (already validated)
+                if (
+                    trimmed.startsWith("Ngày ") ||
+                    trimmed.startsWith("Tháng ") ||
+                    trimmed.startsWith("Năm ")
+                ) {
+                    return "";
+                }
+
+                // Check if it's already a backend format (already processed)
+                if (trimmed.includes(":")) {
+                    return "";
+                }
+
+                // Validate single number (day or month or year)
+                if (/^\d{1,2}$/.test(trimmed)) {
+                    const num = parseInt(trimmed);
+                    if (num < 1 || num > 31) {
+                        return "Số phải từ 1-31";
+                    }
+                    return "";
+                }
+
+                // Validate year format (YYYY)
+                if (/^\d{4}$/.test(trimmed)) {
+                    const year = parseInt(trimmed);
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                // Validate month/year format (MM/YYYY)
+                if (/^\d{1,2}\/\d{4}$/.test(trimmed)) {
+                    const [month, year] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                // Validate day/month format (DD/MM)
+                if (/^\d{1,2}\/\d{1,2}$/.test(trimmed)) {
+                    const [day, month] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (day < 1 || day > 31) {
+                        return "Ngày phải từ 1-31";
+                    }
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    return "";
+                }
+
+                // Validate full date format (DD/MM/YYYY)
+                if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmed)) {
+                    const [day, month, year] = trimmed
+                        .split("/")
+                        .map((n) => parseInt(n));
+                    if (day < 1 || day > 31) {
+                        return "Ngày phải từ 1-31";
+                    }
+                    if (month < 1 || month > 12) {
+                        return "Tháng phải từ 1-12";
+                    }
+                    if (year < 1900 || year > currentYear + 10) {
+                        return `Năm phải từ 1900-${currentYear + 10}`;
+                    }
+                    return "";
+                }
+
+                return "Định dạng không hợp lệ. Ví dụ: 15, 2024, 03/2024, 15/03, 15/03/2024";
+            }
+
+            function isValidDateInput(input) {
+                if (!input || input.trim() === "") return true;
+
+                const trimmed = input.trim();
+
+                // Check if it's a display text format (already validated)
+                if (
+                    trimmed.startsWith("Ngày ") ||
+                    trimmed.startsWith("Tháng ") ||
+                    trimmed.startsWith("Năm ")
+                ) {
+                    return true;
+                }
+
+                // Check if it's already a backend format (already processed)
+                if (trimmed.includes(":")) {
+                    return true;
+                }
+
+                return getValidationErrorMessage(input) === "";
+            }
+
+            function convertDisplayTextToBackendFormat(displayText) {
+                if (displayText.startsWith("Ngày ")) {
+                    const day = displayText.replace("Ngày ", "");
+                    return `ngay:${day}`;
+                } else if (displayText.startsWith("Tháng ")) {
+                    const monthPart = displayText.replace("Tháng ", "");
+                    if (monthPart.includes("/")) {
+                        return `thang_nam:${monthPart}`;
+                    } else {
+                        return `thang:${monthPart}`;
+                    }
+                } else if (displayText.startsWith("Năm ")) {
+                    const year = displayText.replace("Năm ", "");
+                    return `nam:${year}`;
+                } else if (/^\d{1,2}\/\d{1,2}$/.test(displayText)) {
+                    return `ngay_thang:${displayText}`;
+                } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(displayText)) {
+                    return `ngay_cu_the:${displayText}`;
+                }
+                return displayText;
+            }
+
+            // Manual test
+            document
+                .getElementById("manualTest")
+                .addEventListener("input", function () {
+                    const value = this.value;
+                    const errorMsg = getValidationErrorMessage(value);
+                    const isValid = isValidDateInput(value);
+
+                    const resultDiv =
+                        document.getElementById("manualTestResult");
+                    const errorDiv = document.getElementById("manualTestError");
+
+                    if (value.trim() === "") {
+                        resultDiv.style.display = "none";
+                        errorDiv.style.display = "none";
+                        this.classList.remove("border-red-500", "bg-red-50");
+                    } else if (errorMsg) {
+                        resultDiv.style.display = "none";
+                        errorDiv.style.display = "block";
+                        errorDiv.textContent = "❌ " + errorMsg;
+                        this.classList.add("border-red-500", "bg-red-50");
+                    } else {
+                        resultDiv.style.display = "block";
+                        errorDiv.style.display = "none";
+                        resultDiv.textContent = "✅ Valid format: " + value;
+                        this.classList.remove("border-red-500", "bg-red-50");
+                    }
+                });
+
+            // Simulation test
+            document
+                .getElementById("runSimulation")
+                .addEventListener("click", function () {
+                    const log = document.getElementById("simulationLog");
+                    log.style.display = "block";
+                    log.innerHTML = "";
+
+                    function logMessage(msg) {
+                        log.innerHTML +=
+                            new Date().toLocaleTimeString() +
+                            " - " +
+                            msg +
+                            "\\n";
+                        log.scrollTop = log.scrollHeight;
+                    }
+
+                    logMessage("🚀 Starting simulation...");
+
+                    const testCases = [
+                        {
+                            input: "15",
+                            expected: "Ngày 15",
+                            backend: "ngay:15",
+                        },
+                        { input: "3", expected: "Tháng 3", backend: "thang:3" },
+                        {
+                            input: "2024",
+                            expected: "Năm 2024",
+                            backend: "nam:2024",
+                        },
+                        {
+                            input: "03/2024",
+                            expected: "Tháng 3/2024",
+                            backend: "thang_nam:3/2024",
+                        },
+                        {
+                            input: "15/03",
+                            expected: "15/03",
+                            backend: "ngay_thang:15/03",
+                        },
+                        {
+                            input: "15/03/2024",
+                            expected: "15/03/2024",
+                            backend: "ngay_cu_the:15/03/2024",
+                        },
+                    ];
+
+                    testCases.forEach((testCase, index) => {
+                        setTimeout(() => {
+                            logMessage(
+                                `Test ${index + 1}: Input "${testCase.input}"`,
+                            );
+
+                            // Test original input validation
+                            const originalValid = isValidDateInput(
+                                testCase.input,
+                            );
+                            const originalError = getValidationErrorMessage(
+                                testCase.input,
+                            );
+                            logMessage(
+                                `  Original validation: ${originalValid ? "✅ Valid" : "❌ Invalid"} ${originalError ? "(" + originalError + ")" : ""}`,
+                            );
+
+                            // Simulate user clicking suggestion (setting display text)
+                            const displayText = testCase.expected;
+                            logMessage(
+                                `  Simulating click on suggestion: "${displayText}"`,
+                            );
+
+                            // Test display text validation
+                            const displayValid = isValidDateInput(displayText);
+                            const displayError =
+                                getValidationErrorMessage(displayText);
+                            logMessage(
+                                `  Display text validation: ${displayValid ? "✅ Valid" : "❌ Invalid"} ${displayError ? "(" + displayError + ")" : ""}`,
+                            );
+
+                            // Test backend format conversion
+                            const backendFormat =
+                                convertDisplayTextToBackendFormat(displayText);
+                            logMessage(`  Backend format: "${backendFormat}"`);
+
+                            // Test backend format validation
+                            const backendValid =
+                                isValidDateInput(backendFormat);
+                            const backendError =
+                                getValidationErrorMessage(backendFormat);
+                            logMessage(
+                                `  Backend validation: ${backendValid ? "✅ Valid" : "❌ Invalid"} ${backendError ? "(" + backendError + ")" : ""}`,
+                            );
+
+                            logMessage("");
+
+                            if (index === testCases.length - 1) {
+                                logMessage("🎉 Simulation completed!");
+                            }
+                        }, index * 1000);
+                    });
+                });
+
+            // Form submission test
+            document
+                .getElementById("testForm")
+                .addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    const dateField = document.getElementById("dateSearch");
+                    const value = dateField.value.trim();
+                    const resultDiv = document.getElementById("formResult");
+
+                    resultDiv.style.display = "block";
+
+                    if (!value) {
+                        resultDiv.className = "result info";
+                        resultDiv.textContent =
+                            "ℹ️ No date input provided - this is valid for search";
+                        return;
+                    }
+
+                    // Simulate the exact validation logic from management.blade.php
+                    const errorMsg = getValidationErrorMessage(value);
+                    if (errorMsg) {
+                        resultDiv.className = "result error";
+                        resultDiv.innerHTML = `❌ Form submission would be blocked:<br><strong>Lỗi ngày tháng:</strong> ${errorMsg}<br><br>Ví dụ hợp lệ:<br>- Ngày: 15<br>- Năm: 2024<br>- Tháng/Năm: 03/2024<br>- Ngày/Tháng: 15/03<br>- Đầy đủ: 15/03/2024`;
+                        return;
+                    }
+
+                    // If validation passes, show what would be submitted
+                    const backendFormat =
+                        convertDisplayTextToBackendFormat(value);
+                    resultDiv.className = "result success";
+                    resultDiv.innerHTML = `✅ Form submission would succeed!<br><strong>Display value:</strong> ${value}<br><strong>Backend value:</strong> ${backendFormat}`;
+                });
+        </script>
+    </body>
+</html>
