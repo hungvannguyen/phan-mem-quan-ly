@@ -5,13 +5,12 @@ use App\Http\Controllers\DiplomaBlankController;
 use App\Http\Controllers\DiplomaBlankImportController;
 use App\Http\Controllers\DiplomaManagementController;
 use App\Http\Controllers\EmbryoManagementController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-})->middleware('auth');
+Route::get('/', [StatisticsController::class, 'index'])->middleware('auth')->name('home');
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])
     ->middleware(RedirectIfAuthenticated::class)->name('login');
@@ -227,6 +226,22 @@ Route::get(
     "api/diploma-blanks/available/{typeId}",
     [DiplomaManagementController::class, 'getAvailableDiplomaBlanks']
 )->middleware('auth')->name('api.diploma-blanks.available');
+
+// Statistics routes
+Route::get(
+    '/statistics',
+    [StatisticsController::class, 'index']
+)->middleware('auth')->name('statistics.index');
+
+Route::post(
+    '/statistics/chart-data',
+    [StatisticsController::class, 'getChartData']
+)->middleware('auth')->name('statistics.chart-data');
+
+Route::post(
+    '/statistics/export',
+    [StatisticsController::class, 'export']
+)->middleware('auth')->name('statistics.export');
 
 // Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
