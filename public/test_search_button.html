@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Search Button Disable Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .field-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-input, .field-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-actions {
+            margin-top: 20px;
+        }
+        .btn-search {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-search:disabled {
+            background-color: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .btn-search:disabled:hover {
+            background-color: #d1d5db;
+            color: #9ca3af;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .enabled {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .disabled {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Search Button Disable Functionality</h1>
+    <p>Thử nhập dữ liệu vào các trường bên dưới để xem nút "Tìm kiếm" được enable/disable.</p>
+    
+    <form>
+        <div class="form-field">
+            <label for="serial_number" class="field-label">Số Serial</label>
+            <input type="text" id="serial_number" name="serial_number" class="field-input" 
+                   placeholder="Nhập số serial">
+        </div>
+
+        <div class="form-field">
+            <label for="type_id" class="field-label">Loại phôi văn bằng</label>
+            <select id="type_id" name="type_id" class="field-select">
+                <option value="">-- Tất cả loại phôi --</option>
+                <option value="1">Loại A</option>
+                <option value="2">Loại B</option>
+                <option value="3">Loại C</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="status" class="field-label">Trạng thái</label>
+            <select id="status" name="status" class="field-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="InStock">Trong kho</option>
+                <option value="Issued">Đã cấp</option>
+                <option value="Recalled">Thu hồi</option>
+                <option value="Damaged">Hư hỏng</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="import_date_from" class="field-label">Ngày nhập từ</label>
+            <input type="date" id="import_date_from" name="import_date_from" class="field-input">
+        </div>
+
+        <div class="form-field">
+            <label for="import_date_to" class="field-label">Ngày nhập đến</label>
+            <input type="date" id="import_date_to" name="import_date_to" class="field-input">
+        </div>
+
+        <div class="search-actions">
+            <button type="submit" class="btn-search" id="search-button">
+                Tìm kiếm
+            </button>
+        </div>
+    </form>
+
+    <div id="status-display" class="status disabled">
+        Nút tìm kiếm: DISABLED (không có dữ liệu input)
+    </div>
+
+    <script>
+        // Disable search button when all inputs are empty
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchButton = document.getElementById('search-button');
+            const statusDisplay = document.getElementById('status-display');
+            const searchInputs = [
+                document.getElementById('serial_number'),
+                document.getElementById('type_id'),
+                document.getElementById('status'),
+                document.getElementById('import_date_from'),
+                document.getElementById('import_date_to')
+            ].filter(Boolean); // Remove null elements
+
+            function checkSearchInputs() {
+                let hasValue = false;
+                
+                searchInputs.forEach(input => {
+                    if (input.value && input.value.trim() !== '') {
+                        hasValue = true;
+                    }
+                });
+
+                searchButton.disabled = !hasValue;
+                
+                // Update status display
+                if (hasValue) {
+                    statusDisplay.textContent = 'Nút tìm kiếm: ENABLED (có dữ liệu input)';
+                    statusDisplay.className = 'status enabled';
+                } else {
+                    statusDisplay.textContent = 'Nút tìm kiếm: DISABLED (không có dữ liệu input)';
+                    statusDisplay.className = 'status disabled';
+                }
+            }
+
+            // Check initial state
+            checkSearchInputs();
+
+            // Add event listeners to all search inputs
+            searchInputs.forEach(input => {
+                input.addEventListener('input', checkSearchInputs);
+                input.addEventListener('change', checkSearchInputs);
+            });
+
+            // Prevent form submission for testing
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Form submission prevented for testing. Button is ' + (searchButton.disabled ? 'DISABLED' : 'ENABLED'));
+            });
+        });
+    </script>
+</body>
+</html>

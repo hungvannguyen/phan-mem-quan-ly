@@ -13,6 +13,54 @@ use Illuminate\Support\Facades\Auth;
 class DiplomaBlankController extends Controller
 {
     /**
+     * Display all diploma blanks with filtering.
+     */
+    public function index(Request $request)
+    {
+        $query = DiplomaBlank::with(['type', 'import', 'damageReason']);
+
+        // Apply filters from request
+        if ($request->filled('serial_number')) {
+            $query->where('serial_number', 'like', '%' . $request->serial_number . '%');
+        }
+
+        if ($request->filled('type_id')) {
+            $query->where('type_id', $request->type_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('import_date_from')) {
+            $query->whereDate('import_date', '>=', $request->import_date_from);
+        }
+
+        if ($request->filled('import_date_to')) {
+            $query->whereDate('import_date', '<=', $request->import_date_to);
+        }
+
+        // Get per_page from request, default to 15
+        $perPage = $request->get('per_page', 15);
+        $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 15;
+
+        // Sort by serial number with length first, then alphabetically
+        $diplomaBlanks = $query->orderByRaw('LENGTH(serial_number) ASC, serial_number ASC')
+            ->paginate($perPage);
+
+        $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
+        $damageReasons = DamageReason::orderBy('reason_name')->get();
+
+        return view('components.diploma-blanks.list', [
+            'diplomaBlanks' => $diplomaBlanks,
+            'diplomaBlankTypes' => $diplomaBlankTypes,
+            'damageReasons' => $damageReasons,
+            'currentImport' => null,
+            'importId' => null,
+        ]);
+    }
+
+    /**
      * Display diploma blanks for a specific import ID.
      */
     public function indexByImport(Request $request, $importId)

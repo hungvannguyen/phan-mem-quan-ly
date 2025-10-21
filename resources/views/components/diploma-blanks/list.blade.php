@@ -136,7 +136,7 @@
                 </div>
 
                 <div class="search-actions">
-                    <button type="submit" class="btn-search">
+                    <button type="submit" class="btn-search" id="search-button">
                         Tìm kiếm
                     </button>
                     @if (isset($importId))
@@ -169,15 +169,99 @@
                 @else
                     <div class="empty-results">
                         <div class="empty-icon">
-                            🔍
+                            <i class="fas fa-search mb-4 text-6xl text-gray-300"></i>
                         </div>
-                        <h3>Không tìm thấy kết quả</h3>
-                        <p>Không có phôi văn bằng nào phù hợp với tiêu chí tìm kiếm của bạn.</p>
-                        @if ($currentImport && $currentImport->status->value == 0)
-                            <p class="text-info">
-                                Import này đang ở trạng thái PENDING. Các phôi sẽ được tạo tự động trong vài phút.
-                            </p>
-                        @endif
+                        <h3 class="mb-3 text-xl font-semibold text-gray-700">Không tìm thấy kết quả</h3>
+                        <div class="empty-content">
+                            @if (request()->hasAny(['serial_number', 'type_id', 'status', 'import_date_from', 'import_date_to']))
+                                <p class="mb-4 text-gray-600">
+                                    Không có phôi văn bằng nào phù hợp với tiêu chí tìm kiếm của bạn.
+                                </p>
+                                <div class="search-criteria mb-4 rounded-lg bg-gray-50 p-4 text-left">
+                                    <h4 class="mb-2 font-medium text-gray-700">
+                                        <i class="fas fa-filter mr-2"></i>Tiêu chí tìm kiếm hiện tại:
+                                    </h4>
+                                    <ul class="space-y-1 text-sm text-gray-600">
+                                        @if (request('serial_number'))
+                                            <li><strong>Số serial:</strong> {{ request('serial_number') }}</li>
+                                        @endif
+                                        @if (request('type_id') && !$currentImport)
+                                            <li><strong>Loại phôi:</strong>
+                                                {{ $diplomaBlankTypes->where('type_id', request('type_id'))->first()->type_name ?? request('type_id') }}
+                                            </li>
+                                        @endif
+                                        @if (request('status'))
+                                            <li><strong>Trạng thái:</strong>
+                                                @switch(request('status'))
+                                                    @case('InStock')
+                                                        Trong kho
+                                                    @break
+
+                                                    @case('Issued')
+                                                        Đã cấp
+                                                    @break
+
+                                                    @case('Recalled')
+                                                        Thu hồi
+                                                    @break
+
+                                                    @case('Damaged')
+                                                        Hư hỏng
+                                                    @break
+
+                                                    @default
+                                                        {{ request('status') }}
+                                                @endswitch
+                                            </li>
+                                        @endif
+                                        @if (request('import_date_from'))
+                                            <li><strong>Từ ngày:</strong> {{ request('import_date_from') }}</li>
+                                        @endif
+                                        @if (request('import_date_to'))
+                                            <li><strong>Đến ngày:</strong> {{ request('import_date_to') }}</li>
+                                        @endif
+                                    </ul>
+                                </div>
+                                <div class="empty-suggestions">
+                                    <p class="mb-3 text-sm text-gray-500">
+                                        <i class="fas fa-lightbulb mr-1"></i>Gợi ý:
+                                    </p>
+                                    <ul class="space-y-1 text-left text-sm text-gray-500">
+                                        <li>• Thử mở rộng khoảng thời gian tìm kiếm</li>
+                                        <li>• Kiểm tra lại số serial (có thể có lỗi chính tả)</li>
+                                        <li>• Thử tìm kiếm với ít tiêu chí hơn</li>
+                                        <li>• Sử dụng nút "Đặt lại" để xóa bộ lọc</li>
+                                    </ul>
+                                </div>
+                            @else
+                                <p class="mb-4 text-gray-600">
+                                    @if ($currentImport)
+                                        Import này chưa có phôi văn bằng nào.
+                                    @else
+                                        Hệ thống chưa có phôi văn bằng nào.
+                                    @endif
+                                </p>
+                                @if (!$currentImport)
+                                    <div class="empty-actions">
+                                        <a href="{{ route('diploma-blank-import.create') }}"
+                                            class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus mr-2"></i>Nhập phôi mới
+                                        </a>
+                                    </div>
+                                @endif
+                            @endif
+
+                            @if ($currentImport && $currentImport->status->value == 0)
+                                <div class="alert alert-info d-flex align-items-center mt-4">
+                                    <i class="fas fa-clock text-info mr-3"></i>
+                                    <div>
+                                        <strong>Import đang chờ xử lý</strong><br>
+                                        <small>Import này đang ở trạng thái PENDING. Các phôi sẽ được tạo tự động trong vài
+                                            phút.</small>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endif
             </div>
@@ -272,6 +356,55 @@
                 background-color: #4b5563;
                 color: white;
                 text-decoration: none;
+            }
+
+            /* Enhanced empty results styles */
+            .empty-results {
+                text-align: center;
+                padding: 3rem 2rem;
+                background: #ffffff;
+                border-radius: 12px;
+                border: 2px dashed #e5e7eb;
+                margin: 2rem 0;
+            }
+
+            .empty-content {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .search-criteria {
+                border-left: 4px solid #3b82f6;
+            }
+
+            .search-criteria h4 {
+                color: #1f2937;
+            }
+
+            .search-criteria ul {
+                margin: 0;
+                padding-left: 1rem;
+            }
+
+            .empty-suggestions ul {
+                margin: 0;
+                padding-left: 1rem;
+            }
+
+            .empty-actions {
+                margin-top: 1.5rem;
+            }
+
+            .alert {
+                border-radius: 8px;
+                border: 1px solid transparent;
+                padding: 0.75rem 1rem;
+            }
+
+            .alert-info {
+                background-color: #e0f2fe;
+                border-color: #b3e5fc;
+                color: #0277bd;
             }
         </style>
 
@@ -400,4 +533,41 @@
         @endif
         </script>
     @endif
+
+    <script>
+        // Disable search button when all inputs are empty
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchButton = document.getElementById('search-button');
+            const searchInputs = [
+                document.getElementById('serial_number'),
+                @if (!$currentImport)
+                    document.getElementById('type_id'),
+                @endif
+                document.getElementById('status'),
+                document.getElementById('import_date_from'),
+                document.getElementById('import_date_to')
+            ].filter(Boolean); // Remove null elements
+
+            function checkSearchInputs() {
+                let hasValue = false;
+
+                searchInputs.forEach(input => {
+                    if (input.value && input.value.trim() !== '') {
+                        hasValue = true;
+                    }
+                });
+
+                searchButton.disabled = !hasValue;
+            }
+
+            // Check initial state
+            checkSearchInputs();
+
+            // Add event listeners to all search inputs
+            searchInputs.forEach(input => {
+                input.addEventListener('input', checkSearchInputs);
+                input.addEventListener('change', checkSearchInputs);
+            });
+        });
+    </script>
 @endsection

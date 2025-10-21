@@ -165,12 +165,10 @@
                         'issue_date_from',
                     ]))
                     <a href="{{ route('diploma-blank-management') }}" class="btn-secondary">
-                        <i class="fas fa-times"></i>
                         Xóa bộ lọc
                     </a>
                 @endif
                 <a href="{{ route('diploma-blank-import.create') }}" class="btn-primary">
-                    <i class="fas fa-plus"></i>
                     Thêm mới
                 </a>
             </div>
