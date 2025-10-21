@@ -106,10 +106,10 @@
                 <a href="{{ route('diploma-blank-import.create') }}" class="action-btn action-btn-primary">
                     Nhập phôi mới
                 </a>
-                {{-- <button type="button" class="action-btn action-btn-warning">
-                    Nhập từ Excel
+                <button type="button" class="action-btn action-btn-warning">
+                    Xuất phôi
                 </button>
-                <button type="button" class="action-btn action-btn-info">
+                {{-- <button type="button" class="action-btn action-btn-info">
                     In lịch sử nhập
                 </button>
                 <button type="button" class="action-btn action-btn-success">
