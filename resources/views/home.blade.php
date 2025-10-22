@@ -245,12 +245,16 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="loading-overlay hidden">
-            <div class="loading-spinner">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>Đang tải dữ liệu...</p>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <div class="spinner-ring">
+                <div class="spinner-circle"></div>
+                <div class="spinner-circle"></div>
+                <div class="spinner-circle"></div>
+                <div class="spinner-circle"></div>
             </div>
         </div>
     </div>
@@ -483,28 +487,167 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .loading-spinner {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
+            background: transparent;
+            border: none;
+            padding: 0;
+            border-radius: 0;
             text-align: center;
+            box-shadow: none;
+            max-width: none;
+            width: auto;
+            position: relative;
         }
 
-        .loading-spinner i {
-            font-size: 32px;
-            color: #3b82f6;
-            margin-bottom: 15px;
+        .spinner-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .spinner-circle {
+            position: absolute;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .spinner-circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            border-top-color: #667eea;
+            animation-delay: 0s;
+        }
+
+        .spinner-circle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 10px;
+            left: 10px;
+            border-right-color: #764ba2;
+            animation-delay: -0.4s;
+            animation-direction: reverse;
+        }
+
+        .spinner-circle:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 20px;
+            left: 20px;
+            border-bottom-color: #f093fb;
+            animation-delay: -0.8s;
+        }
+
+        .spinner-circle:nth-child(4) {
+            width: 20px;
+            height: 20px;
+            top: 30px;
+            left: 30px;
+            border-left-color: #f5576c;
+            animation-delay: -1.2s;
+            animation-direction: reverse;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: rotate(360deg);
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 200% 100%;
+            border-radius: 2px;
+            animation: progressMove 2s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        @keyframes progressMove {
+            0% {
+                transform: translateX(-100%);
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                transform: translateX(100%);
+                background-position: 0% 50%;
+            }
         }
 
         .hidden {
             display: none !important;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .loading-overlay:not(.hidden) {
+            display: flex !important;
+            visibility: visible;
+            opacity: 1;
+            animation: overlayFadeIn 0.3s ease-out;
+        }
+
+        .loading-overlay:not(.hidden) .loading-spinner {
+            animation: spinnerSlideIn 0.4s ease-out 0.1s both;
+        }
+
+        @keyframes overlayFadeIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+                -webkit-backdrop-filter: blur(0px);
+            }
+
+            to {
+                opacity: 1;
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+        }
+
+        @keyframes spinnerSlideIn {
+            from {
+                transform: translateY(30px) scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
 
         /* Responsive design */
@@ -530,6 +673,51 @@
             .stat-card {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .loading-spinner {
+                padding: 30px 25px;
+                margin: 0 15px;
+            }
+
+            .spinner-ring {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 20px;
+            }
+
+            .spinner-circle:nth-child(1) {
+                width: 60px;
+                height: 60px;
+            }
+
+            .spinner-circle:nth-child(2) {
+                width: 45px;
+                height: 45px;
+                top: 7.5px;
+                left: 7.5px;
+            }
+
+            .spinner-circle:nth-child(3) {
+                width: 30px;
+                height: 30px;
+                top: 15px;
+                left: 15px;
+            }
+
+            .spinner-circle:nth-child(4) {
+                width: 15px;
+                height: 15px;
+                top: 22.5px;
+                left: 22.5px;
+            }
+
+            .loading-content h4 {
+                font-size: 16px;
+            }
+
+            .loading-content p {
+                font-size: 13px;
             }
         }
     </style>
@@ -1067,11 +1255,62 @@
         }
 
         function showLoading() {
-            document.getElementById('loadingOverlay').classList.remove('hidden');
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden');
+            // Prevent body scroll when loading is shown
+            document.body.style.overflow = 'hidden';
         }
 
         function hideLoading() {
-            document.getElementById('loadingOverlay').classList.add('hidden');
+            const overlay = document.getElementById('loadingOverlay');
+
+            // Add fade out animation
+            overlay.style.animation = 'overlayFadeOut 0.3s ease-in';
+            overlay.querySelector('.loading-spinner').style.animation = 'spinnerSlideOut 0.2s ease-in';
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                // Restore body scroll
+                document.body.style.overflow = 'auto';
+                // Reset animations
+                overlay.style.animation = '';
+                overlay.querySelector('.loading-spinner').style.animation = '';
+            }, 300);
         }
+
+        // Add CSS for fade out animations
+        const fadeOutStyles = `
+            @keyframes overlayFadeOut {
+                from {
+                    opacity: 1;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                }
+                to {
+                    opacity: 0;
+                    backdrop-filter: blur(0px);
+                    -webkit-backdrop-filter: blur(0px);
+                }
+            }
+                    -webkit-backdrop-filter: blur(0px);
+                }
+            }
+
+            @keyframes spinnerSlideOut {
+                from {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-20px) scale(0.9);
+                    opacity: 0;
+                }
+            }
+        `;
+
+        // Inject fade out styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = fadeOutStyles;
+        document.head.appendChild(styleSheet);
     </script>
 @endsection
