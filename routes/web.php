@@ -243,6 +243,32 @@ Route::post(
     [StatisticsController::class, 'export']
 )->middleware('auth')->name('statistics.export');
 
+// Diploma Blank Recall routes
+Route::get(
+    '/diploma-blank-recalls',
+    [App\Http\Controllers\DiplomaBlankRecallController::class, 'index']
+)->middleware('auth')->name('diploma-blank-recalls.index');
+
+Route::get(
+    '/diploma-blank-recalls/recalled-list',
+    [App\Http\Controllers\DiplomaBlankRecallController::class, 'recalledList']
+)->middleware('auth')->name('diploma-blank-recalls.recalled-list');
+
+Route::post(
+    '/diploma-blank-recalls/check-serial',
+    [App\Http\Controllers\DiplomaBlankRecallController::class, 'checkSerial']
+)->middleware('auth')->name('diploma-blank-recalls.check-serial');
+
+Route::post(
+    '/diploma-blank-recalls/recall',
+    [App\Http\Controllers\DiplomaBlankRecallController::class, 'recall']
+)->middleware('auth')->name('diploma-blank-recalls.recall');
+
+Route::get(
+    '/diploma-blank-recalls/statistics',
+    [App\Http\Controllers\DiplomaBlankRecallController::class, 'statistics']
+)->middleware('auth')->name('diploma-blank-recalls.statistics');
+
 // Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');

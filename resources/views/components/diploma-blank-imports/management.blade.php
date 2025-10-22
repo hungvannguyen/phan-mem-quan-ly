@@ -112,6 +112,12 @@
                 <a href="{{ route('diploma-blank-exports.index') }}" class="action-btn action-btn-info">
                     Lịch sử xuất phôi
                 </a>
+                <a href="{{ route('diploma-blank-recalls.index') }}" class="action-btn action-btn-danger">
+                    Thu hồi phôi
+                </a>
+                <a href="{{ route('diploma-blank-recalls.recalled-list') }}" class="action-btn action-btn-secondary">
+                    Phôi đã thu hồi
+                </a>
                 {{-- <button type="button" class="action-btn action-btn-success">
                     Xuất Excel
                 </button>
