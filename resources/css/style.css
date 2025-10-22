@@ -1540,6 +1540,145 @@
     @apply min-w-0;
   }
 }
+.recalled-list-statistics {
+  @apply grid gap-5 mb-8;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.recalled-list-modal .modal-content {
+  @apply bg-white rounded-lg shadow-xl;
+}
+.recalled-list-modal .modal-header {
+  @apply flex items-center justify-between p-4 border-b border-gray-200;
+}
+.recalled-list-modal .modal-body {
+  @apply p-4;
+}
+.recalled-list-modal .modal-footer {
+  @apply flex items-center justify-end gap-2 p-4 border-t border-gray-200;
+}
+
+.stat-card {
+  @apply bg-white rounded-lg p-5 shadow-sm flex items-center gap-4;
+}
+.stat-icon {
+  @apply w-12 h-12 rounded-full flex items-center justify-center text-2xl text-white;
+}
+.stat-content h3 {
+  @apply text-3xl font-bold m-0 text-gray-800;
+}
+.stat-content p {
+  @apply m-0 text-gray-500 text-sm;
+}
+.stat-total .stat-icon {
+  @apply bg-red-600;
+}
+.stat-today .stat-icon {
+  @apply bg-orange-500;
+}
+.stat-month .stat-icon {
+  @apply bg-blue-600;
+}
+
+.table-student-info {
+  @apply max-w-[200px];
+}
+.table-recall-reason {
+  @apply max-w-[250px] leading-relaxed;
+}
+
+.status-recalled {
+  @apply bg-red-100 text-red-800 border border-red-200;
+}
+.status-failed {
+  @apply bg-red-100 text-red-800;
+}
+
+.text-truncate {
+  @apply truncate;
+}
+
+.full-reason-content {
+  @apply text-gray-700 leading-relaxed;
+}
+.full-reason-content br {
+  @apply block;
+}
+
+.search-form .form-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+@media (max-width: 768px) {
+  .search-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field-group {
+  @apply mb-4;
+}
+.field-label {
+  @apply block text-sm font-semibold text-gray-700 mb-1;
+}
+.field-label.required::after {
+  content: " *";
+  @apply text-red-500;
+}
+.field-input {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white;
+}
+.field-input::placeholder {
+  @apply text-gray-400;
+}
+.field-input:focus {
+  @apply outline-none ring-2 ring-blue-500 border-transparent;
+}
+.field-input.error {
+  @apply border-red-300 ring-2 ring-red-200;
+}
+.field-select {
+  @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white;
+}
+.field-select:focus {
+  @apply outline-none ring-2 ring-blue-500 border-transparent;
+}
+.field-select.error {
+  @apply border-red-300 ring-2 ring-red-200;
+}
+
+.page-actions .action-btn-warning {
+  @apply bg-orange-500 hover:bg-orange-600 text-white;
+}
+.page-actions .action-btn-success {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+@media (max-width: 768px) {
+  .recalled-list-statistics {
+    @apply grid-cols-1 gap-4;
+  }
+  .stat-card {
+    @apply p-4;
+  }
+  .table-student-info, .table-recall-reason {
+    @apply max-w-none;
+  }
+  .search-form .form-grid {
+    @apply gap-3;
+  }
+}
+@media print {
+  .page-actions,
+  .search-card {
+    @apply hidden;
+  }
+  .recalled-list-statistics {
+    @apply mb-4;
+  }
+  .stat-card {
+    @apply shadow-none border border-gray-300;
+  }
+}
 #exportModal {
   z-index: 99999 !important;
 }
@@ -1798,6 +1937,140 @@
   @apply text-xl font-bold leading-none;
 }
 
+.export-show-info-card {
+  @apply bg-white rounded-xl p-6 mb-6 shadow-lg;
+}
+.export-show-ranges-card {
+  @apply bg-white rounded-xl p-6 mb-6 shadow-lg;
+}
+.export-show-ranges-card h5 {
+  @apply mb-5 text-gray-700;
+}
+
+.info-group {
+  @apply mb-4;
+}
+.info-group.full-width {
+  @apply col-span-full;
+}
+.info-group label {
+  @apply block font-semibold text-gray-700 mb-1 text-sm;
+}
+.info-group span {
+  @apply block text-gray-900 text-base;
+}
+.info-export-id {
+  @apply font-bold text-blue-600 text-lg;
+}
+.info-notes-content {
+  @apply bg-gray-50 p-3 rounded-md border-l-4 border-blue-500 mt-1;
+}
+
+.ranges-list {
+  @apply grid gap-3;
+}
+.ranges-item {
+  @apply bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-between;
+}
+.ranges-info {
+  @apply flex items-center gap-3;
+}
+.ranges-serial {
+  @apply font-semibold text-gray-700;
+}
+.ranges-count {
+  @apply text-gray-500 text-sm;
+}
+.ranges-index {
+  @apply bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge {
+  @apply px-3 py-1.5 rounded-md text-sm font-medium;
+}
+.badge-primary {
+  @apply bg-blue-600 text-white;
+}
+.badge-success {
+  @apply bg-green-600 text-white;
+}
+.badge-warning {
+  @apply bg-yellow-500 text-gray-900;
+}
+.badge-danger {
+  @apply bg-red-600 text-white;
+}
+.badge-info {
+  @apply bg-cyan-600 text-white;
+}
+
+.serial-number {
+  @apply font-mono font-semibold text-gray-700;
+}
+
+.status-badge {
+  @apply px-2 py-1 rounded text-xs font-medium;
+}
+.status-pending {
+  @apply bg-yellow-500 text-gray-900;
+}
+.status-completed {
+  @apply bg-green-600 text-white;
+}
+.status-processing {
+  @apply bg-cyan-600 text-white;
+}
+.status-failed {
+  @apply bg-red-600 text-white;
+}
+.status-exported {
+  @apply bg-blue-600 text-white;
+}
+.status-damaged {
+  @apply bg-orange-600 text-white;
+}
+.status-recalled {
+  @apply bg-purple-600 text-white;
+}
+.status-unknown {
+  @apply bg-gray-500 text-white;
+}
+
+.empty-state {
+  @apply text-center py-8;
+}
+.empty-state p {
+  @apply text-gray-500 text-base;
+}
+
+@media print {
+  .page-actions {
+    @apply hidden;
+  }
+  .table-section h5 {
+    page-break-before: always;
+  }
+  .export-show-info-card, .export-show-ranges-card {
+    @apply shadow-none border border-gray-300;
+  }
+}
+@media (max-width: 768px) {
+  .info-group {
+    @apply mb-3;
+  }
+  .info-group label {
+    @apply text-xs;
+  }
+  .info-group span {
+    @apply text-sm;
+  }
+  .ranges-item {
+    @apply flex-col items-start gap-2;
+  }
+  .ranges-info {
+    @apply flex-col items-start gap-1;
+  }
+}
 .auth-login-container {
   @apply min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4;
 }

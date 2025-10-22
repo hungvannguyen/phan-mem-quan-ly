@@ -50,7 +50,7 @@
                             </td>
                             <td class="td">
                                 @if ($blank->degree)
-                                    <div class="student-info">
+                                    <div class="table-student-info">
                                         <div class="document-ref">{{ $blank->degree->student_name }}</div>
                                         <div class="student-details">
                                             <small class="date-text">
@@ -81,7 +81,7 @@
                             </td>
                             <td class="td">
                                 @if ($blank->recall_reason)
-                                    <div class="recall-reason" title="{{ $blank->recall_reason }}">
+                                    <div class="table-recall-reason" title="{{ $blank->recall_reason }}">
                                         {{ Str::limit($blank->recall_reason, 100) }}
                                         @if (strlen($blank->recall_reason) > 100)
                                             <button type="button" class="btn-view btn-action"
