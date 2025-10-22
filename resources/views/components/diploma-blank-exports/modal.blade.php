@@ -1,21 +1,60 @@
+{{-- Styles for modal positioning and z-index --}}
+<style>
+    /* Ensure export modal has highest z-index and proper centering */
+    #exportModal {
+        z-index: 99999 !important;
+    }
+
+    #exportModal.modal.show {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    #exportModal .modal-dialog {
+        margin: 0 auto !important;
+        position: relative;
+        z-index: 100000 !important;
+    }
+
+    /* Ensure backdrop doesn't interfere */
+    .modal-backdrop {
+        z-index: 99998 !important;
+    }
+
+    /* For nested modals */
+    #customRangeModal {
+        z-index: 100001 !important;
+    }
+
+    #customRangeModal.modal.show {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    #customRangeModal+.modal-backdrop {
+        z-index: 100000 !important;
+    }
+</style>
+
 {{-- Modal Xuất phôi --}}
 <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true"
-    style="z-index: 9999;">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exportModalLabel">Xuất phôi văn bằng</h5>
+    style="z-index: 99999 !important;">
+    <div class="modal-dialog export-modal-dialog modal-lg" style="margin: 0 auto !important;">
+        <div class="modal-content export-modal-content">
+            <div class="modal-header export-modal-header">
+                <h5 class="modal-title export-modal-title" id="exportModalLabel">Xuất phôi văn bằng</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="exportForm" action="{{ route('diploma-blank-exports.store') }}" method="POST">
                 @csrf
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_type_id" class="form-label">Loại văn bằng <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" id="export_type_id" name="type_id" required>
+                <div class="modal-body export-modal-body">
+                    <div class="form-row">
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_type_id" class="field-label required">Loại văn bằng</label>
+                                <select class="field-select" id="export_type_id" name="type_id" required>
                                     <option value="">-- Chọn loại văn bằng --</option>
                                     @foreach ($diplomaBlankTypes as $type)
                                         <option value="{{ $type->type_id }}">{{ $type->type_name }}</option>
@@ -23,82 +62,79 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_course" class="form-label">Khóa</label>
-                                <input type="text" class="form-control" id="export_course" name="course"
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_course" class="field-label">Khóa</label>
+                                <input type="text" class="field-input" id="export_course" name="course"
                                     placeholder="Nhập khóa học">
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_graduation_year" class="form-label">Năm tốt nghiệp <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="export_graduation_year"
+                    <div class="form-row">
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_graduation_year" class="field-label required">Năm tốt nghiệp</label>
+                                <input type="number" class="field-input" id="export_graduation_year"
                                     name="graduation_year" min="2000" max="2100" value="{{ date('Y') }}"
                                     required>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_decision_number" class="form-label">Quyết định tốt nghiệp <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="export_decision_number"
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_decision_number" class="field-label required">Quyết định tốt
+                                    nghiệp</label>
+                                <input type="text" class="field-input" id="export_decision_number"
                                     name="decision_number" placeholder="Số quyết định" required>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_issue_date" class="form-label">Ngày ban hành <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="export_issue_date" name="issue_date"
+                    <div class="form-row">
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_issue_date" class="field-label required">Ngày ban hành</label>
+                                <input type="date" class="field-input" id="export_issue_date" name="issue_date"
                                     value="{{ date('Y-m-d') }}" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="export_quantity" class="form-label">Số lượng <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="export_quantity" name="quantity"
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="export_quantity" class="field-label required">Số lượng</label>
+                                <input type="number" class="field-input" id="export_quantity" name="quantity"
                                     min="1" placeholder="Nhập số lượng" required>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <button type="button" class="btn btn-info" id="getSuggestedRanges">
+                    <div class="field-container">
+                        <button type="button" class="btn-base btn-info" id="getSuggestedRanges">
                             <i class="fas fa-magic"></i> Gợi ý dải Serial
                         </button>
-                        <button type="button" class="btn btn-secondary" id="addCustomRange">
+                        <button type="button" class="btn-base btn-secondary" id="addCustomRange">
                             <i class="fas fa-plus"></i> Thêm dải tùy chỉnh
                         </button>
                     </div>
 
                     {{-- Hiển thị dải serial --}}
-                    <div id="serialRanges" style="display: none;">
-                        <h6>Dải serial xuất phôi:</h6>
-                        <div id="rangesList"></div>
+                    <div id="serialRanges" class="range-container hidden-element">
+                        <h6 class="range-header">Dải serial xuất phôi:</h6>
+                        <div id="rangesList" class="range-list"></div>
                         <input type="hidden" id="rangesData" name="ranges">
                     </div>
 
-                    <div class="mb-3">
-                        <label for="export_notes" class="form-label">Ghi chú</label>
-                        <textarea class="form-control" id="export_notes" name="notes" rows="3"
+                    <div class="field-container">
+                        <label for="export_notes" class="field-label">Ghi chú</label>
+                        <textarea class="field-textarea" id="export_notes" name="notes" rows="3"
                             placeholder="Nhập ghi chú (tùy chọn)"></textarea>
                     </div>
 
                     {{-- Hiển thị thông báo --}}
-                    <div id="exportMessage" style="display: none;"></div>
+                    <div id="exportMessage" class="message-container"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary" id="exportSubmitBtn" disabled>
+                <div class="modal-footer export-modal-footer">
+                    <button type="button" class="btn-base btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn-base btn-primary" id="exportSubmitBtn" disabled>
                         <i class="fas fa-download"></i> Xuất phôi
                     </button>
                 </div>
@@ -109,141 +145,83 @@
 
 {{-- Modal thêm dải tùy chỉnh --}}
 <div class="modal fade" id="customRangeModal" tabindex="-1" aria-labelledby="customRangeModalLabel"
-    aria-hidden="true" style="z-index: 10000;">
-    <div class="modal-dialog">
+    aria-hidden="true" style="z-index: 100001 !important;">
+    <div class="modal-dialog" style="margin: 0 auto !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="customRangeModalLabel">Thêm dải Serial tùy chỉnh</h5>
+                <h5 class="modal-title export-modal-title" id="customRangeModalLabel">Thêm dải Serial tùy chỉnh</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="customRangeForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="custom_from_serial" class="form-label">Từ Serial <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="custom_from_serial"
-                                    name="from_serial" placeholder="VD: A001" required>
+                    <div class="form-row">
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="custom_from_serial" class="field-label required">Từ Serial</label>
+                                <input type="text" class="field-input" id="custom_from_serial" name="from_serial"
+                                    placeholder="VD: A001" required>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="custom_to_serial" class="form-label">Đến Serial <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="custom_to_serial" name="to_serial"
+                        <div class="form-col-half">
+                            <div class="field-container">
+                                <label for="custom_to_serial" class="field-label required">Đến Serial</label>
+                                <input type="text" class="field-input" id="custom_to_serial" name="to_serial"
                                     placeholder="VD: A100" required>
                             </div>
                         </div>
                     </div>
-                    <div id="customRangeMessage" style="display: none;"></div>
+                    <div id="customRangeMessage" class="message-container"></div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-primary" id="validateCustomRange">Kiểm tra</button>
-                <button type="button" class="btn btn-success" id="addCustomRangeBtn"
-                    style="display: none;">Thêm</button>
+                <button type="button" class="btn-base btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn-base btn-primary" id="validateCustomRange">Kiểm tra</button>
+                <button type="button" class="btn-base btn-success hidden-element"
+                    id="addCustomRangeBtn">Thêm</button>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Modal styling fixes */
-    .modal {
-        z-index: 999999 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-    }
-
-    .modal-backdrop {
-        z-index: 999998 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-    }
-
-    .modal-dialog {
-        z-index: 1000000 !important;
-        position: relative;
-        pointer-events: auto !important;
-    }
-
-    .modal-content {
-        position: relative;
-        z-index: 1000001 !important;
-        pointer-events: auto !important;
-    }
-
-    .range-item {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .range-info {
-        font-weight: 500;
-    }
-
-    .range-count {
-        color: #6c757d;
-        font-size: 0.9em;
-    }
-
-    .range-remove {
-        background: none;
-        border: none;
-        color: #dc3545;
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .range-remove:hover {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .alert {
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-
-    /* Ensure all modal elements are clickable */
-    .modal * {
-        pointer-events: auto !important;
-    }
-
-    .modal-backdrop.show {
-        opacity: 0.5;
-    }
-
-    /* Fix for potential overlay issues */
-    body.modal-open {
-        overflow: hidden;
-    }
-
-    .btn,
-    .form-control,
-    .form-select {
-        position: relative;
-        z-index: 1;
-    }
-</style>
+{{-- Styles are now handled by SCSS in resources/scss/components/_export-modal.scss --}}
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Helper functions for managing element visibility using CSS classes
+        function hideElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.add('hidden-element');
+                element.classList.remove('show');
+            }
+        }
+
+        function showElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.remove('hidden-element');
+                if (element.classList.contains('message-container')) {
+                    element.classList.add('show');
+                }
+            }
+        }
+
+        function hideMessageContainer(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.remove('show');
+                element.classList.add('hidden-element');
+            }
+        }
+
+        function showMessageContainer(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.remove('hidden-element');
+                element.classList.add('show');
+            }
+        }
+
         const exportModal = new bootstrap.Modal(document.getElementById('exportModal'), {
             backdrop: true,
             keyboard: true,
@@ -355,7 +333,7 @@
                 .catch(error => {
                     console.error('Error:', error);
                     showMessage('exportMessage', 'Có lỗi xảy ra khi lấy gợi ý dải serial',
-                    'danger');
+                        'danger');
                 })
                 .finally(() => {
                     // Reset button state
@@ -373,8 +351,8 @@
             }
 
             document.getElementById('customRangeForm').reset();
-            document.getElementById('customRangeMessage').style.display = 'none';
-            document.getElementById('addCustomRangeBtn').style.display = 'none';
+            hideMessageContainer('customRangeMessage');
+            hideElement('addCustomRangeBtn');
             customRangeModal.show();
         });
 
@@ -408,10 +386,10 @@
                     if (data.success) {
                         showMessage('customRangeMessage', `Dải serial hợp lệ (${data.count} phôi)`,
                             'success');
-                        document.getElementById('addCustomRangeBtn').style.display = 'inline-block';
+                        showElement('addCustomRangeBtn');
                     } else {
                         showMessage('customRangeMessage', data.message, 'danger');
-                        document.getElementById('addCustomRangeBtn').style.display = 'none';
+                        hideElement('addCustomRangeBtn');
                     }
                 })
                 .catch(error => {
@@ -467,12 +445,12 @@
             const exportSubmitBtn = document.getElementById('exportSubmitBtn');
 
             if (currentRanges.length === 0) {
-                serialRanges.style.display = 'none';
+                hideElement('serialRanges');
                 exportSubmitBtn.disabled = true;
                 return;
             }
 
-            serialRanges.style.display = 'block';
+            showElement('serialRanges');
             rangesList.innerHTML = '';
 
             // ✅ OPTIMIZED: Only show the actual ranges, not unavailable serials
@@ -536,8 +514,8 @@
         function resetExportForm() {
             document.getElementById('exportForm').reset();
             currentRanges = [];
-            document.getElementById('serialRanges').style.display = 'none';
-            document.getElementById('exportMessage').style.display = 'none';
+            hideElement('serialRanges');
+            hideMessageContainer('exportMessage');
             document.getElementById('exportSubmitBtn').disabled = true;
             document.getElementById('export_graduation_year').value = new Date().getFullYear();
             document.getElementById('export_issue_date').value = new Date().toISOString().split('T')[0];
@@ -548,7 +526,7 @@
             element.className = `alert alert-${type}`;
             // ✅ Support multi-line messages
             element.innerHTML = message.replace(/\n/g, '<br>');
-            element.style.display = 'block';
+            showMessageContainer(elementId);
         }
 
         function calculateRangeCount(fromSerial, toSerial) {

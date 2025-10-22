@@ -48,8 +48,8 @@
                         <h4 class="step-title">Bước 1: Nhập thông tin phôi cần thu hồi</h4>
 
                         <div class="form-field">
-                            <label for="serial_number" class="field-label">
-                                Số Serial phôi <span class="text-danger">*</span>
+                            <label for="serial_number" class="field-label required">
+                                Số Serial phôi
                             </label>
                             <div class="input-group">
                                 <input type="text" id="serial_number" name="serial_number" class="field-input"
@@ -58,7 +58,7 @@
                                     <i class="fas fa-search"></i> Kiểm tra
                                 </button>
                             </div>
-                            <small class="form-text text-muted">
+                            <small class="form-text">
                                 Nhập đúng số serial của phôi đã cấp cần thu hồi
                             </small>
                         </div>
@@ -129,12 +129,12 @@
 
                         <!-- Nhập lý do thu hồi -->
                         <div class="form-field">
-                            <label for="recall_reason" class="field-label">
-                                Lý do thu hồi <span class="text-danger">*</span>
+                            <label for="recall_reason" class="field-label required">
+                                Lý do thu hồi
                             </label>
                             <textarea id="recall_reason" name="recall_reason" class="field-textarea" rows="4"
                                 placeholder="Nhập lý do thu hồi phôi..." required></textarea>
-                            <small class="form-text text-muted">
+                            <small class="form-text">
                                 Mô tả chi tiết lý do tại sao cần thu hồi phôi này
                             </small>
                         </div>
@@ -157,201 +157,7 @@
         </div>
     </main>
 
-    <style>
-        .recall-page {
-            padding: 20px;
-        }
-
-        .recall-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-top: 20px;
-        }
-
-        .card-header {
-            border-bottom: 1px solid #eee;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-        }
-
-        .card-title {
-            color: #2c3e50;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .form-step {
-            margin-bottom: 30px;
-        }
-
-        .step-title {
-            color: #34495e;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #3498db;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-group .field-input {
-            flex: 1;
-        }
-
-        .loading-indicator {
-            text-align: center;
-            padding: 15px;
-            color: #3498db;
-        }
-
-        .diploma-info-card {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .info-title {
-            color: #2c3e50;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .info-subtitle {
-            color: #34495e;
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 15px 0 10px 0;
-            padding-top: 15px;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-item label {
-            font-weight: 600;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        .info-item span {
-            color: #2c3e50;
-            font-weight: 500;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #7f8c8d;
-        }
-
-        .btn-outline-secondary {
-            background-color: transparent;
-            color: #6c757d;
-            border: 1px solid #6c757d;
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .recall-page {
-                padding: 10px;
-            }
-
-            .recall-card {
-                padding: 20px;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-actions {
-                flex-direction: column-reverse;
-            }
-        }
-    </style>
+    {{-- Styles are now handled by SCSS component: resources/scss/components/_recall-form.scss --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
