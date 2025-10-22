@@ -33,9 +33,9 @@ Route::get(
 )->middleware('auth')->name('diploma-blanks.index');
 
 Route::get(
-    '/diploma-blanks-list/{importId}',
+    '/diploma-blanks-management/{importId}',
     [DiplomaBlankController::class, 'indexByImport']
-)->middleware('auth')->name('diploma-blanks.list-by-import');
+)->middleware('auth')->name('diploma-blanks.management-by-import');
 
 Route::post(
     '/diploma-blanks/{diplomaBlankId}/mark-damaged',
@@ -250,9 +250,9 @@ Route::get(
 )->middleware('auth')->name('diploma-blank-recalls.index');
 
 Route::get(
-    '/diploma-blank-recalls/recalled-list',
+    '/diploma-blank-recalls/management',
     [App\Http\Controllers\DiplomaBlankRecallController::class, 'recalledList']
-)->middleware('auth')->name('diploma-blank-recalls.recalled-list');
+)->middleware('auth')->name('diploma-blank-recalls.management');
 
 Route::post(
     '/diploma-blank-recalls/check-serial',

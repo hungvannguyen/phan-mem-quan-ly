@@ -74,7 +74,7 @@ class DiplomaBlankRecallController extends Controller
                 ->whereYear('recall_date', now()->year)->count(),
         ];
 
-        return view('components.diploma-blank-recalls.recalled-list', compact(
+        return view('components.diploma-blank-recalls.management', compact(
             'recalledBlanks',
             'diplomaBlankTypes',
             'statistics'

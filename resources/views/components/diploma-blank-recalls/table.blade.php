@@ -117,7 +117,7 @@
             <h3 class="empty-title">Không tìm thấy phôi đã thu hồi</h3>
             <p class="empty-message">Không có phôi nào khớp với tiêu chí tìm kiếm của bạn.</p>
             <div class="empty-actions">
-                <a href="{{ route('diploma-blank-recalls.recalled-list') }}" class="btn-primary">
+                <a href="{{ route('diploma-blank-recalls.management') }}" class="btn-primary">
                     <i class="fas fa-refresh"></i> Xem tất cả
                 </a>
             </div>

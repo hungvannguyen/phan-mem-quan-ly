@@ -59,7 +59,7 @@
 
             <!-- Search Form -->
             <div class="search-card">
-                <form class="search-form" method="GET" action="{{ route('diploma-blank-recalls.recalled-list') }}">
+                <form class="search-form" method="GET" action="{{ route('diploma-blank-recalls.management') }}">
                     <div class="form-grid">
                         <div class="field-group">
                             <label for="serial_number" class="field-label">Số Serial</label>
@@ -98,7 +98,7 @@
                         <button type="submit" class="btn-search">
                             <i class="fas fa-search"></i> Tìm kiếm
                         </button>
-                        <a href="{{ route('diploma-blank-recalls.recalled-list') }}" class="btn-reset">
+                        <a href="{{ route('diploma-blank-recalls.management') }}" class="btn-reset">
                             <i class="fas fa-refresh"></i> Xóa bộ lọc
                         </a>
                     </div>

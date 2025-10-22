@@ -51,7 +51,7 @@ class DiplomaBlankController extends Controller
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
         $damageReasons = DamageReason::orderBy('reason_name')->get();
 
-        return view('components.diploma-blanks.list', [
+        return view('components.diploma-blanks.management', [
             'diplomaBlanks' => $diplomaBlanks,
             'diplomaBlankTypes' => $diplomaBlankTypes,
             'damageReasons' => $damageReasons,
@@ -110,7 +110,7 @@ class DiplomaBlankController extends Controller
             abort(404, 'Import không tồn tại.');
         }
 
-        return view('components.diploma-blanks.list', [
+        return view('components.diploma-blanks.management', [
             'diplomaBlanks' => $diplomaBlanks,
             'diplomaBlankTypes' => $diplomaBlankTypes,
             'damageReasons' => $damageReasons,

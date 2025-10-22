@@ -26,7 +26,7 @@
 
             <!-- Action Buttons -->
             <div class="page-actions">
-                <a href="{{ route('diploma-blank-recalls.recalled-list') }}" class="action-btn action-btn-info">
+                <a href="{{ route('diploma-blank-recalls.management') }}" class="action-btn action-btn-info">
                     <i class="fas fa-list"></i> Xem phôi đã thu hồi
                 </a>
                 <a href="{{ route('diploma-blank-management') }}" class="action-btn action-btn-secondary">

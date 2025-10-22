@@ -115,7 +115,7 @@
                 <a href="{{ route('diploma-blank-recalls.index') }}" class="action-btn action-btn-danger">
                     Thu hồi phôi
                 </a>
-                <a href="{{ route('diploma-blank-recalls.recalled-list') }}" class="action-btn action-btn-secondary">
+                <a href="{{ route('diploma-blank-recalls.management') }}" class="action-btn action-btn-secondary">
                     Phôi đã thu hồi
                 </a>
                 {{-- <button type="button" class="action-btn action-btn-success">

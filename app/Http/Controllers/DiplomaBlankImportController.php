@@ -151,7 +151,7 @@ class DiplomaBlankImportController extends Controller
     public function show(DiplomaBlankImport $import)
     {
         // Chuyển hướng đến trang diploma-blanks-list với import ID
-        return redirect()->route('diploma-blanks.list-by-import', $import->id);
+        return redirect()->route('diploma-blanks.management-by-import', $import->id);
     }
 
     /**

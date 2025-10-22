@@ -216,7 +216,7 @@
             <div class="empty-actions">
                 @if (request()->hasAny(['serial_number', 'type_id', 'status', 'import_date_from', 'import_date_to']))
                     @if ($importId)
-                        <a href="{{ route('diploma-blanks.list-by-import', $importId) }}" class="btn-secondary">
+                        <a href="{{ route('diploma-blanks.management-by-import', $importId) }}" class="btn-secondary">
                             <i class="fas fa-times"></i>
                             Xóa bộ lọc
                         </a>

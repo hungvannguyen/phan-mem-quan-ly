@@ -86,7 +86,7 @@
             <div class="search-card">
                 @if (isset($importId))
                     <form class="search-form" method="GET"
-                        action="{{ route('diploma-blanks.list-by-import', $importId) }}">
+                        action="{{ route('diploma-blanks.management-by-import', $importId) }}">
                     @else
                         <form class="search-form" method="GET" action="{{ route('diploma-blanks.index') }}">
                 @endif
@@ -140,7 +140,7 @@
                         Tìm kiếm
                     </button>
                     @if (isset($importId))
-                        <a href="{{ route('diploma-blanks.list-by-import', $importId) }}" class="btn-reset">
+                        <a href="{{ route('diploma-blanks.management-by-import', $importId) }}" class="btn-reset">
                             Đặt lại
                         </a>
                     @else
