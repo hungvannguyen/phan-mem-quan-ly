@@ -101,31 +101,31 @@ class StatisticsController extends Controller
         $labels = [];
         $data = [];
         $colors = [];
-        
+
         foreach ($statusCounts as $statusCount) {
             $statusValue = $statusCount->status instanceof DiplomaBlankStatus ? $statusCount->status->value : $statusCount->status;
-            
+
             $label = match ($statusValue) {
                 'InStock' => 'Trong kho',
-                'Issued' => 'Đã cấp', 
+                'Issued' => 'Đã cấp',
                 'Recalled' => 'Đã thu hồi',
                 'Damaged' => 'Hư hỏng',
                 'IN_STOCK' => 'Trong kho',  // Fallback for enum values
                 'ISSUED' => 'Đã cấp',
-                'RECALLED' => 'Đã thu hồi', 
+                'RECALLED' => 'Đã thu hồi',
                 'DAMAGED' => 'Hư hỏng',
                 default => $statusValue
             };
-            
+
             // Assign specific colors for each status
             $color = match ($label) {
                 'Trong kho' => '#10B981',     // Green
-                'Đã cấp' => '#3B82F6',       // Blue  
+                'Đã cấp' => '#3B82F6',       // Blue
                 'Đã thu hồi' => '#F59E0B',   // Yellow/Orange
                 'Hư hỏng' => '#EF4444',      // Red
                 default => '#6B7280'         // Gray
             };
-            
+
             $labels[] = $label;
             $data[] = $statusCount->count;
             $colors[] = $color;

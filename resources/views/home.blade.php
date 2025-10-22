@@ -647,11 +647,16 @@
 
         function updateStatsDisplay(stats) {
             // Update values - handle both nested (.value) and direct value formats
-            document.getElementById('total-blanks').textContent = (stats.total_blanks?.value || stats.total_blanks || 0).toLocaleString();
-            document.getElementById('available-blanks').textContent = (stats.available_blanks?.value || stats.available_blanks || 0).toLocaleString();
-            document.getElementById('issued-blanks').textContent = (stats.issued_blanks?.value || stats.issued_blanks || 0).toLocaleString();
-            document.getElementById('recalled-blanks').textContent = (stats.recalled_blanks?.value || stats.recalled_blanks || 0).toLocaleString();
-            document.getElementById('damaged-blanks').textContent = (stats.damaged_blanks?.value || stats.damaged_blanks || 0).toLocaleString();
+            document.getElementById('total-blanks').textContent = (stats.total_blanks?.value || stats.total_blanks || 0)
+                .toLocaleString();
+            document.getElementById('available-blanks').textContent = (stats.available_blanks?.value || stats
+                .available_blanks || 0).toLocaleString();
+            document.getElementById('issued-blanks').textContent = (stats.issued_blanks?.value || stats.issued_blanks || 0)
+                .toLocaleString();
+            document.getElementById('recalled-blanks').textContent = (stats.recalled_blanks?.value || stats
+                .recalled_blanks || 0).toLocaleString();
+            document.getElementById('damaged-blanks').textContent = (stats.damaged_blanks?.value || stats.damaged_blanks ||
+                0).toLocaleString();
 
             // Update growth indicators
             updateGrowthIndicator('total-blanks-growth', stats.total_blanks?.growth || "+0%");
