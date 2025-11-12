@@ -17,13 +17,14 @@ return new class extends Migration {
             $table->date('date_of_birth');
             $table->string('class_name', 50);
             $table->foreignId('major_id')->constrained('majors', 'major_id');
-            $table->timestamps();
             $table->string('place_of_birth');
             $table->tinyInteger('gender');
             $table->string('nation');
             $table->string('nationality');
             $table->string('number_in_the_book')->unique();
             $table->tinyInteger('status')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

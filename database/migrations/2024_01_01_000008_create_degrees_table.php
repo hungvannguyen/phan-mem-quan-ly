@@ -13,13 +13,21 @@ return new class extends Migration {
         Schema::create('degrees', function (Blueprint $table) {
             $table->id('degree_id');
             $table->foreignUlid('student_id')->constrained('students', 'student_id');
+            $table->enum('degree_type', ['bachelor', 'master', 'doctor', 'certificate'])
+                ->default('bachelor')
+                ->comment('Loại văn bằng: bachelor=Cử nhân, master=Thạc sĩ, doctor=Tiến sĩ, certificate=Chứng chỉ');
             $table->foreignId('diploma_blank_id')->unique()->constrained('diploma_blanks', 'diploma_blank_id');
             $table->string('registration_number', 50)->unique();
             $table->date('granting_date');
             $table->integer('graduation_year');
             $table->string('ranking', 50)->nullable();
             $table->string('decision_number', 50)->nullable();
+            $table->unsignedBigInteger('major_id')->nullable();
+            $table->foreign('major_id')->references('major_id')->on('majors')->onDelete('set null');
+            $table->string('major_name', 255)->nullable()->comment('Tên chuyên ngành');
+            $table->text('notes')->nullable()->comment('Ghi chú thêm');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
