@@ -17,7 +17,8 @@
             Quản lý văn bằng
         </a>
 
-        <a class="menu-item">
+        <a href="{{ route('user-management') }}"
+            class="menu-item {{ request()->routeIs('user-management') || request()->routeIs('user.*') ? 'active' : '' }}">
             Quản lý người dùng
         </a>
 

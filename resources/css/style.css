@@ -30,19 +30,6 @@
   @apply rounded bg-[var(--color-primary)] px-4 py-2 font-bold text-white hover:bg-[var(--color-primary-dark)] focus:outline-none;
 }
 
-.loading-overlay {
-  @apply absolute inset-0 flex h-full w-full items-center justify-center bg-[var(--color-bg-card)];
-}
-.loading-overlay td {
-  @apply border-none py-4 text-center;
-}
-.loading-overlay .spinner {
-  @apply inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--color-primary)] border-t-transparent align-middle;
-}
-.loading-overlay .loading-text {
-  @apply ml-2;
-}
-
 .modal {
   @apply fixed inset-0 z-10 overflow-y-auto;
 }

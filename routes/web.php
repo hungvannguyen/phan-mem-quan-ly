@@ -168,6 +168,35 @@ Route::get('/settings', function () {
     return view('settings');
 })->middleware('auth')->name('settings');
 
+// User Management Routes
+Route::get('/user-management', [App\Http\Controllers\UserController::class, 'index'])
+    ->middleware('auth')
+    ->name('user-management');
+
+Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])
+    ->middleware('auth')
+    ->name('user.create');
+
+Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])
+    ->middleware('auth')
+    ->name('user.store');
+
+Route::get('/users/{user:user_id}/edit', [App\Http\Controllers\UserController::class, 'edit'])
+    ->middleware('auth')
+    ->name('user.edit');
+
+Route::put('/users/{user:user_id}', [App\Http\Controllers\UserController::class, 'update'])
+    ->middleware('auth')
+    ->name('user.update');
+
+Route::delete('/users/{user:user_id}', [App\Http\Controllers\UserController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('user.destroy');
+
+Route::patch('/users/{user:user_id}/toggle-status', [App\Http\Controllers\UserController::class, 'toggleStatus'])
+    ->middleware('auth')
+    ->name('user.toggle-status');
+
 Route::get('/about', function () {
     return view('about');
 })->middleware('auth')->name('about');
