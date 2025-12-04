@@ -25,9 +25,10 @@
             Quản lý người dùng
         </a>
 
-        <a class="menu-item">
-            <i class="fas fa-cog"></i>
-            Cài đặt
+        <a href="{{ route('settings.index') }}"
+            class="menu-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+            <i class="fas fa-list-ul"></i>
+            Quản lý danh mục
         </a>
     </nav>
 

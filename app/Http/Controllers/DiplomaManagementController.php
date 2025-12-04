@@ -75,9 +75,9 @@ class DiplomaManagementController extends Controller
         }
 
         // Lọc theo loại văn bằng - chỉ khi có input
-        if ($request->filled('degree_type')) {
-            $query->whereHas('degrees', function ($q) use ($request) {
-                $q->where('degree_type', $request->degree_type);
+        if ($request->filled('diploma_blank_type_id')) {
+            $query->whereHas('degrees.diplomaBlank', function ($q) use ($request) {
+                $q->where('type_id', $request->diploma_blank_type_id);
             });
         }
 
@@ -87,6 +87,7 @@ class DiplomaManagementController extends Controller
 
         $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
         $majors = Major::orderBy('major_name')->get();
+        $diplomaBlankTypes = \App\Models\DiplomaBlankType::orderBy('type_name')->get();
 
         if ($request->ajax()) {
             return view('components.students.table', compact('students'))->render();
@@ -95,6 +96,7 @@ class DiplomaManagementController extends Controller
         return view('components.diplomas.management', [
             'students' => $students,
             'majors' => $majors,
+            'diplomaBlankTypes' => $diplomaBlankTypes,
         ]);
     }
 

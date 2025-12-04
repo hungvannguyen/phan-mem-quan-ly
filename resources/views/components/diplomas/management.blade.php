@@ -146,22 +146,17 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="degree_type" class="field-label">Loại văn bằng</label>
-                            <select id="degree_type" name="degree_type" class="field-select">
+                            <label for="diploma_blank_type_id" class="field-label">Loại văn bằng</label>
+                            <select id="diploma_blank_type_id" name="diploma_blank_type_id" class="field-select">
                                 <option value="">-- Tất cả loại văn bằng --</option>
-                                <option value="bachelor" {{ request('degree_type') == 'bachelor' ? 'selected' : '' }}>
-                                    Cử nhân
-                                </option>
-                                <option value="master" {{ request('degree_type') == 'master' ? 'selected' : '' }}>
-                                    Thạc sĩ
-                                </option>
-                                <option value="doctor" {{ request('degree_type') == 'doctor' ? 'selected' : '' }}>
-                                    Tiến sĩ
-                                </option>
-                                <option value="certificate"
-                                    {{ request('degree_type') == 'certificate' ? 'selected' : '' }}>
-                                    Chứng chỉ
-                                </option>
+                                @if (isset($diplomaBlankTypes))
+                                    @foreach ($diplomaBlankTypes as $type)
+                                        <option value="{{ $type->type_id }}"
+                                            {{ request('diploma_blank_type_id') == $type->type_id ? 'selected' : '' }}>
+                                            {{ $type->type_name }}
+                                        </option>
+                                    @endforeach
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -414,7 +409,7 @@
                 'class_name',
                 'date_of_birth',
                 'major_id',
-                'degree_type'
+                'diploma_blank_type_id'
             ];
 
             // Function to check if form has any data and is valid

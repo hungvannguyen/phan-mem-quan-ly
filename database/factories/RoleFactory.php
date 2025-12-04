@@ -54,4 +54,37 @@ class RoleFactory extends Factory
             'description' => 'Quản lý văn bằng và phôi văn bằng',
         ]);
     }
+
+    /**
+     * Create certificate manager role.
+     */
+    public function certificateManager(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'role_name' => 'CertificateManager',
+            'description' => 'Quản lý chứng chỉ',
+        ]);
+    }
+
+    /**
+     * Create student manager role.
+     */
+    public function studentManager(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'role_name' => 'StudentManager',
+            'description' => 'Quản lý sinh viên',
+        ]);
+    }
+
+    /**
+     * Create viewer role.
+     */
+    public function viewer(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'role_name' => 'Viewer',
+            'description' => 'Chỉ xem thông tin',
+        ]);
+    }
 }

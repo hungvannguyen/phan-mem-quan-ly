@@ -164,9 +164,52 @@ Route::get('/certificate-management', function () {
     return view('certificate-management');
 })->middleware('auth')->name('certificate-management');
 
-Route::get('/settings', function () {
-    return view('settings');
-})->middleware('auth')->name('settings');
+// Settings Routes
+Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'index'])
+    ->middleware('auth')
+    ->name('settings.index');
+
+// Diploma Blank Type Routes
+Route::get('/settings/types/create', [App\Http\Controllers\SettingsController::class, 'createType'])
+    ->middleware('auth')
+    ->name('settings.types.create');
+
+Route::post('/settings/types', [App\Http\Controllers\SettingsController::class, 'storeType'])
+    ->middleware('auth')
+    ->name('settings.types.store');
+
+Route::get('/settings/types/{type:type_id}/edit', [App\Http\Controllers\SettingsController::class, 'editType'])
+    ->middleware('auth')
+    ->name('settings.types.edit');
+
+Route::put('/settings/types/{type:type_id}', [App\Http\Controllers\SettingsController::class, 'updateType'])
+    ->middleware('auth')
+    ->name('settings.types.update');
+
+Route::delete('/settings/types/{type:type_id}', [App\Http\Controllers\SettingsController::class, 'destroyType'])
+    ->middleware('auth')
+    ->name('settings.types.destroy');
+
+// Major Routes
+Route::get('/settings/majors/create', [App\Http\Controllers\SettingsController::class, 'createMajor'])
+    ->middleware('auth')
+    ->name('settings.majors.create');
+
+Route::post('/settings/majors', [App\Http\Controllers\SettingsController::class, 'storeMajor'])
+    ->middleware('auth')
+    ->name('settings.majors.store');
+
+Route::get('/settings/majors/{major:major_id}/edit', [App\Http\Controllers\SettingsController::class, 'editMajor'])
+    ->middleware('auth')
+    ->name('settings.majors.edit');
+
+Route::put('/settings/majors/{major:major_id}', [App\Http\Controllers\SettingsController::class, 'updateMajor'])
+    ->middleware('auth')
+    ->name('settings.majors.update');
+
+Route::delete('/settings/majors/{major:major_id}', [App\Http\Controllers\SettingsController::class, 'destroyMajor'])
+    ->middleware('auth')
+    ->name('settings.majors.destroy');
 
 // User Management Routes
 Route::get('/user-management', [App\Http\Controllers\UserController::class, 'index'])

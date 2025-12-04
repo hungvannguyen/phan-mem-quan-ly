@@ -25,24 +25,123 @@ class DiplomaBlankTypeFactory extends Factory
     }
 
     /**
-     * Create university degree type.
+     * Bằng cử nhân
      */
-    public function university(): static
+    public function bachelor(): static
     {
         return $this->state(fn(array $attributes) => [
-            'type_name' => 'Bằng tốt nghiệp Đại học',
-            'prefix' => 'DH',
+            'type_name' => 'Bằng cử nhân',
+            'prefix' => 'CN',
         ]);
     }
 
     /**
-     * Create college degree type.
+     * Bằng kỹ sư
      */
-    public function college(): static
+    public function engineer(): static
     {
         return $this->state(fn(array $attributes) => [
-            'type_name' => 'Bằng tốt nghiệp Cao đẳng',
-            'prefix' => 'CD',
+            'type_name' => 'Bằng kỹ sư',
+            'prefix' => 'KS',
+        ]);
+    }
+
+    /**
+     * Bằng thạc sĩ
+     */
+    public function master(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Bằng thạc sĩ',
+            'prefix' => 'THS',
+        ]);
+    }
+
+    /**
+     * Bằng tiến sĩ
+     */
+    public function doctor(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Bằng tiến sĩ',
+            'prefix' => 'TS',
+        ]);
+    }
+
+    /**
+     * Bằng tốt nghiệp trung cấp lý luận chính trị
+     */
+    public function intermediatePolitical(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Bằng tốt nghiệp trung cấp lý luận chính trị',
+            'prefix' => 'TCLLCT',
+        ]);
+    }
+
+    /**
+     * Bằng tốt nghiệp cao cấp lý luận chính trị
+     */
+    public function advancedPolitical(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Bằng tốt nghiệp cao cấp lý luận chính trị',
+            'prefix' => 'CCLLCT',
+        ]);
+    }
+
+    /**
+     * Chứng chỉ nghiệp vụ 6 tháng
+     */
+    public function sixMonthCertificate(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Chứng chỉ nghiệp vụ 6 tháng',
+            'prefix' => 'CCNV6T',
+        ]);
+    }
+
+    /**
+     * Chứng chỉ tương đương trung cấp lý luận chính trị
+     */
+    public function equivalentIntermediatePolitical(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Chứng chỉ tương đương trung cấp lý luận chính trị',
+            'prefix' => 'CCTDTCLLCT',
+        ]);
+    }
+
+    /**
+     * Chứng chỉ QSVT 45 ngày
+     */
+    public function militaryCertificate(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Chứng chỉ QSVT 45 ngày',
+            'prefix' => 'CCQSVT',
+        ]);
+    }
+
+    /**
+     * Chứng chỉ bổ sung kiến thức
+     */
+    public function knowledgeSupplementCertificate(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Chứng chỉ bổ sung kiến thức',
+            'prefix' => 'CCBSKT',
+        ]);
+    }
+
+    /**
+     * Chứng chỉ bồi dưỡng khác
+     */
+    public function otherTrainingCertificate(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type_name' => 'Chứng chỉ bồi dưỡng khác',
+            'prefix' => 'CCBDK',
         ]);
     }
 }

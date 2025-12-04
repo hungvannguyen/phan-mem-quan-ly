@@ -22,23 +22,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles first
+        // 1. Create roles using factory
         $adminRole = Role::factory()->admin()->create();
         $diplomaManagerRole = Role::factory()->diplomaManager()->create();
-        Role::factory()->create([
-            'role_name' => 'CertificateManager',
-            'description' => 'Quản lý chứng chỉ',
-        ]);
-        Role::factory()->create([
-            'role_name' => 'StudentManager',
-            'description' => 'Quản lý sinh viên',
-        ]);
-        Role::factory()->create([
-            'role_name' => 'Viewer',
-            'description' => 'Chỉ xem thông tin',
-        ]);
+        $certificateManagerRole = Role::factory()->certificateManager()->create();
+        $studentManagerRole = Role::factory()->studentManager()->create();
+        $viewerRole = Role::factory()->viewer()->create();
 
-        // Create admin user
+        // 2. Create users using factory
         $adminUser = User::factory()->create([
             'username' => 'admin',
             'password' => bcrypt('password'),
@@ -48,7 +39,6 @@ class DatabaseSeeder extends Seeder
         ]);
         $adminUser->roles()->attach($adminRole->role_id);
 
-        // Create diploma manager user
         $diplomaUser = User::factory()->create([
             'username' => 'diploma_manager',
             'password' => bcrypt('password'),
@@ -60,117 +50,124 @@ class DatabaseSeeder extends Seeder
 
         // Create additional users
         User::factory(8)->create()->each(function ($user) use ($diplomaManagerRole) {
-            // Assign random roles to users
             $user->roles()->attach($diplomaManagerRole->role_id);
         });
 
-        // Create majors (replacing trainings)
+        // 3. Create majors using factory
         $majorData = [
-            ['major_name' => 'Công nghệ thông tin', 'major_code' => 'IT01'],
-            ['major_name' => 'Kế toán', 'major_code' => 'ACC01'],
-            ['major_name' => 'Quản trị kinh doanh', 'major_code' => 'BUS01'],
-            ['major_name' => 'Ngôn ngữ Anh', 'major_code' => 'ENG01'],
-            ['major_name' => 'Thiết kế đồ họa', 'major_code' => 'GD01'],
-            ['major_name' => 'Marketing', 'major_code' => 'MKT01'],
-            ['major_name' => 'Tài chính - Ngân hàng', 'major_code' => 'FIN01'],
-            ['major_name' => 'Luật kinh doanh', 'major_code' => 'LAW01'],
-            ['major_name' => 'Điều dưỡng', 'major_code' => 'NUR01'],
-            ['major_name' => 'Y học cổ truyền', 'major_code' => 'TCM01'],
+            ['Công nghệ thông tin', 'IT01'],
+            ['Kế toán', 'ACC01'],
+            ['Quản trị kinh doanh', 'BUS01'],
+            ['Ngôn ngữ Anh', 'ENG01'],
+            ['Thiết kế đồ họa', 'GD01'],
+            ['Marketing', 'MKT01'],
+            ['Tài chính - Ngân hàng', 'FIN01'],
+            ['Luật kinh doanh', 'LAW01'],
+            ['Điều dưỡng', 'NUR01'],
+            ['Y học cổ truyền', 'TCM01'],
         ];
 
         $majors = collect();
-        foreach ($majorData as $data) {
-            $major = Major::create($data);
+        foreach ($majorData as [$name, $code]) {
+            $major = Major::factory()->withName($name, $code)->create();
             $majors->push($major);
         }
 
-        // Create students with different statuses
+        // 4. Create diploma blank types using factory
+        // a) Các loại văn bằng
+        $bachelorType = DiplomaBlankType::factory()->bachelor()->create();
+        $engineerType = DiplomaBlankType::factory()->engineer()->create();
+        $masterType = DiplomaBlankType::factory()->master()->create();
+        $doctorType = DiplomaBlankType::factory()->doctor()->create();
+        $intermediatePoliticalType = DiplomaBlankType::factory()->intermediatePolitical()->create();
+        $advancedPoliticalType = DiplomaBlankType::factory()->advancedPolitical()->create();
+
+        // b) Các loại chứng chỉ
+        $sixMonthCertType = DiplomaBlankType::factory()->sixMonthCertificate()->create();
+        $equivalentIntermediatePoliticalType = DiplomaBlankType::factory()->equivalentIntermediatePolitical()->create();
+        $militaryCertType = DiplomaBlankType::factory()->militaryCertificate()->create();
+        $knowledgeSupplementCertType = DiplomaBlankType::factory()->knowledgeSupplementCertificate()->create();
+        $otherTrainingCertType = DiplomaBlankType::factory()->otherTrainingCertificate()->create();
+
+        $allTypes = collect([
+            $bachelorType,
+            $engineerType,
+            $masterType,
+            $doctorType,
+            $intermediatePoliticalType,
+            $advancedPoliticalType,
+            $sixMonthCertType,
+            $equivalentIntermediatePoliticalType,
+            $militaryCertType,
+            $knowledgeSupplementCertType,
+            $otherTrainingCertType
+        ]);
+
+        // 5. Create students with different statuses using factory
         $allStudents = collect();
 
-        // Create graduated students (30 students)
+        // Graduated students (30)
         $graduatedStudents = Student::factory(30)->create()->each(function ($student) use ($majors) {
             $student->update([
                 'major_id' => $majors->random()->major_id,
-                'status' => \App\Enums\StudentStatus::Graduate, // Đã tốt nghiệp
+                'status' => \App\Enums\StudentStatus::Graduate,
             ]);
         });
         $allStudents = $allStudents->merge($graduatedStudents);
 
-        // Create studying students (15 students)
+        // Studying students (15)
         $studyingStudents = Student::factory(15)->create()->each(function ($student) use ($majors) {
             $student->update([
                 'major_id' => $majors->random()->major_id,
-                'status' => \App\Enums\StudentStatus::Studying, // Đang học
+                'status' => \App\Enums\StudentStatus::Studying,
             ]);
         });
         $allStudents = $allStudents->merge($studyingStudents);
 
-        // Create dropout students (5 students)
+        // Dropout students (5)
         $dropoutStudents = Student::factory(5)->create()->each(function ($student) use ($majors) {
             $student->update([
                 'major_id' => $majors->random()->major_id,
-                'status' => \App\Enums\StudentStatus::DropOut, // Bỏ học
+                'status' => \App\Enums\StudentStatus::DropOut,
             ]);
         });
         $allStudents = $allStudents->merge($dropoutStudents);
 
-        // Create diploma blank types directly to avoid duplicates
-        $universityType = DiplomaBlankType::create([
-            'type_name' => 'Bằng tốt nghiệp Đại học',
-            'prefix' => 'DH',
-        ]);
-        $collegeType = DiplomaBlankType::create([
-            'type_name' => 'Bằng tốt nghiệp Cao đẳng',
-            'prefix' => 'CD',
-        ]);
-        $itCertType = DiplomaBlankType::create([
-            'type_name' => 'Chứng chỉ Tin học',
-            'prefix' => 'TH',
-        ]);
-        $langCertType = DiplomaBlankType::create([
-            'type_name' => 'Chứng chỉ Ngoại ngữ',
-            'prefix' => 'NN',
-        ]);
-
-        // Create diploma blanks
-        $diplomaBlanks = collect();
-
-        // Create available diploma blanks
+        // 6. Create diploma blanks using factory
+        // Available diploma blanks (100)
         $availableBlanks = DiplomaBlank::factory()
             ->count(100)
             ->available()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
+            ->each(function ($blank) use ($allTypes) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
+                    'type_id' => $allTypes->random()->type_id
                 ]);
             });
-        $diplomaBlanks = $diplomaBlanks->merge($availableBlanks);
 
-        // Create issued diploma blanks
+        // Issued diploma blanks (30)
         $issuedBlanks = DiplomaBlank::factory()
             ->count(30)
             ->issued()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
+            ->each(function ($blank) use ($allTypes) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
+                    'type_id' => $allTypes->random()->type_id
                 ]);
             });
-        $diplomaBlanks = $diplomaBlanks->merge($issuedBlanks);
 
-        // Create damaged diploma blanks
+        // Damaged diploma blanks (10)
         DiplomaBlank::factory()
             ->count(10)
             ->damaged()
             ->create()
-            ->each(function ($blank) use ($universityType, $collegeType, $itCertType, $langCertType) {
+            ->each(function ($blank) use ($allTypes) {
                 $blank->update([
-                    'type_id' => collect([$universityType->type_id, $collegeType->type_id, $itCertType->type_id, $langCertType->type_id])->random()
+                    'type_id' => $allTypes->random()->type_id
                 ]);
             });
 
-        // Create degrees only for graduated students using issued diploma blanks
+        // 7. Create degrees for graduated students using factory
         $graduatedStudentsOnly = Student::where('status', \App\Enums\StudentStatus::Graduate)->get();
         $issuedBlanks->each(function ($blank, $index) use ($graduatedStudentsOnly) {
             if ($index < $graduatedStudentsOnly->count()) {
@@ -179,12 +176,11 @@ class DatabaseSeeder extends Seeder
                     'diploma_blank_id' => $blank->diploma_blank_id,
                 ]);
 
-                // Update blank status to issued
                 $blank->update(['status' => DiplomaBlank::STATUS_ISSUED]);
             }
         });
 
-        // Create system settings
+        // 8. Create system settings using factory
         SystemSetting::factory()->schoolName('Trường Đại học ABC')->create();
         SystemSetting::factory()->address('123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh')->create();
         SystemSetting::factory()->phone('(028) 1234 5678')->create();
@@ -194,20 +190,42 @@ class DatabaseSeeder extends Seeder
             'setting_value' => 'https://abc.edu.vn',
         ]);
 
-        // Create damage reasons
-        DamageReason::factory()->withReason('Rách phôi', 'Phôi bị rách trong quá trình sử dụng')->create();
-        DamageReason::factory()->withReason('Ố vàng', 'Phôi bị ố vàng do bảo quản không tốt')->create();
-        DamageReason::factory()->withReason('Lỗi in ấn', 'Phôi có lỗi trong quá trình in ấn')->create();
-        DamageReason::factory()->withReason('Thủng lỗ', 'Phôi bị thủng lỗ')->create();
+        // 9. Create damage reasons using factory
+        $damageReasons = [
+            ['Rách phôi', 'Phôi bị rách trong quá trình sử dụng'],
+            ['Ố vàng', 'Phôi bị ố vàng do bảo quản không tốt'],
+            ['Lỗi in ấn', 'Phôi có lỗi trong quá trình in ấn'],
+            ['Thủng lỗ', 'Phôi bị thủng lỗ'],
+        ];
 
+        foreach ($damageReasons as [$name, $description]) {
+            DamageReason::factory()->withReason($name, $description)->create();
+        }
+
+        // Summary information
         $this->command->info('Database seeding completed successfully!');
-        $this->command->info('Admin user: admin / password');
-        $this->command->info('Diploma manager: diploma_manager / password');
         $this->command->info('');
-        $this->command->info('Students created:');
-        $this->command->info('- Graduated (có văn bằng): ' . $graduatedStudents->count());
-        $this->command->info('- Studying (chưa tốt nghiệp): ' . $studyingStudents->count());
-        $this->command->info('- Dropout (bỏ học): ' . $dropoutStudents->count());
-        $this->command->info('- Total degrees issued: ' . $graduatedStudentsOnly->count());
+        $this->command->info('=== User Accounts ===');
+        $this->command->info('Admin: admin / password');
+        $this->command->info('Diploma Manager: diploma_manager / password');
+        $this->command->info('');
+        $this->command->info('=== Students ===');
+        $this->command->info('- Graduated: ' . $graduatedStudents->count());
+        $this->command->info('- Studying: ' . $studyingStudents->count());
+        $this->command->info('- Dropout: ' . $dropoutStudents->count());
+        $this->command->info('- Total: ' . $allStudents->count());
+        $this->command->info('');
+        $this->command->info('=== Diploma Types ===');
+        $this->command->info('Văn bằng: 6 loại (Cử nhân, Kỹ sư, Thạc sĩ, Tiến sĩ, TC LLCT, CC LLCT)');
+        $this->command->info('Chứng chỉ: 5 loại (NV 6 tháng, TĐ TC LLCT, QSVT 45 ngày, BSKT, Bồi dưỡng khác)');
+        $this->command->info('');
+        $this->command->info('=== Diploma Blanks ===');
+        $this->command->info('- Available: 100');
+        $this->command->info('- Issued: 30');
+        $this->command->info('- Damaged: 10');
+        $this->command->info('- Total: 140');
+        $this->command->info('');
+        $this->command->info('=== Degrees Issued ===');
+        $this->command->info('Total degrees: ' . $graduatedStudentsOnly->count());
     }
 }

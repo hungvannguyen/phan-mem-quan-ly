@@ -2,7 +2,7 @@
     @apply mx-auto mb-[20px] container max-w-[1500px] overflow-hidden rounded-md border-[var(--color-border-light)] shadow-md;
 
     &-menu {
-        @apply grid w-full grid-cols-6 items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
+        @apply flex w-full items-center justify-between divide-x-[1px] divide-[var(--color-border-light)] bg-[var(--color-secondary)];
     }
 }
 
