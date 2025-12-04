@@ -30,6 +30,12 @@
                         <i class="fas fa-plus"></i>
                         Thêm người dùng mới
                     </a>
+                    @admin
+                        <a href="{{ route('permissions.index') }}" class="btn-secondary ms-2">
+                            <i class="fas fa-shield-alt"></i>
+                            Quản lý Permissions
+                        </a>
+                    @endadmin
                 </div>
             </div>
 

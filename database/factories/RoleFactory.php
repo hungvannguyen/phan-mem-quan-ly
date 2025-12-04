@@ -45,13 +45,24 @@ class RoleFactory extends Factory
     }
 
     /**
+     * Create diploma blank manager role.
+     */
+    public function diplomaBlankManager(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'role_name' => 'Quản lý phôi',
+            'description' => 'Quản lý phôi văn bằng',
+        ]);
+    }
+
+    /**
      * Create diploma manager role.
      */
     public function diplomaManager(): static
     {
         return $this->state(fn(array $attributes) => [
-            'role_name' => 'DiplomaManager',
-            'description' => 'Quản lý văn bằng và phôi văn bằng',
+            'role_name' => 'Quản lý văn bằng',
+            'description' => 'Quản lý văn bằng',
         ]);
     }
 
@@ -61,19 +72,8 @@ class RoleFactory extends Factory
     public function certificateManager(): static
     {
         return $this->state(fn(array $attributes) => [
-            'role_name' => 'CertificateManager',
+            'role_name' => 'Quản lý chứng chỉ',
             'description' => 'Quản lý chứng chỉ',
-        ]);
-    }
-
-    /**
-     * Create student manager role.
-     */
-    public function studentManager(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'role_name' => 'StudentManager',
-            'description' => 'Quản lý sinh viên',
         ]);
     }
 
@@ -83,8 +83,8 @@ class RoleFactory extends Factory
     public function viewer(): static
     {
         return $this->state(fn(array $attributes) => [
-            'role_name' => 'Viewer',
-            'description' => 'Chỉ xem thông tin',
+            'role_name' => 'Tra cứu',
+            'description' => 'Chỉ xem thông tin, tra cứu',
         ]);
     }
 }

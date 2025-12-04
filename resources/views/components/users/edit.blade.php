@@ -205,6 +205,102 @@
                 @endif
             </div>
 
+            <!-- Permission Assignment Section -->
+            @admin
+                <div class="section-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-shield-alt text-purple-600"></i>
+                        Phân quyền
+                    </h2>
+
+                    @if ($availablePermissions->isEmpty())
+                        <div class="alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>Chưa có quyền nào trong hệ thống. Vui lòng tạo quyền trước.</div>
+                        </div>
+                    @else
+                        <div class="mb-4">
+                            <div class="mb-3 flex items-center justify-between">
+                                <div class="text-sm text-gray-600">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                    Đã chọn: <strong id="selected-count">{{ $user->permissions->count() }}</strong> /
+                                    {{ $availablePermissions->count() }} quyền
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="selectAllPermissions()"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-check-double"></i> Chọn tất cả
+                                    </button>
+                                    <button type="button" onclick="clearAllPermissions()"
+                                        class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-times"></i> Bỏ chọn tất cả
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        @php
+                            $groupedPermissions = $availablePermissions->groupBy('category');
+                        @endphp
+
+                        @foreach ($groupedPermissions as $category => $permissions)
+                            <div class="permission-category mb-4">
+                                <div
+                                    class="mb-2 flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3">
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" id="category-{{ Str::slug($category) }}"
+                                            class="category-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            onchange="toggleCategory('{{ Str::slug($category) }}')">
+                                        <label for="category-{{ Str::slug($category) }}"
+                                            class="cursor-pointer font-semibold text-gray-800">
+                                            {{ ucfirst($category) }}
+                                        </label>
+                                        <span class="text-xs text-gray-500">({{ $permissions->count() }} quyền)</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down toggle-icon cursor-pointer text-gray-400"
+                                        onclick="toggleCategoryCollapse('{{ Str::slug($category) }}')"></i>
+                                </div>
+
+                                <div class="permission-list category-permissions grid grid-cols-1 gap-3 pl-4 md:grid-cols-2"
+                                    id="permissions-{{ Str::slug($category) }}">
+                                    @foreach ($permissions as $permission)
+                                        <div class="permission-item flex items-start gap-2 rounded p-2 hover:bg-gray-50">
+                                            <input type="checkbox" name="permissions[]"
+                                                value="{{ $permission->permission_id }}"
+                                                id="permission-{{ $permission->permission_id }}"
+                                                class="permission-checkbox mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                                                data-category="{{ Str::slug($category) }}"
+                                                {{ $user->permissions->contains($permission->permission_id) ? 'checked' : '' }}
+                                                onchange="updateSelectedCount()">
+                                            <label for="permission-{{ $permission->permission_id }}"
+                                                class="flex-1 cursor-pointer">
+                                                <div class="text-sm font-medium text-gray-800">{{ $permission->display_name }}
+                                                </div>
+                                                <div class="text-xs text-gray-500">
+                                                    <code class="rounded bg-gray-100 px-1">{{ $permission->name }}</code>
+                                                </div>
+                                                @if ($permission->description)
+                                                    <div class="mt-1 text-xs text-gray-600">{{ $permission->description }}
+                                                    </div>
+                                                @endif
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+
+                        <div class="alert-info mt-4">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Lưu ý:</strong> Các quyền được gán trực tiếp cho người dùng này.
+                                Người dùng có thể có thêm quyền từ vai trò (role) của họ.
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endadmin
+
             <!-- Password Section -->
             <div class="section-card">
                 <h2 class="section-title">
@@ -316,8 +412,69 @@
             }
         }
 
+        // Permission management functions
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.permission-checkbox:checked');
+            document.getElementById('selected-count').textContent = checkedBoxes.length;
+
+            // Update category checkbox states
+            document.querySelectorAll('.category-checkbox').forEach(categoryCheckbox => {
+                const categorySlug = categoryCheckbox.id.replace('category-', '');
+                const categoryPermissions = document.querySelectorAll(
+                    `.permission-checkbox[data-category="${categorySlug}"]`);
+                const checkedInCategory = Array.from(categoryPermissions).filter(cb => cb.checked).length;
+
+                categoryCheckbox.checked = checkedInCategory === categoryPermissions.length;
+                categoryCheckbox.indeterminate = checkedInCategory > 0 && checkedInCategory < categoryPermissions
+                    .length;
+            });
+        }
+
+        function selectAllPermissions() {
+            document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateSelectedCount();
+        }
+
+        function clearAllPermissions() {
+            document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateSelectedCount();
+        }
+
+        function toggleCategory(categorySlug) {
+            const categoryCheckbox = document.getElementById(`category-${categorySlug}`);
+            const categoryPermissions = document.querySelectorAll(`.permission-checkbox[data-category="${categorySlug}"]`);
+
+            categoryPermissions.forEach(checkbox => {
+                checkbox.checked = categoryCheckbox.checked;
+            });
+
+            updateSelectedCount();
+        }
+
+        function toggleCategoryCollapse(categorySlug) {
+            const permissionList = document.getElementById(`permissions-${categorySlug}`);
+            const icon = event.target;
+
+            if (permissionList.style.display === 'none') {
+                permissionList.style.display = 'grid';
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                permissionList.style.display = 'none';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-right');
+            }
+        }
+
         // Form validation
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize category checkbox states
+            updateSelectedCount();
+
             const form = document.querySelector('form');
             const requiredFields = form.querySelectorAll('input[required]');
             const password = document.getElementById('password');

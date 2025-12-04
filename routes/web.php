@@ -240,6 +240,31 @@ Route::patch('/users/{user:user_id}/toggle-status', [App\Http\Controllers\UserCo
     ->middleware('auth')
     ->name('user.toggle-status');
 
+// Permission Management Routes (Admin Only)
+Route::get('/permissions', [App\Http\Controllers\PermissionController::class, 'index'])
+    ->middleware('auth')
+    ->name('permissions.index');
+
+Route::get('/permissions/create', [App\Http\Controllers\PermissionController::class, 'create'])
+    ->middleware('auth')
+    ->name('permissions.create');
+
+Route::post('/permissions', [App\Http\Controllers\PermissionController::class, 'store'])
+    ->middleware('auth')
+    ->name('permissions.store');
+
+Route::get('/permissions/{permission:permission_id}/edit', [App\Http\Controllers\PermissionController::class, 'edit'])
+    ->middleware('auth')
+    ->name('permissions.edit');
+
+Route::put('/permissions/{permission:permission_id}', [App\Http\Controllers\PermissionController::class, 'update'])
+    ->middleware('auth')
+    ->name('permissions.update');
+
+Route::delete('/permissions/{permission:permission_id}', [App\Http\Controllers\PermissionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('permissions.destroy');
+
 Route::get('/about', function () {
     return view('about');
 })->middleware('auth')->name('about');

@@ -91,7 +91,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('components.users.edit', compact('user'));
+        // Load all available permissions
+        $availablePermissions = \App\Models\Permission::orderBy('category')->orderBy('name')->get();
+
+        return view('components.users.edit', compact('user', 'availablePermissions'));
     }
 
     /**
@@ -114,6 +117,8 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->user_id, 'user_id'),
             ],
             'password' => 'nullable|string|min:6|confirmed',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,permission_id',
         ], [
             'username.required' => 'Tên đăng nhập là bắt buộc',
             'username.unique' => 'Tên đăng nhập đã tồn tại',
@@ -135,7 +140,16 @@ class UserController extends Controller
         // Set is_active based on checkbox
         $validated['is_active'] = $request->has('is_active');
 
+        // Remove permissions from validated array before update
+        $permissions = $validated['permissions'] ?? [];
+        unset($validated['permissions']);
+
         $user->update($validated);
+
+        // Sync permissions if current user is admin
+        if (Auth::user()->isAdmin()) {
+            $user->permissions()->sync($permissions);
+        }
 
         return redirect()->route('user.edit', $user->user_id)
             ->with('success', 'Cập nhật thông tin người dùng thành công!');

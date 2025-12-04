@@ -46,4 +46,23 @@ class Role extends Model
     {
         return $this->belongsToMany(User::class, 'user_roles', 'role_id', 'user_id');
     }
+
+    /**
+     * Get the permissions assigned to this role.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
+    }
+
+    /**
+     * Check if the role has a specific permission.
+     *
+     * @param string $permissionName
+     * @return bool
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        return $this->permissions()->where('name', $permissionName)->exists();
+    }
 }

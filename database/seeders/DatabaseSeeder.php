@@ -24,12 +24,15 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Create roles using factory
         $adminRole = Role::factory()->admin()->create();
+        $diplomaBlankManagerRole = Role::factory()->diplomaBlankManager()->create();
         $diplomaManagerRole = Role::factory()->diplomaManager()->create();
         $certificateManagerRole = Role::factory()->certificateManager()->create();
-        $studentManagerRole = Role::factory()->studentManager()->create();
         $viewerRole = Role::factory()->viewer()->create();
 
-        // 2. Create users using factory
+        // 2. Seed permissions and assign to roles
+        $this->call(PermissionSeeder::class);
+
+        // 3. Create users using factory
         $adminUser = User::factory()->create([
             'username' => 'admin',
             'password' => bcrypt('password'),
@@ -53,7 +56,7 @@ class DatabaseSeeder extends Seeder
             $user->roles()->attach($diplomaManagerRole->role_id);
         });
 
-        // 3. Create majors using factory
+        // 4. Create majors using factory
         $majorData = [
             ['Công nghệ thông tin', 'IT01'],
             ['Kế toán', 'ACC01'],
@@ -73,7 +76,7 @@ class DatabaseSeeder extends Seeder
             $majors->push($major);
         }
 
-        // 4. Create diploma blank types using factory
+        // 5. Create diploma blank types using factory
         // a) Các loại văn bằng
         $bachelorType = DiplomaBlankType::factory()->bachelor()->create();
         $engineerType = DiplomaBlankType::factory()->engineer()->create();
@@ -103,7 +106,7 @@ class DatabaseSeeder extends Seeder
             $otherTrainingCertType
         ]);
 
-        // 5. Create students with different statuses using factory
+        // 6. Create students with different statuses using factory
         $allStudents = collect();
 
         // Graduated students (30)
@@ -133,7 +136,7 @@ class DatabaseSeeder extends Seeder
         });
         $allStudents = $allStudents->merge($dropoutStudents);
 
-        // 6. Create diploma blanks using factory
+        // 7. Create diploma blanks using factory
         // Available diploma blanks (100)
         $availableBlanks = DiplomaBlank::factory()
             ->count(100)
@@ -167,7 +170,7 @@ class DatabaseSeeder extends Seeder
                 ]);
             });
 
-        // 7. Create degrees for graduated students using factory
+        // 8. Create degrees for graduated students using factory
         $graduatedStudentsOnly = Student::where('status', \App\Enums\StudentStatus::Graduate)->get();
         $issuedBlanks->each(function ($blank, $index) use ($graduatedStudentsOnly) {
             if ($index < $graduatedStudentsOnly->count()) {
@@ -180,7 +183,7 @@ class DatabaseSeeder extends Seeder
             }
         });
 
-        // 8. Create system settings using factory
+        // 9. Create system settings using factory
         SystemSetting::factory()->schoolName('Trường Đại học ABC')->create();
         SystemSetting::factory()->address('123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh')->create();
         SystemSetting::factory()->phone('(028) 1234 5678')->create();
@@ -190,7 +193,7 @@ class DatabaseSeeder extends Seeder
             'setting_value' => 'https://abc.edu.vn',
         ]);
 
-        // 9. Create damage reasons using factory
+        // 10. Create damage reasons using factory
         $damageReasons = [
             ['Rách phôi', 'Phôi bị rách trong quá trình sử dụng'],
             ['Ố vàng', 'Phôi bị ố vàng do bảo quản không tốt'],

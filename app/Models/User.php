@@ -78,6 +78,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the permissions directly assigned to the user.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id');
+    }
+
+    /**
      * Check if user has a specific role.
      */
     public function hasRole(string $roleName): bool
@@ -91,5 +99,45 @@ class User extends Authenticatable
     public function hasAnyRole(array $roles): bool
     {
         return $this->roles()->whereIn('role_name', $roles)->exists();
+    }
+
+    /**
+     * Check if user has a specific permission (from roles or direct assignment).
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        // Check direct permissions
+        if ($this->permissions()->where('name', $permissionName)->exists()) {
+            return true;
+        }
+
+        // Check permissions through roles
+        foreach ($this->roles as $role) {
+            if ($role->hasPermission($permissionName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all permissions for this user (both from roles and direct assignment).
+     */
+    public function allPermissions()
+    {
+        $directPermissions = $this->permissions;
+        $rolePermissions = Permission::whereHas('roles', function ($query) {
+            $query->whereIn('role_id', $this->roles->pluck('role_id'));
+        })->get();
+
+        return $directPermissions->merge($rolePermissions)->unique('permission_id');
+    }
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('Admin');
     }
 }
