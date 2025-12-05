@@ -51,30 +51,40 @@
                         </td>
                         <td class="td">
                             <div class="action-buttons">
-                                <a href="{{ route('user.edit', $user->user_id) }}" class="btn-action btn-view"
-                                    title="Chỉnh sửa thông tin người dùng">
-                                    Sửa
-                                </a>
+                                @if (auth()->user()->hasPermission('users.edit'))
+                                    <a href="{{ route('user.edit', $user->user_id) }}" class="btn-action btn-view"
+                                        title="Chỉnh sửa thông tin người dùng">
+                                        Sửa
+                                    </a>
+                                @endif
 
                                 @if (Auth::id() !== $user->user_id)
-                                    <form action="{{ route('user.toggle-status', $user->user_id) }}" method="POST"
-                                        class="inline-block">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit"
-                                            class="btn-action {{ $user->is_active ? 'btn-pause' : 'btn-start' }}"
-                                            title="{{ $user->is_active ? 'Vô hiệu hóa' : 'Kích hoạt' }}">
-                                            {{ $user->is_active ? 'Vô hiệu hóa' : 'Kích hoạt' }}
-                                        </button>
-                                    </form>
+                                    @if (auth()->user()->hasPermission('users.edit'))
+                                        <form action="{{ route('user.toggle-status', $user->user_id) }}" method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="btn-action {{ $user->is_active ? 'btn-pause' : 'btn-start' }}"
+                                                title="{{ $user->is_active ? 'Vô hiệu hóa' : 'Kích hoạt' }}">
+                                                {{ $user->is_active ? 'Vô hiệu hóa' : 'Kích hoạt' }}
+                                            </button>
+                                        </form>
+                                    @endif
 
-                                    <button class="btn-action btn-delete"
-                                        onclick="confirmDeleteUser('{{ $user->user_id }}', '{{ $user->username }}')"
-                                        title="Xóa người dùng">
-                                        Xóa
-                                    </button>
+                                    @if (auth()->user()->hasPermission('users.delete'))
+                                        <button class="btn-action btn-delete"
+                                            onclick="confirmDeleteUser('{{ $user->user_id }}', '{{ $user->username }}')"
+                                            title="Xóa người dùng">
+                                            Xóa
+                                        </button>
+                                    @endif
                                 @else
                                     <span class="text-muted text-sm">(Bạn)</span>
+                                @endif
+
+                                @if (!auth()->user()->hasPermission('users.edit') && !auth()->user()->hasPermission('users.delete'))
+                                    <span class="text-muted text-sm">Chỉ xem</span>
                                 @endif
                             </div>
                         </td>
@@ -88,9 +98,12 @@
                                 </div>
                                 <h3 class="empty-title">Không có dữ liệu</h3>
                                 <p class="empty-message">Không tìm thấy người dùng nào phù hợp với bộ lọc hiện tại.</p>
-                                <div class="empty-actions">
-                                    <a href="{{ route('user.create') }}" class="btn-secondary">Thêm người dùng mới</a>
-                                </div>
+                                @if (auth()->user()->hasPermission('users.create'))
+                                    <div class="empty-actions">
+                                        <a href="{{ route('user.create') }}" class="btn-secondary">Thêm người dùng
+                                            mới</a>
+                                    </div>
+                                @endif
                             </div>
                         </td>
                     </tr>

@@ -31,21 +31,25 @@
                         </td>
                         <td class="td">
                             <div class="action-buttons">
-                                <a href="{{ route('settings.majors.edit', $major->major_id) }}"
-                                    class="btn-action btn-view" title="Chỉnh sửa">
-                                    Sửa
-                                </a>
+                                @if (auth()->user()->hasPermission('settings.edit'))
+                                    <a href="{{ route('settings.majors.edit', $major->major_id) }}"
+                                        class="btn-action btn-view" title="Chỉnh sửa">
+                                        Sửa
+                                    </a>
 
-                                <form action="{{ route('settings.majors.destroy', $major->major_id) }}" method="POST"
-                                    class="d-inline"
-                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa ngành đào tạo này không?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete" title="Xóa"
-                                        {{ $major->students()->count() > 0 ? 'disabled' : '' }}>
-                                        Xóa
-                                    </button>
-                                </form>
+                                    <form action="{{ route('settings.majors.destroy', $major->major_id) }}"
+                                        method="POST" class="d-inline"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa ngành đào tạo này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-action btn-delete" title="Xóa"
+                                            {{ $major->students()->count() > 0 ? 'disabled' : '' }}>
+                                            Xóa
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-muted text-sm">Chỉ xem</span>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -58,12 +62,14 @@
                                 </div>
                                 <h3 class="empty-title">Không có dữ liệu</h3>
                                 <p class="empty-message">Hệ thống chưa có ngành đào tạo nào được thiết lập.</p>
-                                <div class="empty-actions">
-                                    <a href="{{ route('settings.majors.create') }}" class="btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Thêm ngành mới
-                                    </a>
-                                </div>
+                                @if (auth()->user()->hasPermission('settings.edit'))
+                                    <div class="empty-actions">
+                                        <a href="{{ route('settings.majors.create') }}" class="btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                            Thêm ngành mới
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </td>
                     </tr>

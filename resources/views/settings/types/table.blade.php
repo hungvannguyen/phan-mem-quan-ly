@@ -31,21 +31,25 @@
                         </td>
                         <td class="td">
                             <div class="action-buttons">
-                                <a href="{{ route('settings.types.edit', $type->type_id) }}" class="btn-action btn-view"
-                                    title="Chỉnh sửa">
-                                    Sửa
-                                </a>
+                                @if (auth()->user()->hasPermission('settings.edit'))
+                                    <a href="{{ route('settings.types.edit', $type->type_id) }}"
+                                        class="btn-action btn-view" title="Chỉnh sửa">
+                                        Sửa
+                                    </a>
 
-                                <form action="{{ route('settings.types.destroy', $type->type_id) }}" method="POST"
-                                    class="d-inline"
-                                    onsubmit="return confirm('Bạn có chắc chắn muốn xóa loại văn bằng này không?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-action btn-delete" title="Xóa"
-                                        {{ $type->diplomaBlanks()->count() > 0 ? 'disabled' : '' }}>
-                                        Xóa
-                                    </button>
-                                </form>
+                                    <form action="{{ route('settings.types.destroy', $type->type_id) }}" method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa loại văn bằng này không?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-action btn-delete" title="Xóa"
+                                            {{ $type->diplomaBlanks()->count() > 0 ? 'disabled' : '' }}>
+                                            Xóa
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-muted text-sm">Chỉ xem</span>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -59,12 +63,14 @@
                                 <h3 class="empty-title">Không có dữ liệu</h3>
                                 <p class="empty-message">Hệ thống chưa có loại văn bằng hoặc chứng chỉ nào được thiết
                                     lập.</p>
-                                <div class="empty-actions">
-                                    <a href="{{ route('settings.types.create') }}" class="btn-primary">
-                                        <i class="fas fa-plus"></i>
-                                        Thêm loại mới
-                                    </a>
-                                </div>
+                                @if (auth()->user()->hasPermission('settings.edit'))
+                                    <div class="empty-actions">
+                                        <a href="{{ route('settings.types.create') }}" class="btn-primary">
+                                            <i class="fas fa-plus"></i>
+                                            Thêm loại mới
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </td>
                     </tr>

@@ -26,16 +26,18 @@
                     </p>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('user.create') }}" class="btn-primary">
-                        <i class="fas fa-plus"></i>
-                        Thêm người dùng mới
-                    </a>
-                    @admin
+                    @if (auth()->user()->hasPermission('users.create'))
+                        <a href="{{ route('user.create') }}" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Thêm người dùng mới
+                        </a>
+                    @endif
+                    @if (auth()->user()->hasPermission('users.edit'))
                         <a href="{{ route('permissions.index') }}" class="btn-secondary ms-2">
                             <i class="fas fa-shield-alt"></i>
                             Quản lý Permissions
                         </a>
-                    @endadmin
+                    @endif
                 </div>
             </div>
 

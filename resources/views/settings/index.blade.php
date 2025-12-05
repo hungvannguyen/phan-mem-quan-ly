@@ -38,12 +38,14 @@
                             </h2>
                             <p>Quản lý các loại văn bằng và chứng chỉ trong hệ thống</p>
                         </div>
-                        <div class="section-actions">
-                            <a href="{{ route('settings.types.create') }}" class="btn-primary">
-                                <i class="fas fa-plus"></i>
-                                Thêm loại mới
-                            </a>
-                        </div>
+                        @if (auth()->user()->hasPermission('settings.edit'))
+                            <div class="section-actions">
+                                <a href="{{ route('settings.types.create') }}" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm loại mới
+                                </a>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Statistics Cards -->
@@ -187,12 +189,14 @@
                             </h2>
                             <p>Quản lý các ngành đào tạo trong hệ thống</p>
                         </div>
-                        <div class="section-actions">
-                            <a href="{{ route('settings.majors.create') }}" class="btn-primary">
-                                <i class="fas fa-plus"></i>
-                                Thêm ngành mới
-                            </a>
-                        </div>
+                        @if (auth()->user()->hasPermission('settings.edit'))
+                            <div class="section-actions">
+                                <a href="{{ route('settings.majors.create') }}" class="btn-primary">
+                                    <i class="fas fa-plus"></i>
+                                    Thêm ngành mới
+                                </a>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Statistics Cards -->
