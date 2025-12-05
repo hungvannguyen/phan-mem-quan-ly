@@ -3,7 +3,6 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th class="th">Tên đăng nhập</th>
                     <th class="th">Họ và tên</th>
                     <th class="th">Email</th>
                     <th class="th">Trạng thái</th>
@@ -20,11 +19,6 @@
                 </tr>
                 @forelse($users as $index => $user)
                     <tr class="table-row" data-user-id="{{ $user->user_id }}" onclick="toggleRowHighlight(this)">
-                        <td class="td">
-                            <div class="user-info">
-                                <span class="user-username font-semibold">{{ $user->username }}</span>
-                            </div>
-                        </td>
                         <td class="td">
                             <span class="user-name">{{ $user->full_name }}</span>
                         </td>
