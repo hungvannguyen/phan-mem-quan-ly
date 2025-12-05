@@ -340,6 +340,27 @@ Route::post(
     [StatisticsController::class, 'export']
 )->middleware(['auth', 'permission:diplomas.export'])->name('statistics.export');
 
+// New statistics routes
+Route::get(
+    '/statistics/page',
+    [StatisticsController::class, 'statisticsPage']
+)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.page');
+
+Route::get(
+    '/statistics/diplomas',
+    [StatisticsController::class, 'getDiplomaStatistics']
+)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.diplomas');
+
+Route::get(
+    '/statistics/certificates',
+    [StatisticsController::class, 'getCertificateStatistics']
+)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.certificates');
+
+Route::get(
+    '/statistics/export-report',
+    [StatisticsController::class, 'exportStatistics']
+)->middleware(['auth', 'permission:diplomas.export'])->name('statistics.export-report');
+
 // Diploma Blank Recall routes
 Route::get(
     '/diploma-blank-recalls',
@@ -365,6 +386,19 @@ Route::get(
     '/diploma-blank-recalls/statistics',
     [App\Http\Controllers\DiplomaBlankRecallController::class, 'statistics']
 )->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-recalls.statistics');
+
+// Profile routes
+Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])
+    ->middleware('auth')
+    ->name('profile.show');
+
+Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'updateProfile'])
+    ->middleware('auth')
+    ->name('profile.update');
+
+Route::patch('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
+    ->middleware('auth')
+    ->name('profile.password');
 
 // Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])

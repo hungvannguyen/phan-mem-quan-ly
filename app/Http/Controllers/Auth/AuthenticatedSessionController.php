@@ -25,18 +25,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        $login = $request->validated()['login'];
+        $email = $request->validated()['email'];
         $password = $request->validated()['password'];
 
-        // Try to find user by username first, then by email
-        $user = User::where('username', $login)
-            ->orWhere('email', $login)
+        // Find user by email
+        $user = User::where('email', $email)
             ->where('is_active', true)
             ->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
-                'login' => 'Thông tin đăng nhập không chính xác.',
+                'email' => 'Thông tin đăng nhập không chính xác.',
             ]);
         }
 

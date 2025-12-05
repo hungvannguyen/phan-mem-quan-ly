@@ -79,6 +79,49 @@
                         </div>
 
                         <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="major">Ngành</label>
+                                <select id="major" name="major" class="form-select">
+                                    <option value="">Tất cả ngành</option>
+                                    @foreach ($majors as $major)
+                                        <option value="{{ $major->major_id }}">{{ $major->major_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="gender">Giới tính</label>
+                                <select id="gender" name="gender" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="ranking">Xếp loại tốt nghiệp</label>
+                                <select id="ranking" name="ranking" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Xuất sắc">Xuất sắc</option>
+                                    <option value="Giỏi">Giỏi</option>
+                                    <option value="Khá">Khá</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="training_type">Hình thức đào tạo</label>
+                                <select id="training_type" name="training_type" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Chính quy">Chính quy</option>
+                                    <option value="Liên thông">Liên thông</option>
+                                    <option value="Từ xa">Từ xa</option>
+                                    <option value="Vừa làm vừa học">Vừa làm vừa học</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filter-row">
                             <div class="filter-group filter-actions">
                                 <button type="button" class="btn btn-primary" onclick="applyDiplomaFilters()">
                                     <i class="fas fa-search"></i>
@@ -103,6 +146,16 @@
 
                     <form id="certificateFilters" class="filter-form">
                         <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="certificate_type">Loại chứng chỉ</label>
+                                <select id="certificate_type" name="certificate_type" class="form-select">
+                                    <option value="">Tất cả loại</option>
+                                    <option value="Chứng chỉ ngoại ngữ">Chứng chỉ ngoại ngữ</option>
+                                    <option value="Chứng chỉ tin học">Chứng chỉ tin học</option>
+                                    <option value="Chứng chỉ nghề">Chứng chỉ nghề</option>
+                                    <option value="Chứng chỉ khác">Chứng chỉ khác</option>
+                                </select>
+                            </div>
 
                             <div class="filter-group">
                                 <label for="cert_start_date">Từ ngày</label>
@@ -293,8 +346,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="5" class="text-center text-gray-500">Vui lòng chọn bộ lọc và nhấn
-                                        "Thống kê"</td>
+                                    <td colspan="5" class="text-center text-gray-500">Vui lòng chọn bộ lọc và nhấn "Thống kê"</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -326,6 +378,49 @@
                     </div>
                 </div>
 
+                <!-- Certificate Stats Cards -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Chứng chỉ ngoại ngữ</h3>
+                            <div class="stat-value" id="language-certs">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Chứng chỉ tin học</h3>
+                            <div class="stat-value" id="it-certs">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Chứng chỉ nghề</h3>
+                            <div class="stat-value" id="vocational-certs">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Tổng chứng chỉ</h3>
+                            <div class="stat-value" id="total-certificates">0</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Detailed Table -->
                 <div class="chart-card full-width" style="margin-top: 25px;">
                     <div class="chart-header">
@@ -343,8 +438,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="4" class="text-center text-gray-500">Vui lòng chọn bộ lọc và nhấn
-                                        "Thống kê"</td>
+                                    <td colspan="4" class="text-center text-gray-500">Vui lòng chọn bộ lọc và nhấn "Thống kê"</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -516,29 +610,16 @@
         .data-table thead th {
             background: #f9fafb;
             padding: 12px 16px;
-            text-align: center;
+            text-align: left;
             font-weight: 600;
             color: #374151;
             border-bottom: 2px solid #e5e7eb;
-            white-space: nowrap;
-        }
-
-        .data-table thead th:nth-child(2),
-        .data-table thead th:nth-child(3) {
-            text-align: left;
         }
 
         .data-table tbody td {
             padding: 12px 16px;
             border-bottom: 1px solid #e5e7eb;
             color: #6b7280;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .data-table tbody td:nth-child(2),
-        .data-table tbody td:nth-child(3) {
-            text-align: left;
         }
 
         .data-table tbody tr:hover {
@@ -944,11 +1025,11 @@
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabType = this.dataset.tab;
-
+                    
                     // Remove active class from all tabs
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
+                    
                     // Add active class to clicked tab
                     this.classList.add('active');
                     document.getElementById(tabType + '-tab').classList.add('active');
@@ -972,49 +1053,11 @@
                     recalled_growth: "{{ $generalStatistics['recalled_growth'] }}"
                 });
 
-                // Load default diploma statistics (without filters)
-                await loadDefaultDiplomaStatistics();
-
-                // Load default certificate statistics (without filters)
-                await loadDefaultCertificateStatistics();
-
                 hideLoading();
             } catch (error) {
                 console.error('Error loading initial data:', error);
                 hideLoading();
                 alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng làm mới trang.');
-            }
-        }
-
-        // Load default diploma statistics without filters
-        async function loadDefaultDiplomaStatistics() {
-            try {
-                const response = await fetch('/statistics/diplomas');
-                const data = await response.json();
-
-                // Update charts
-                updateDiplomaCharts(data);
-
-                // Update table
-                updateDiplomaTable(data.details || []);
-            } catch (error) {
-                console.error('Error loading default diploma statistics:', error);
-            }
-        }
-
-        // Load default certificate statistics without filters
-        async function loadDefaultCertificateStatistics() {
-            try {
-                const response = await fetch('/statistics/certificates');
-                const data = await response.json();
-
-                // Update charts
-                updateCertificateCharts(data);
-
-                // Update table
-                updateCertificateTable(data.details || []);
-            } catch (error) {
-                console.error('Error loading default certificate statistics:', error);
             }
         }
 
@@ -1104,6 +1147,12 @@
                 const response = await fetch(`/statistics/certificates?${params}`);
                 const data = await response.json();
 
+                // Update stats cards
+                document.getElementById('total-certificates').textContent = data.total || 0;
+                document.getElementById('language-certs').textContent = data.language_count || 0;
+                document.getElementById('it-certs').textContent = data.it_count || 0;
+                document.getElementById('vocational-certs').textContent = data.vocational_count || 0;
+
                 // Update charts
                 updateCertificateCharts(data);
 
@@ -1127,9 +1176,7 @@
                     labels: data.by_type?.labels || [],
                     datasets: [{
                         data: data.by_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
                     }]
                 }
             });
@@ -1141,9 +1188,7 @@
                     labels: ['Nam', 'Nữ'],
                     datasets: [{
                         data: [data.male_count || 0, data.female_count || 0],
-                        backgroundColor: ['#3B82F6', '#EC4899'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        backgroundColor: ['#3B82F6', '#EC4899']
                     }]
                 }
             });
@@ -1156,21 +1201,8 @@
                     datasets: [{
                         label: 'Số lượng',
                         data: data.by_ranking?.values || [],
-                        backgroundColor: '#10B981',
-                        borderRadius: 6
+                        backgroundColor: '#10B981'
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
                 }
             });
 
@@ -1182,22 +1214,13 @@
                     datasets: [{
                         label: 'Số lượng',
                         data: data.by_major?.values || [],
-                        backgroundColor: '#8B5CF6',
-                        borderRadius: 6
+                        backgroundColor: '#8B5CF6'
                     }]
                 },
                 options: {
                     indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
@@ -1210,23 +1233,10 @@
                         label: 'Số lượng',
                         data: data.by_year?.values || [],
                         borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
                 }
             });
 
@@ -1237,9 +1247,7 @@
                     labels: data.by_training_type?.labels || [],
                     datasets: [{
                         data: data.by_training_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
                     }]
                 }
             });
@@ -1254,9 +1262,7 @@
                     labels: data.by_type?.labels || [],
                     datasets: [{
                         data: data.by_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444']
                     }]
                 }
             });
@@ -1270,23 +1276,10 @@
                         label: 'Số lượng',
                         data: data.by_month?.values || [],
                         borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)'
                     }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
                 }
             });
         }
@@ -1298,49 +1291,6 @@
             }
             const ctx = document.getElementById(canvasId);
             if (ctx) {
-                // Add default options if not provided
-                if (!config.options) {
-                    config.options = {};
-                }
-
-                // Set default responsive options
-                config.options.responsive = true;
-                config.options.maintainAspectRatio = false;
-
-                // Add default plugins if not provided
-                if (!config.options.plugins) {
-                    config.options.plugins = {};
-                }
-
-                // Add legend configuration
-                if (!config.options.plugins.legend) {
-                    config.options.plugins.legend = {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    };
-                }
-
-                // Add tooltip configuration
-                if (!config.options.plugins.tooltip) {
-                    config.options.plugins.tooltip = {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14
-                        },
-                        bodyFont: {
-                            size: 13
-                        }
-                    };
-                }
-
                 charts[canvasId] = new Chart(ctx, config);
             }
         }
@@ -1428,6 +1378,558 @@
                 to {
                     opacity: 0;
                     backdrop-filter: blur(0px);
+                    -webkit-backdrop-filter: blur(0px);
+                }
+            }
+
+            @keyframes spinnerSlideOut {
+                from {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-20px) scale(0.9);
+                    opacity: 0;
+                }
+            }
+        `;
+
+        // Inject fade out styles
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = fadeOutStyles;
+        document.head.appendChild(styleSheet);
+    </script>
+@endsection
+            try {
+                const response = await fetch('/statistics/chart-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
+                    },
+                    body: JSON.stringify({
+                        chart_type: 'general_stats',
+                        time_range: document.getElementById('time_range').value
+                    })
+                });
+
+                if (!response.ok) {
+                    // Fallback to real data from server if API not available
+                    updateStatsDisplay({
+                        total_blanks: {
+                            value: {{ $generalStatistics['total_blanks'] ?? 8431 }},
+                            growth: 5.2
+                        },
+                        available_blanks: {
+                            value: {{ $generalStatistics['available_blanks'] ?? 6000 }},
+                            growth: 2.1
+                        },
+                        issued_blanks: {
+                            value: {{ $generalStatistics['issued_blanks'] ?? 2329 }},
+                            growth: 15.3
+                        },
+                        recalled_blanks: {
+                            value: {{ $generalStatistics['recalled_blanks'] ?? 0 }},
+                            growth: -8.5
+                        },
+                        damaged_blanks: {
+                            value: {{ $generalStatistics['damaged_blanks'] ?? 102 }},
+                            growth: 0
+                        }
+                    });
+                    return;
+                }
+
+                const data = await response.json();
+                updateStatsDisplay(data);
+            } catch (error) {
+                console.error('Error loading general stats:', error);
+                // Use fallback data on error
+                updateStatsDisplay({
+                    total_blanks: {
+                        value: {{ $generalStatistics['total_blanks'] ?? 8431 }},
+                        growth: "{{ $generalStatistics['issued_growth'] ?? '+5%' }}"
+                    },
+                    available_blanks: {
+                        value: {{ $generalStatistics['available_blanks'] ?? 6000 }},
+                        growth: "{{ $generalStatistics['issued_growth'] ?? '+3%' }}"
+                    },
+                    issued_blanks: {
+                        value: {{ $generalStatistics['issued_blanks'] ?? 2329 }},
+                        growth: "{{ $generalStatistics['issued_growth'] ?? '+12%' }}"
+                    },
+                    recalled_blanks: {
+                        value: {{ $generalStatistics['recalled_blanks'] ?? 0 }},
+                        growth: "{{ $generalStatistics['recalled_growth'] ?? '0%' }}"
+                    },
+                    damaged_blanks: {
+                        value: {{ $generalStatistics['damaged_blanks'] ?? 102 }},
+                        growth: "0%"
+                    }
+                });
+            }
+        }
+
+        function updateStatsDisplay(stats) {
+            // Update values - handle both nested (.value) and direct value formats
+            document.getElementById('total-blanks').textContent = (stats.total_blanks?.value || stats.total_blanks || 0)
+                .toLocaleString();
+            document.getElementById('available-blanks').textContent = (stats.available_blanks?.value || stats
+                .available_blanks || 0).toLocaleString();
+            document.getElementById('issued-blanks').textContent = (stats.issued_blanks?.value || stats.issued_blanks || 0)
+                .toLocaleString();
+            document.getElementById('recalled-blanks').textContent = (stats.recalled_blanks?.value || stats
+                .recalled_blanks || 0).toLocaleString();
+            document.getElementById('damaged-blanks').textContent = (stats.damaged_blanks?.value || stats.damaged_blanks ||
+                0).toLocaleString();
+
+            // Update growth indicators
+            updateGrowthIndicator('total-blanks-growth', stats.total_blanks?.growth || "+0%");
+            updateGrowthIndicator('available-blanks-growth', stats.available_blanks?.growth || "+0%");
+            updateGrowthIndicator('issued-blanks-growth', stats.issued_growth || "+0%");
+            updateGrowthIndicator('recalled-blanks-growth', stats.recalled_growth || "+0%");
+            updateGrowthIndicator('damaged-blanks-growth', stats.damaged_blanks?.growth || "+0%");
+        }
+
+        function updateGrowthIndicator(elementId, growth) {
+            const element = document.getElementById(elementId);
+            const span = element.querySelector('span');
+            const icon = element.querySelector('i');
+
+            // Parse growth value (handle both numeric and string formats)
+            let growthValue = 0;
+            if (typeof growth === 'string') {
+                // Extract numeric value from string like "+12%" or "-5.5%"
+                const match = growth.match(/([+-]?\d+\.?\d*)/);
+                growthValue = match ? parseFloat(match[1]) : 0;
+            } else {
+                growthValue = growth || 0;
+            }
+
+            if (growthValue >= 0) {
+                element.className = 'stat-growth positive';
+                icon.className = 'fas fa-arrow-up';
+            } else {
+                element.className = 'stat-growth negative';
+                icon.className = 'fas fa-arrow-down';
+            }
+
+            // Display growth value
+            if (typeof growth === 'string' && growth.includes('%')) {
+                span.textContent = growth; // Use original string if it already has %
+            } else {
+                span.textContent = Math.abs(growthValue).toFixed(1) + '%';
+            }
+        }
+
+        async function loadAllCharts() {
+            // Use real data from server with fallback demo data
+            const chartData = {
+                statusDistribution: {!! json_encode(
+                    $statusDistribution ?? [
+                        'labels' => ['Trong kho', 'Đã cấp', 'Đã thu hồi', 'Hư hỏng'],
+                        'data' => [8281, 120, 25, 5],
+                        'colors' => ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'],
+                    ],
+                ) !!},
+                typeDistribution: {!! json_encode(
+                    $typeDistribution ?? [
+                        'labels' => ['Cử nhân', 'Thạc sĩ', 'Tiến sĩ', 'Chứng chỉ'],
+                        'data' => [5200, 2100, 800, 331],
+                    ],
+                ) !!},
+                issuedTrend: {!! json_encode(
+                    $issuedTrend ?? [
+                        'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        'data' => [45, 52, 48, 61, 55, 67, 73, 69, 76, 85, 81, 92],
+                    ],
+                ) !!},
+                recalledTrend: {!! json_encode(
+                    $recalledTrend ?? [
+                        'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        'data' => [2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 4, 2],
+                    ],
+                ) !!},
+                monthlyComparison: {!! json_encode(
+                    $monthlyComparison ?? [
+                        'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        'issued_data' => [45, 52, 48, 61, 55, 67, 73, 69, 76, 85, 81, 92],
+                        'recalled_data' => [2, 1, 3, 2, 4, 1, 2, 3, 1, 2, 4, 2],
+                    ],
+                ) !!}
+            };
+
+            currentData = chartData;
+            initializeAllCharts();
+        }
+
+        function initializeAllCharts() {
+            initStatusDistributionChart();
+            initTypeDistributionChart();
+            initIssuedTrendChart();
+            initRecalledTrendChart();
+            initMonthlyComparisonChart();
+        }
+
+        function initStatusDistributionChart() {
+            const ctx = document.getElementById('statusDistributionChart').getContext('2d');
+
+            if (charts.statusDistribution) {
+                charts.statusDistribution.destroy();
+            }
+
+            charts.statusDistribution = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: currentData.statusDistribution.labels,
+                    datasets: [{
+                        data: currentData.statusDistribution.data,
+                        backgroundColor: currentData.statusDistribution.colors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed.toLocaleString() + ' (' +
+                                        percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initTypeDistributionChart() {
+            const ctx = document.getElementById('typeDistributionChart').getContext('2d');
+
+            if (charts.typeDistribution) {
+                charts.typeDistribution.destroy();
+            }
+
+            charts.typeDistribution = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: currentData.typeDistribution.labels,
+                    datasets: [{
+                        label: 'Số lượng phôi',
+                        data: currentData.typeDistribution.data,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initIssuedTrendChart() {
+            const ctx = document.getElementById('issuedTrendChart').getContext('2d');
+
+            if (charts.issuedTrend) {
+                charts.issuedTrend.destroy();
+            }
+
+            charts.issuedTrend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: currentData.issuedTrend.labels,
+                    datasets: [{
+                        label: 'Phôi đã cấp',
+                        data: currentData.issuedTrend.data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initRecalledTrendChart() {
+            const ctx = document.getElementById('recalledTrendChart').getContext('2d');
+
+            if (charts.recalledTrend) {
+                charts.recalledTrend.destroy();
+            }
+
+            charts.recalledTrend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: currentData.recalledTrend.labels,
+                    datasets: [{
+                        label: 'Phôi đã thu hồi',
+                        data: currentData.recalledTrend.data,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initMonthlyComparisonChart() {
+            const ctx = document.getElementById('monthlyComparisonChart').getContext('2d');
+
+            if (charts.monthlyComparison) {
+                charts.monthlyComparison.destroy();
+            }
+
+            charts.monthlyComparison = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: currentData.monthlyComparison.labels,
+                    datasets: [{
+                            label: 'Phôi đã cấp',
+                            data: currentData.monthlyComparison.issued_data,
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Phôi đã thu hồi',
+                            data: currentData.monthlyComparison.recalled_data,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function populateFilters() {
+            // Populate diploma blank types (demo data)
+            const blankTypeSelect = document.getElementById('blank_type');
+            const types = [{
+                    id: 1,
+                    name: 'Văn bằng Cử nhân'
+                },
+                {
+                    id: 2,
+                    name: 'Văn bằng Thạc sĩ'
+                },
+                {
+                    id: 3,
+                    name: 'Văn bằng Tiến sĩ'
+                },
+                {
+                    id: 4,
+                    name: 'Chứng chỉ'
+                }
+            ];
+
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.id;
+                option.textContent = type.name;
+                blankTypeSelect.appendChild(option);
+            });
+
+            // Populate graduation years (demo data)
+            const yearSelect = document.getElementById('graduation_year');
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= currentYear - 10; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = `Khóa ${year}`;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function applyFilters() {
+            showLoading();
+
+            // Simulate filter application
+            setTimeout(() => {
+                // In real implementation, this would fetch new data based on filters
+                console.log('Filters applied:', {
+                    time_range: document.getElementById('time_range').value,
+                    blank_type: document.getElementById('blank_type').value,
+                    graduation_year: document.getElementById('graduation_year').value,
+                    start_date: document.getElementById('start_date').value,
+                    end_date: document.getElementById('end_date').value
+                });
+
+                hideLoading();
+            }, 1000);
+        }
+
+        function resetFilters() {
+            document.getElementById('time_range').value = '30';
+            document.getElementById('blank_type').value = '';
+            document.getElementById('graduation_year').value = '';
+            document.getElementById('start_date').value = '';
+            document.getElementById('end_date').value = '';
+
+            applyFilters();
+        }
+
+        function refreshChart(chartType) {
+            showLoading();
+
+            // Simulate chart refresh
+            setTimeout(() => {
+                switch (chartType) {
+                    case 'status_distribution':
+                        initStatusDistributionChart();
+                        break;
+                    case 'type_distribution':
+                        initTypeDistributionChart();
+                        break;
+                    case 'issued_trend':
+                        initIssuedTrendChart();
+                        break;
+                    case 'recalled_trend':
+                        initRecalledTrendChart();
+                        break;
+                    case 'monthly_comparison':
+                        initMonthlyComparisonChart();
+                        break;
+                }
+
+                hideLoading();
+            }, 500);
+        }
+
+        function refreshAllCharts() {
+            showLoading();
+            loadInitialData();
+        }
+
+        function exportStatistics() {
+            alert('Tính năng xuất báo cáo sẽ được triển khai sớm');
+        }
+
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden');
+            // Prevent body scroll when loading is shown
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+
+            // Add fade out animation
+            overlay.style.animation = 'overlayFadeOut 0.3s ease-in';
+            overlay.querySelector('.loading-spinner').style.animation = 'spinnerSlideOut 0.2s ease-in';
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                // Restore body scroll
+                document.body.style.overflow = 'auto';
+                // Reset animations
+                overlay.style.animation = '';
+                overlay.querySelector('.loading-spinner').style.animation = '';
+            }, 300);
+        }
+
+        // Add CSS for fade out animations
+        const fadeOutStyles = `
+            @keyframes overlayFadeOut {
+                from {
+                    opacity: 1;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                }
+                to {
+                    opacity: 0;
+                    backdrop-filter: blur(0px);
+                    -webkit-backdrop-filter: blur(0px);
+                }
+            }
                     -webkit-backdrop-filter: blur(0px);
                 }
             }

@@ -22,7 +22,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:6'],
         ];
     }
@@ -35,7 +35,7 @@ class LoginRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'login' => 'tên đăng nhập hoặc email',
+            'email' => 'email',
             'password' => 'mật khẩu',
         ];
     }
@@ -48,9 +48,9 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login.required' => 'Vui lòng nhập tên đăng nhập hoặc email.',
-            'login.string' => 'Tên đăng nhập hoặc email phải là chuỗi ký tự.',
-            'login.max' => 'Tên đăng nhập hoặc email không được quá 255 ký tự.',
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Địa chỉ email không hợp lệ.',
+            'email.max' => 'Email không được quá 255 ký tự.',
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.string' => 'Mật khẩu phải là chuỗi ký tự.',
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',

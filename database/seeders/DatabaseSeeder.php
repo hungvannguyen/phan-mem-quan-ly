@@ -34,19 +34,17 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create users using factory
         $adminUser = User::factory()->create([
-            'username' => 'admin',
+            'email' => 'admin@hvannd.edu.vn',
             'password' => bcrypt('password'),
             'full_name' => 'Quản trị viên',
-            'email' => 'admin@example.com',
             'is_active' => true,
         ]);
         $adminUser->roles()->attach($adminRole->role_id);
 
         $diplomaUser = User::factory()->create([
-            'username' => 'diploma_manager',
+            'email' => 'diploma@hvannd.edu.vn',
             'password' => bcrypt('password'),
             'full_name' => 'Người quản lý văn bằng',
-            'email' => 'diploma@example.com',
             'is_active' => true,
         ]);
         $diplomaUser->roles()->attach($diplomaManagerRole->role_id);
@@ -109,11 +107,13 @@ class DatabaseSeeder extends Seeder
         // 6. Create students with different statuses using factory
         $allStudents = collect();
 
-        // Graduated students (30)
-        $graduatedStudents = Student::factory(30)->create()->each(function ($student) use ($majors) {
+        // Graduated students (80) - Tăng số lượng để có đủ data
+        $graduatedStudents = Student::factory(80)->create()->each(function ($student) use ($majors) {
+            $trainingTypes = ['Chính quy', 'Liên thông', 'Từ xa', 'Vừa làm vừa học'];
             $student->update([
                 'major_id' => $majors->random()->major_id,
                 'status' => \App\Enums\StudentStatus::Graduate,
+                'training_type' => $trainingTypes[array_rand($trainingTypes)],
             ]);
         });
         $allStudents = $allStudents->merge($graduatedStudents);
@@ -172,16 +172,49 @@ class DatabaseSeeder extends Seeder
 
         // 8. Create degrees for graduated students using factory
         $graduatedStudentsOnly = Student::where('status', \App\Enums\StudentStatus::Graduate)->get();
-        $issuedBlanks->each(function ($blank, $index) use ($graduatedStudentsOnly) {
-            if ($index < $graduatedStudentsOnly->count()) {
+
+        // Tạo 60 văn bằng với các loại khác nhau
+        $degreeTypes = ['bachelor', 'bachelor', 'bachelor', 'master', 'doctor']; // 60% bachelor, 20% master, 20% doctor
+        $rankings = ['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình'];
+
+        for ($i = 0; $i < min(60, $graduatedStudentsOnly->count()); $i++) {
+            $student = $graduatedStudentsOnly[$i];
+            $blank = $issuedBlanks[$i] ?? null;
+
+            if ($blank) {
                 Degree::factory()->create([
-                    'student_id' => $graduatedStudentsOnly[$index]->student_id,
+                    'student_id' => $student->student_id,
                     'diploma_blank_id' => $blank->diploma_blank_id,
+                    'degree_type' => $degreeTypes[array_rand($degreeTypes)],
+                    'major_id' => $student->major_id,
+                    'major_name' => $student->major->major_name,
+                    'ranking' => $rankings[array_rand($rankings)],
+                    'graduation_year' => rand(2020, 2024),
+                    'granting_date' => now()->subDays(rand(0, 365)),
                 ]);
 
                 $blank->update(['status' => DiplomaBlank::STATUS_ISSUED]);
             }
-        });
+        }
+
+        // Tạo 20 chứng chỉ với các loại khác nhau
+        $certificateTypes = ['Chứng chỉ ngoại ngữ', 'Chứng chỉ tin học', 'Chứng chỉ nghề', 'Chứng chỉ khác'];
+
+        for ($i = 60; $i < min(80, $graduatedStudentsOnly->count()); $i++) {
+            $student = $graduatedStudentsOnly[$i];
+
+            Degree::factory()->create([
+                'student_id' => $student->student_id,
+                'diploma_blank_id' => null,
+                'degree_type' => 'certificate',
+                'major_id' => $student->major_id,
+                'major_name' => $student->major->major_name,
+                'ranking' => null,
+                'graduation_year' => rand(2020, 2024),
+                'granting_date' => now()->subDays(rand(0, 365)),
+                'notes' => $certificateTypes[array_rand($certificateTypes)],
+            ]);
+        }
 
         // 9. Create system settings using factory
         SystemSetting::factory()->schoolName('Trường Đại học ABC')->create();
@@ -209,8 +242,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Database seeding completed successfully!');
         $this->command->info('');
         $this->command->info('=== User Accounts ===');
-        $this->command->info('Admin: admin / password');
-        $this->command->info('Diploma Manager: diploma_manager / password');
+        $this->command->info('Admin: admin@hvannd.edu.vn / password');
+        $this->command->info('Diploma Manager: diploma@hvannd.edu.vn / password');
         $this->command->info('');
         $this->command->info('=== Students ===');
         $this->command->info('- Graduated: ' . $graduatedStudents->count());

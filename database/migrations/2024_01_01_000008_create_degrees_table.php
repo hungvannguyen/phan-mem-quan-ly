@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->enum('degree_type', ['bachelor', 'master', 'doctor', 'certificate'])
                 ->default('bachelor')
                 ->comment('Loại văn bằng: bachelor=Cử nhân, master=Thạc sĩ, doctor=Tiến sĩ, certificate=Chứng chỉ');
-            $table->foreignId('diploma_blank_id')->unique()->constrained('diploma_blanks', 'diploma_blank_id');
+            $table->foreignId('diploma_blank_id')->nullable()->constrained('diploma_blanks', 'diploma_blank_id');
             $table->string('registration_number', 50)->unique();
             $table->date('granting_date');
             $table->integer('graduation_year');

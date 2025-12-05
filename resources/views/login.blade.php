@@ -27,10 +27,10 @@
                 <form action="/login" class="auth-login-form" method="POST">
                     @csrf
                     <div class="form-group">
-                        <label for="login">Tên đăng nhập hoặc Email</label>
-                        <input type="text" class="form-control @error('login') is-invalid @enderror" id="login"
-                            placeholder="Nhập tên đăng nhập hoặc email" name="login" value="{{ old('login') }}" required>
-                        @error('login')
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            placeholder="Nhập địa chỉ email" name="email" value="{{ old('email') }}" required autofocus>
+                        @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

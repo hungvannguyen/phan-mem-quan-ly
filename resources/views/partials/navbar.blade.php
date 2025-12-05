@@ -44,10 +44,10 @@
         </div>
 
         <div class="user-menu">
-            <div class="user-info">
+            <a href="{{ route('profile.show') }}" class="user-info" title="Xem thông tin cá nhân">
                 <i class="fas fa-user-circle"></i>
                 <span class="user-name">{{ auth()->user()->full_name }}</span>
-            </div>
+            </a>
             <form method="POST" action="{{ route('logout') }}" class="logout-form">
                 @csrf
                 <button type="submit" class="logout-btn" title="Đăng xuất">

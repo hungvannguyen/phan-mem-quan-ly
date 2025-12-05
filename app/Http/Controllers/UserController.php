@@ -21,8 +21,7 @@ class UserController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('username', 'like', "%{$search}%")
-                    ->orWhere('full_name', 'like', "%{$search}%")
+                $q->where('full_name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             });
         }
@@ -58,13 +57,10 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
         ], [
-            'username.required' => 'Tên đăng nhập là bắt buộc',
-            'username.unique' => 'Tên đăng nhập đã tồn tại',
             'full_name.required' => 'Họ và tên là bắt buộc',
             'email.required' => 'Email là bắt buộc',
             'email.email' => 'Email không hợp lệ',
@@ -103,12 +99,6 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'username' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')->ignore($user->user_id, 'user_id'),
-            ],
             'full_name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -120,8 +110,6 @@ class UserController extends Controller
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,permission_id',
         ], [
-            'username.required' => 'Tên đăng nhập là bắt buộc',
-            'username.unique' => 'Tên đăng nhập đã tồn tại',
             'full_name.required' => 'Họ và tên là bắt buộc',
             'email.required' => 'Email là bắt buộc',
             'email.email' => 'Email không hợp lệ',
