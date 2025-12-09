@@ -7,14 +7,15 @@ Tính năng xuất công văn xác minh văn bằng cho phép xuất file Word (
 ## Cách Sử Dụng
 
 1. **Từ Trang Quản Lý Sinh Viên:**
-   - Truy cập trang "Quản lý Sinh viên và Văn bằng"
-   - Tìm sinh viên cần xuất công văn xác minh
-   - Nhấn nút **"Xác minh"** (màu xanh cyan) ở cột "Hành động"
-   - File Word sẽ được tải xuống tự động
+
+    - Truy cập trang "Quản lý Sinh viên và Văn bằng"
+    - Tìm sinh viên cần xuất công văn xác minh
+    - Nhấn nút **"Xác minh"** (màu xanh cyan) ở cột "Hành động"
+    - File Word sẽ được tải xuống tự động
 
 2. **Điều Kiện:**
-   - Sinh viên phải có ít nhất 1 văn bằng đã được cấp
-   - Nếu chưa có văn bằng, nút "Xác minh" sẽ không hiển thị
+    - Sinh viên phải có ít nhất 1 văn bằng đã được cấp
+    - Nếu chưa có văn bằng, nút "Xác minh" sẽ không hiển thị
 
 ## File Template
 
@@ -25,6 +26,7 @@ File template này sử dụng các placeholder (biến thay thế) được đ�
 ## Danh Sách Placeholder Có Sẵn
 
 ### Thông Tin Sinh Viên
+
 - `${student_code}` - Mã số sinh viên
 - `${full_name}` - Họ và tên sinh viên
 - `${date_of_birth}` - Ngày sinh (định dạng: dd/mm/yyyy)
@@ -35,10 +37,12 @@ File template này sử dụng các placeholder (biến thay thế) được đ�
 - `${class_name}` - Tên lớp học
 
 ### Thông Tin Ngành Học
+
 - `${major_name}` - Tên ngành đào tạo
 - `${major_code}` - Mã ngành đào tạo
 
 ### Thông Tin Văn Bằng
+
 - `${degree_type}` - Loại văn bằng (Cử nhân, Thạc sĩ, Tiến sĩ, Chứng chỉ)
 - `${registration_number}` - Số hiệu văn bằng
 - `${diploma_number}` - Số văn bằng (giống registration_number)
@@ -51,6 +55,7 @@ File template này sử dụng các placeholder (biến thay thế) được đ�
 - `${number_in_the_book}` - Số vào sổ gốc
 
 ### Ngày Tháng Hiện Tại
+
 - `${current_date}` - Ngày hiện tại (định dạng: dd/mm/yyyy)
 - `${current_day}` - Ngày hiện tại (số)
 - `${current_month}` - Tháng hiện tại (số)
@@ -76,24 +81,29 @@ Ngày ${current_day} tháng ${current_month} năm ${current_year}
 ## Cấu Trúc Kỹ Thuật
 
 ### File Export Class
+
 **Vị trí:** `app/Exports/DiplomaVerificationExport.php`
 
 Class này xử lý:
+
 - Load file template Word
 - Thay thế các placeholder bằng dữ liệu thực
 - Tạo file mới và lưu vào thư mục tạm
 - Trả về file để download
 
 ### Controller Method
+
 **Vị trí:** `app/Http/Controllers/DiplomaManagementController.php`
 **Method:** `exportDiplomaVerification(Student $student)`
 
 ### Route
+
 **URL:** `/student/{student_id}/export-verification`
 **Method:** GET
 **Permission:** `diplomas.view`
 
 ### View Component
+
 **Vị trí:** `resources/views/components/students/table.blade.php`
 **Button:** Nút "Xác minh" (btn-info)
 
@@ -112,14 +122,17 @@ Class này xử lý:
 ## Troubleshooting
 
 ### Lỗi: "Template file not found"
+
 - Kiểm tra file template có tồn tại tại `/public/excel-template/[Mau XM01] Cong van tra loi xac minh van bang.docx`
 - Kiểm tra quyền đọc file
 
 ### Lỗi: "Sinh viên chưa được cấp văn bằng"
+
 - Sinh viên cần có ít nhất 1 văn bằng đã được cấp
 - Kiểm tra bảng `degrees` trong database
 
 ### File Word bị lỗi khi mở
+
 - Kiểm tra cú pháp placeholder trong template
 - Đảm bảo template gốc không bị corrupt
 - Kiểm tra thư viện PHPWord đã được cài đặt: `composer require phpoffice/phpword`
@@ -132,6 +145,7 @@ Class này xử lý:
 ## Tương Lai
 
 Có thể mở rộng thêm:
+
 1. Cho phép chọn văn bằng cụ thể (nếu sinh viên có nhiều văn bằng)
 2. Thêm template khác cho các loại xác nhận khác
 3. Export hàng loạt cho nhiều sinh viên

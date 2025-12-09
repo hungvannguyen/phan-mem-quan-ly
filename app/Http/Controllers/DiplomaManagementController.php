@@ -351,7 +351,7 @@ class DiplomaManagementController extends Controller
 
     /**
      * Export diploma verification document for a student
-     * 
+     *
      * @param Student $student
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
      */
