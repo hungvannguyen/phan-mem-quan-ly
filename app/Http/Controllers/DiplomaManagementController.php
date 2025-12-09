@@ -6,6 +6,7 @@ use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
+use App\Exports\DiplomaVerificationExport;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -345,6 +346,43 @@ class DiplomaManagementController extends Controller
             // Redirect back to student page with error message
             return redirect()->route('student', ['student' => $degree->student_id])
                 ->with('error', 'Có lỗi xảy ra khi xóa văn bằng: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export diploma verification document for a student
+     * 
+     * @param Student $student
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function exportDiplomaVerification(Student $student)
+    {
+        try {
+            // Check if student has at least one degree
+            if ($student->degrees->count() === 0) {
+                return redirect()->back()->with('error', 'Sinh viên chưa được cấp văn bằng nào!');
+            }
+
+            // Generate the document
+            $export = new DiplomaVerificationExport($student);
+            $filePath = $export->generate();
+
+            \Log::info('About to download file', [
+                'path' => $filePath,
+                'exists' => file_exists($filePath),
+                'size' => file_exists($filePath) ? filesize($filePath) : 0
+            ]);
+
+            // Download the file and delete it after download
+            return response()->download($filePath, basename($filePath), [
+                'Content-Type' => 'application/rtf',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            \Log::error('Export error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất văn bản xác minh: ' . $e->getMessage());
         }
     }
 }

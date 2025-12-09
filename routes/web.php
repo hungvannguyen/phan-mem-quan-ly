@@ -302,6 +302,12 @@ Route::delete(
     [DiplomaManagementController::class, 'deleteStudent']
 )->middleware(['auth', 'permission:diplomas.delete'])->name('student.delete');
 
+// Export diploma verification document
+Route::get(
+    "student/{student:student_id}/export-verification",
+    [DiplomaManagementController::class, 'exportDiplomaVerification']
+)->middleware(['auth', 'permission:diplomas.view'])->name('student.export-verification');
+
 // Degree routes
 Route::post(
     "degrees/store",
@@ -326,25 +332,14 @@ Route::get(
 
 // Statistics routes
 Route::get(
+    '/',
+    [StatisticsController::class, 'index']
+)->middleware(['auth', 'permission:diplomas.view'])->name('home');
+
+Route::get(
     '/statistics',
     [StatisticsController::class, 'index']
 )->middleware(['auth', 'permission:diplomas.view'])->name('statistics.index');
-
-Route::post(
-    '/statistics/chart-data',
-    [StatisticsController::class, 'getChartData']
-)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.chart-data');
-
-Route::post(
-    '/statistics/export',
-    [StatisticsController::class, 'export']
-)->middleware(['auth', 'permission:diplomas.export'])->name('statistics.export');
-
-// New statistics routes
-Route::get(
-    '/statistics/page',
-    [StatisticsController::class, 'statisticsPage']
-)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.page');
 
 Route::get(
     '/statistics/diplomas',

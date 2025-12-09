@@ -189,6 +189,14 @@
         }
     }
 
+    &-info {
+        @apply bg-cyan-50 text-cyan-700;
+
+        &:hover {
+            @apply bg-cyan-100 text-cyan-800;
+        }
+    }
+
     &-blanks {
         @apply bg-indigo-50 text-indigo-700;
 

@@ -9,6 +9,8 @@ export default defineConfig({
                 "resources/js/app.js",
                 "resources/js/main.js",
                 "resources/js/validate.js",
+                "resources/css/statistics.css",
+                "resources/js/statistics.js",
             ],
             refresh: true,
         }),

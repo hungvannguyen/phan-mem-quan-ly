@@ -8,10 +8,11 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RedirectIfAuthenticated
 {
-    public function handle(Request $request, Closure $next, ...$guards): Response|RedirectResponse|JsonResponse
+    public function handle(Request $request, Closure $next, ...$guards): Response|RedirectResponse|JsonResponse|BinaryFileResponse
     {
         $guards = empty($guards) ? [null] : $guards;
 

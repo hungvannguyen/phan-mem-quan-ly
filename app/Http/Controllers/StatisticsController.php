@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\DiplomaBlank;
 use App\Models\DiplomaBlankType;
 use App\Models\Degree;
+use App\Models\Major;
 use App\Enums\DiplomaBlankStatus;
+use App\Exports\DiplomaStatisticsExport;
+use App\Exports\DiplomaStatisticsSummaryExport;
+use App\Exports\CertificateStatisticsExport;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use SaKanjo\EasyMetrics\Metrics\Value;
 use SaKanjo\EasyMetrics\Metrics\Doughnut;
 use SaKanjo\EasyMetrics\Metrics\Trend;
@@ -26,7 +31,7 @@ class StatisticsController extends Controller
         $monthlyComparison = $this->getMonthlyComparison();
 
         // Get majors for filter
-        $majors = \App\Models\Major::all();
+        $majors = Major::orderBy('major_name')->get();
 
         return view('home', compact(
             'generalStatistics',
@@ -286,20 +291,13 @@ class StatisticsController extends Controller
     }
 
     /**
-     * Display statistics page
-     */
-    public function statisticsPage()
-    {
-        $majors = \App\Models\Major::all();
-        return view('statistics.index', compact('majors'));
-    }
-
-    /**
      * Get diploma statistics with filters
      */
     public function getDiplomaStatistics(Request $request)
     {
-        $query = Degree::query()->with(['student', 'major']);
+        $query = Degree::query()
+            ->with(['student', 'major', 'diplomaBlank.type'])
+            ->whereNotNull('diploma_blank_id'); // Chỉ lấy bằng đã cấp
 
         // Apply filters
         if ($request->filled('graduation_year')) {
@@ -318,8 +316,8 @@ class StatisticsController extends Controller
             $query->where('degree_type', $request->degree_type);
         }
 
-        if ($request->filled('major')) {
-            $query->where('major_id', $request->major);
+        if ($request->filled('major_id')) {
+            $query->where('major_id', $request->major_id);
         }
 
         if ($request->filled('gender')) {
@@ -342,7 +340,7 @@ class StatisticsController extends Controller
         $total = $query->count();
 
         // Get statistics by different criteria
-        $byTypeRaw = $this->getStatsByColumn($query, 'degree_type');
+        $byTypeRaw = $this->getStatsByColumn(clone $query, 'degree_type');
 
         // Translate degree types to Vietnamese
         $byType = [
@@ -352,9 +350,9 @@ class StatisticsController extends Controller
             'values' => $byTypeRaw['values']
         ];
 
-        $byMajor = $this->getStatsByRelation($query, 'major', 'major_name');
-        $byRanking = $this->getStatsByColumn($query, 'ranking');
-        $byYear = $this->getStatsByColumn($query, 'graduation_year');
+        $byMajor = $this->getStatsByRelation(clone $query, 'major', 'major_name');
+        $byRanking = $this->getStatsByColumn(clone $query, 'ranking');
+        $byYear = $this->getStatsByColumn(clone $query, 'graduation_year');
 
         // Gender statistics
         $maleCount = (clone $query)->whereHas('student', function ($q) {
@@ -372,34 +370,40 @@ class StatisticsController extends Controller
         $majorCount = (clone $query)->distinct('major_id')->count('major_id');
 
         // Training type statistics
-        $byTrainingType = $this->getTrainingTypeStats($query);
+        $byTrainingType = $this->getTrainingTypeStats(clone $query);
 
         // Detailed breakdown
         $details = [];
 
         // Add type breakdown
         foreach ($byType['labels'] as $index => $label) {
-            $details[] = [
-                'criteria' => 'Loại bằng',
-                'value' => $this->translateDegreeType($label),
-                'count' => $byType['values'][$index],
-                'percentage' => $total > 0 ? round(($byType['values'][$index] / $total) * 100, 2) : 0
-            ];
+            if ($byType['values'][$index] > 0) {
+                $details[] = [
+                    'criteria' => 'Loại bằng',
+                    'value' => $label,
+                    'count' => $byType['values'][$index],
+                    'percentage' => $total > 0 ? round(($byType['values'][$index] / $total) * 100, 2) : 0
+                ];
+            }
         }
 
         // Add gender breakdown
-        $details[] = [
-            'criteria' => 'Giới tính',
-            'value' => 'Nam',
-            'count' => $maleCount,
-            'percentage' => $total > 0 ? round(($maleCount / $total) * 100, 2) : 0
-        ];
-        $details[] = [
-            'criteria' => 'Giới tính',
-            'value' => 'Nữ',
-            'count' => $femaleCount,
-            'percentage' => $total > 0 ? round(($femaleCount / $total) * 100, 2) : 0
-        ];
+        if ($maleCount > 0) {
+            $details[] = [
+                'criteria' => 'Giới tính',
+                'value' => 'Nam',
+                'count' => $maleCount,
+                'percentage' => $total > 0 ? round(($maleCount / $total) * 100, 2) : 0
+            ];
+        }
+        if ($femaleCount > 0) {
+            $details[] = [
+                'criteria' => 'Giới tính',
+                'value' => 'Nữ',
+                'count' => $femaleCount,
+                'percentage' => $total > 0 ? round(($femaleCount / $total) * 100, 2) : 0
+            ];
+        }
 
         return response()->json([
             'total' => $total,
@@ -427,9 +431,14 @@ class StatisticsController extends Controller
             ->where('degree_type', 'certificate')
             ->with(['student', 'major']);
 
+        // Only filter by diploma_blank_id if specifically requested
+        // By default, show all certificates (issued and not issued)
+        if ($request->filled('only_issued') && $request->only_issued == '1') {
+            $query->whereNotNull('diploma_blank_id');
+        }
+
         // Apply filters
         if ($request->filled('certificate_type')) {
-            // Assuming certificate type is stored in notes or a specific field
             $query->where('notes', 'like', '%' . $request->certificate_type . '%');
         }
 
@@ -444,9 +453,19 @@ class StatisticsController extends Controller
         $total = $query->count();
 
         // Count by certificate types (based on notes field)
-        $languageCount = (clone $query)->where('notes', 'like', '%ngoại ngữ%')->count();
-        $itCount = (clone $query)->where('notes', 'like', '%tin học%')->count();
+        $languageCount = (clone $query)->where(function ($q) {
+            $q->where('notes', 'like', '%ngoại ngữ%')
+                ->orWhere('notes', 'like', '%tiếng%');
+        })->count();
+
+        $itCount = (clone $query)->where(function ($q) {
+            $q->where('notes', 'like', '%tin học%')
+                ->orWhere('notes', 'like', '%cntt%')
+                ->orWhere('notes', 'like', '%ict%');
+        })->count();
+
         $vocationalCount = (clone $query)->where('notes', 'like', '%nghề%')->count();
+        $otherCount = $total - $languageCount - $itCount - $vocationalCount;
 
         // Statistics by type
         $byType = [
@@ -455,23 +474,21 @@ class StatisticsController extends Controller
                 $languageCount,
                 $itCount,
                 $vocationalCount,
-                $total - $languageCount - $itCount - $vocationalCount
+                $otherCount
             ]
         ];
 
         // Monthly trend
-        $byMonth = $this->getMonthlyTrend($query);
+        $byMonth = $this->getMonthlyTrend(clone $query);
 
         // Detailed breakdown
         $details = [];
         foreach ($byType['labels'] as $index => $label) {
-            if ($byType['values'][$index] > 0) {
-                $details[] = [
-                    'type' => $label,
-                    'count' => $byType['values'][$index],
-                    'percentage' => $total > 0 ? round(($byType['values'][$index] / $total) * 100, 2) : 0
-                ];
-            }
+            $details[] = [
+                'type' => $label,
+                'count' => $byType['values'][$index],
+                'percentage' => $total > 0 ? round(($byType['values'][$index] / $total) * 100, 2) : 0
+            ];
         }
 
         return response()->json([
@@ -479,6 +496,7 @@ class StatisticsController extends Controller
             'language_count' => $languageCount,
             'it_count' => $itCount,
             'vocational_count' => $vocationalCount,
+            'other_count' => $otherCount,
             'by_type' => $byType,
             'by_month' => $byMonth,
             'details' => $details
@@ -491,12 +509,38 @@ class StatisticsController extends Controller
     public function exportStatistics(Request $request)
     {
         $type = $request->get('type', 'diplomas');
+        $exportType = $request->get('export_type', 'detailed'); // detailed or summary
+        $groupBy = $request->get('group_by', 'degree_type'); // For summary export
+
+        // Prepare filters
+        $filters = [
+            'graduation_year' => $request->get('graduation_year'),
+            'start_date' => $request->get('start_date'),
+            'end_date' => $request->get('end_date'),
+            'degree_type' => $request->get('degree_type'),
+            'major_id' => $request->get('major_id'),
+            'gender' => $request->get('gender'),
+            'ranking' => $request->get('ranking'),
+            'training_type' => $request->get('training_type'),
+            'certificate_type' => $request->get('certificate_type'),
+        ];
+
+        // Generate filename with timestamp
+        $timestamp = now()->format('Y-m-d_His');
 
         if ($type === 'certificates') {
-            return $this->exportCertificateReport($request);
+            $filename = "Thong_ke_chung_chi_{$timestamp}.xlsx";
+            return Excel::download(new CertificateStatisticsExport($filters), $filename);
         }
 
-        return $this->exportDiplomaReport($request);
+        // Diploma statistics export
+        if ($exportType === 'summary') {
+            $filename = "Tong_hop_van_bang_{$timestamp}.xlsx";
+            return Excel::download(new DiplomaStatisticsSummaryExport($filters, $groupBy), $filename);
+        }
+
+        $filename = "Thong_ke_van_bang_{$timestamp}.xlsx";
+        return Excel::download(new DiplomaStatisticsExport($filters), $filename);
     }
 
     /**
@@ -541,14 +585,17 @@ class StatisticsController extends Controller
     private function getMonthlyTrend($query)
     {
         $stats = (clone $query)
+            ->whereNotNull('granting_date')
             ->select(
                 DB::raw('DATE_FORMAT(granting_date, "%Y-%m") as month'),
                 DB::raw('count(*) as count')
             )
             ->groupBy('month')
-            ->orderBy('month')
+            ->orderBy('month', 'desc')
             ->limit(12)
-            ->get();
+            ->get()
+            ->reverse()
+            ->values();
 
         return [
             'labels' => $stats->pluck('month')->toArray(),
@@ -585,23 +632,5 @@ class StatisticsController extends Controller
             'certificate' => 'Chứng chỉ',
             default => $type
         };
-    }
-
-    /**
-     * Export diploma report (placeholder)
-     */
-    private function exportDiplomaReport($request)
-    {
-        // TODO: Implement Excel export
-        return response()->json(['message' => 'Export diploma report - Coming soon']);
-    }
-
-    /**
-     * Export certificate report (placeholder)
-     */
-    private function exportCertificateReport($request)
-    {
-        // TODO: Implement Excel export
-        return response()->json(['message' => 'Export certificate report - Coming soon']);
     }
 }

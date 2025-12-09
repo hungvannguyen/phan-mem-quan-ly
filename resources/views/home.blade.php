@@ -79,6 +79,48 @@
                         </div>
 
                         <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="major_id">Ngành học</label>
+                                <select id="major_id" name="major_id" class="form-select">
+                                    <option value="">Tất cả ngành</option>
+                                    @foreach ($majors as $major)
+                                        <option value="{{ $major->major_id }}">{{ $major->major_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="gender">Giới tính</label>
+                                <select id="gender" name="gender" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="ranking">Xếp loại</label>
+                                <select id="ranking" name="ranking" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Xuất sắc">Xuất sắc</option>
+                                    <option value="Giỏi">Giỏi</option>
+                                    <option value="Khá">Khá</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="training_type">Hình thức đào tạo</label>
+                                <select id="training_type" name="training_type" class="form-select">
+                                    <option value="">Tất cả</option>
+                                    <option value="Chính quy">Chính quy</option>
+                                    <option value="Liên thông">Liên thông</option>
+                                    <option value="Vừa học vừa làm">Vừa học vừa làm</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filter-row">
                             <div class="filter-group filter-actions">
                                 <button type="button" class="btn btn-primary" onclick="applyDiplomaFilters()">
                                     <i class="fas fa-search"></i>
@@ -103,6 +145,15 @@
 
                     <form id="certificateFilters" class="filter-form">
                         <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="certificate_type">Loại chứng chỉ</label>
+                                <select id="certificate_type" name="certificate_type" class="form-select">
+                                    <option value="">Tất cả loại chứng chỉ</option>
+                                    <option value="ngoại ngữ">Chứng chỉ ngoại ngữ</option>
+                                    <option value="tin học">Chứng chỉ tin học</option>
+                                    <option value="nghề">Chứng chỉ nghề</option>
+                                </select>
+                            </div>
 
                             <div class="filter-group">
                                 <label for="cert_start_date">Từ ngày</label>
@@ -300,6 +351,43 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Export Section -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-file-export"></i> Xuất báo cáo Excel</h3>
+                    </div>
+                    <div class="export-actions">
+                        <button type="button" class="btn btn-success" onclick="exportDiplomaDetailed()">
+                            <i class="fas fa-file-excel"></i>
+                            Xuất chi tiết văn bằng
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('degree_type')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo loại bằng
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('graduation_year')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo khóa
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('major')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo ngành
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('ranking')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo xếp loại
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('gender')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo giới tính
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('training_type')">
+                            <i class="fas fa-file-excel"></i>
+                            Tổng hợp theo hình thức
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -350,6 +438,19 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Export Section -->
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-file-export"></i> Xuất báo cáo Excel</h3>
+                    </div>
+                    <div class="export-actions">
+                        <button type="button" class="btn btn-success" onclick="exportCertificateDetailed()">
+                            <i class="fas fa-file-excel"></i>
+                            Xuất chi tiết chứng chỉ
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -369,1084 +470,19 @@
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <style>
-        .statistics-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    <!-- Statistics CSS and JS -->
+    @vite(['resources/css/statistics.css', 'resources/js/statistics.js'])
 
-        .statistics-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            color: white;
-        }
-
-        .header-content h1 {
-            margin: 0 0 10px 0;
-            font-size: 28px;
-            font-weight: 600;
-        }
-
-        .header-content p {
-            margin: 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .header-actions .btn {
-            border-color: rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-
-        .header-actions .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .filter-section {
-            margin-bottom: 30px;
-        }
-
-        .filter-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .filter-card h3 {
-            margin: 0 0 20px 0;
-            color: #374151;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .filter-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            align-items: end;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .tab-navigation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            background: white;
-            padding: 10px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            background: transparent;
-            color: #6b7280;
-            font-weight: 500;
-            font-size: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tab-btn:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        .data-table thead th {
-            background: #f9fafb;
-            padding: 12px 16px;
-            text-align: center;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-            white-space: nowrap;
-        }
-
-        .data-table thead th:nth-child(2),
-        .data-table thead th:nth-child(3) {
-            text-align: left;
-        }
-
-        .data-table tbody td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            color: #6b7280;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .data-table tbody td:nth-child(2),
-        .data-table tbody td:nth-child(3) {
-            text-align: left;
-        }
-
-        .data-table tbody tr:hover {
-            background: #f9fafb;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-gray-500 {
-            color: #6b7280;
-        }
-
-        .stats-overview {
-            margin-bottom: 30px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .total-blanks .stat-icon {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        .available-blanks .stat-icon {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .issued-blanks .stat-icon {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-
-        .recalled-blanks .stat-icon {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .damaged-blanks .stat-icon {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .stat-content h3 {
-            margin: 0 0 5px 0;
-            font-size: 14px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #111827;
-            margin-bottom: 5px;
-        }
-
-        .stat-growth {
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .stat-growth.positive {
-            color: #10b981;
-        }
-
-        .stat-growth.negative {
-            color: #ef4444;
-        }
-
-        .charts-section {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-        }
-
-        .charts-grid .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .chart-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .chart-header h3 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
-
-        .chart-container canvas {
-            max-height: 100%;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        .loading-spinner {
-            background: transparent;
-            border: none;
-            padding: 0;
-            border-radius: 0;
-            text-align: center;
-            box-shadow: none;
-            max-width: none;
-            width: auto;
-            position: relative;
-        }
-
-        .spinner-ring {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 25px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .spinner-circle {
-            position: absolute;
-            border: 4px solid transparent;
-            border-radius: 50%;
-            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-        }
-
-        .spinner-circle:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            border-top-color: #667eea;
-            animation-delay: 0s;
-        }
-
-        .spinner-circle:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            top: 10px;
-            left: 10px;
-            border-right-color: #764ba2;
-            animation-delay: -0.4s;
-            animation-direction: reverse;
-        }
-
-        .spinner-circle:nth-child(3) {
-            width: 40px;
-            height: 40px;
-            top: 20px;
-            left: 20px;
-            border-bottom-color: #f093fb;
-            animation-delay: -0.8s;
-        }
-
-        .spinner-circle:nth-child(4) {
-            width: 20px;
-            height: 20px;
-            top: 30px;
-            left: 30px;
-            border-left-color: #f5576c;
-            animation-delay: -1.2s;
-            animation-direction: reverse;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.7;
-            }
-
-            100% {
-                transform: rotate(360deg);
-                opacity: 1;
-            }
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
-            background-size: 200% 100%;
-            border-radius: 2px;
-            animation: progressMove 2s ease-in-out infinite;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
-        }
-
-        @keyframes progressMove {
-            0% {
-                transform: translateX(-100%);
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                transform: translateX(100%);
-                background-position: 0% 50%;
-            }
-        }
-
-        .hidden {
-            display: none !important;
-            visibility: hidden;
-            opacity: 0;
-        }
-
-        .loading-overlay:not(.hidden) {
-            display: flex !important;
-            visibility: visible;
-            opacity: 1;
-            animation: overlayFadeIn 0.3s ease-out;
-        }
-
-        .loading-overlay:not(.hidden) .loading-spinner {
-            animation: spinnerSlideIn 0.4s ease-out 0.1s both;
-        }
-
-        @keyframes overlayFadeIn {
-            from {
-                opacity: 0;
-                backdrop-filter: blur(0px);
-                -webkit-backdrop-filter: blur(0px);
-            }
-
-            to {
-                opacity: 1;
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-            }
-        }
-
-        @keyframes spinnerSlideIn {
-            from {
-                transform: translateY(30px) scale(0.8);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .statistics-header {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .header-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .loading-spinner {
-                padding: 30px 25px;
-                margin: 0 15px;
-            }
-
-            .spinner-ring {
-                width: 60px;
-                height: 60px;
-                margin-bottom: 20px;
-            }
-
-            .spinner-circle:nth-child(1) {
-                width: 60px;
-                height: 60px;
-            }
-
-            .spinner-circle:nth-child(2) {
-                width: 45px;
-                height: 45px;
-                top: 7.5px;
-                left: 7.5px;
-            }
-
-            .spinner-circle:nth-child(3) {
-                width: 30px;
-                height: 30px;
-                top: 15px;
-                left: 15px;
-            }
-
-            .spinner-circle:nth-child(4) {
-                width: 15px;
-                height: 15px;
-                top: 22.5px;
-                left: 22.5px;
-            }
-
-            .loading-content h4 {
-                font-size: 16px;
-            }
-
-            .loading-content p {
-                font-size: 13px;
-            }
-        }
-    </style>
-
+    <!-- Pass server data to JavaScript -->
     <script>
-        // Store chart instances
-        let charts = {};
-
-        // Store current data
-        let currentData = {};
-
-        // Initialize when document is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            loadInitialData();
-            setupTabSwitching();
-        });
-
-        // Tab switching functionality
-        function setupTabSwitching() {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabType = this.dataset.tab;
-
-                    // Remove active class from all tabs
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                    // Add active class to clicked tab
-                    this.classList.add('active');
-                    document.getElementById(tabType + '-tab').classList.add('active');
-                    document.getElementById(tabType + '-results').classList.add('active');
-                });
-            });
-        }
-
-        async function loadInitialData() {
-            showLoading();
-
-            try {
-                // Load general statistics from server data immediately
-                updateStatsDisplay({
-                    total_blanks: {{ $generalStatistics['total_blanks'] }},
-                    available_blanks: {{ $generalStatistics['available_blanks'] }},
-                    issued_blanks: {{ $generalStatistics['issued_blanks'] }},
-                    recalled_blanks: {{ $generalStatistics['recalled_blanks'] }},
-                    damaged_blanks: {{ $generalStatistics['damaged_blanks'] }},
-                    issued_growth: "{{ $generalStatistics['issued_growth'] }}",
-                    recalled_growth: "{{ $generalStatistics['recalled_growth'] }}"
-                });
-
-                // Load default diploma statistics (without filters)
-                await loadDefaultDiplomaStatistics();
-
-                // Load default certificate statistics (without filters)
-                await loadDefaultCertificateStatistics();
-
-                hideLoading();
-            } catch (error) {
-                console.error('Error loading initial data:', error);
-                hideLoading();
-                alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng làm mới trang.');
-            }
-        }
-
-        // Load default diploma statistics without filters
-        async function loadDefaultDiplomaStatistics() {
-            try {
-                const response = await fetch('/statistics/diplomas');
-                const data = await response.json();
-
-                // Update charts
-                updateDiplomaCharts(data);
-
-                // Update table
-                updateDiplomaTable(data.details || []);
-            } catch (error) {
-                console.error('Error loading default diploma statistics:', error);
-            }
-        }
-
-        // Load default certificate statistics without filters
-        async function loadDefaultCertificateStatistics() {
-            try {
-                const response = await fetch('/statistics/certificates');
-                const data = await response.json();
-
-                // Update charts
-                updateCertificateCharts(data);
-
-                // Update table
-                updateCertificateTable(data.details || []);
-            } catch (error) {
-                console.error('Error loading default certificate statistics:', error);
-            }
-        }
-
-        function updateStatsDisplay(stats) {
-            // Update values - handle both nested (.value) and direct value formats
-            document.getElementById('total-blanks').textContent = (stats.total_blanks?.value || stats.total_blanks || 0)
-                .toLocaleString();
-            document.getElementById('available-blanks').textContent = (stats.available_blanks?.value || stats
-                .available_blanks || 0).toLocaleString();
-            document.getElementById('issued-blanks').textContent = (stats.issued_blanks?.value || stats.issued_blanks || 0)
-                .toLocaleString();
-            document.getElementById('recalled-blanks').textContent = (stats.recalled_blanks?.value || stats
-                .recalled_blanks || 0).toLocaleString();
-            document.getElementById('damaged-blanks').textContent = (stats.damaged_blanks?.value || stats.damaged_blanks ||
-                0).toLocaleString();
-
-            // Update growth indicators
-            updateGrowthIndicator('total-blanks-growth', stats.total_blanks?.growth || "+0%");
-            updateGrowthIndicator('available-blanks-growth', stats.available_blanks?.growth || "+0%");
-            updateGrowthIndicator('issued-blanks-growth', stats.issued_growth || "+0%");
-            updateGrowthIndicator('recalled-blanks-growth', stats.recalled_growth || "+0%");
-            updateGrowthIndicator('damaged-blanks-growth', stats.damaged_blanks?.growth || "+0%");
-        }
-
-        function updateGrowthIndicator(elementId, growth) {
-            const element = document.getElementById(elementId);
-            const span = element.querySelector('span');
-            const icon = element.querySelector('i');
-
-            // Parse growth value (handle both numeric and string formats)
-            let growthValue = 0;
-            if (typeof growth === 'string') {
-                // Extract numeric value from string like "+12%" or "-5.5%"
-                const match = growth.match(/([+-]?\d+\.?\d*)/);
-                growthValue = match ? parseFloat(match[1]) : 0;
-            } else {
-                growthValue = growth || 0;
-            }
-
-            if (growthValue >= 0) {
-                element.className = 'stat-growth positive';
-                icon.className = 'fas fa-arrow-up';
-            } else {
-                element.className = 'stat-growth negative';
-                icon.className = 'fas fa-arrow-down';
-            }
-
-            // Display growth value
-            if (typeof growth === 'string' && growth.includes('%')) {
-                span.textContent = growth; // Use original string if it already has %
-            } else {
-                span.textContent = Math.abs(growthValue).toFixed(1) + '%';
-            }
-        }
-
-        // Apply diploma filters
-        async function applyDiplomaFilters() {
-            showLoading();
-            const formData = new FormData(document.getElementById('diplomaFilters'));
-            const params = new URLSearchParams(formData);
-
-            try {
-                const response = await fetch(`/statistics/diplomas?${params}`);
-                const data = await response.json();
-
-                // Update charts
-                updateDiplomaCharts(data);
-
-                // Update table
-                updateDiplomaTable(data.details || []);
-
-                hideLoading();
-            } catch (error) {
-                console.error('Error fetching diploma statistics:', error);
-                hideLoading();
-                alert('Có lỗi xảy ra khi lấy dữ liệu thống kê');
-            }
-        }
-
-        // Apply certificate filters
-        async function applyCertificateFilters() {
-            showLoading();
-            const formData = new FormData(document.getElementById('certificateFilters'));
-            const params = new URLSearchParams(formData);
-
-            try {
-                const response = await fetch(`/statistics/certificates?${params}`);
-                const data = await response.json();
-
-                // Update charts
-                updateCertificateCharts(data);
-
-                // Update table
-                updateCertificateTable(data.details || []);
-
-                hideLoading();
-            } catch (error) {
-                console.error('Error fetching certificate statistics:', error);
-                hideLoading();
-                alert('Có lỗi xảy ra khi lấy dữ liệu thống kê');
-            }
-        }
-
-        // Update diploma charts
-        function updateDiplomaCharts(data) {
-            // Degree Type Chart
-            updateOrCreateChart('degreeTypeChart', {
-                type: 'doughnut',
-                data: {
-                    labels: data.by_type?.labels || [],
-                    datasets: [{
-                        data: data.by_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                }
-            });
-
-            // Gender Chart
-            updateOrCreateChart('genderChart', {
-                type: 'pie',
-                data: {
-                    labels: ['Nam', 'Nữ'],
-                    datasets: [{
-                        data: [data.male_count || 0, data.female_count || 0],
-                        backgroundColor: ['#3B82F6', '#EC4899'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                }
-            });
-
-            // Ranking Chart
-            updateOrCreateChart('rankingChart', {
-                type: 'bar',
-                data: {
-                    labels: data.by_ranking?.labels || [],
-                    datasets: [{
-                        label: 'Số lượng',
-                        data: data.by_ranking?.values || [],
-                        backgroundColor: '#10B981',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Major Chart
-            updateOrCreateChart('majorChart', {
-                type: 'bar',
-                data: {
-                    labels: data.by_major?.labels || [],
-                    datasets: [{
-                        label: 'Số lượng',
-                        data: data.by_major?.values || [],
-                        backgroundColor: '#8B5CF6',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Graduation Year Chart
-            updateOrCreateChart('graduationYearChart', {
-                type: 'line',
-                data: {
-                    labels: data.by_year?.labels || [],
-                    datasets: [{
-                        label: 'Số lượng',
-                        data: data.by_year?.values || [],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Training Type Chart
-            updateOrCreateChart('trainingTypeChart', {
-                type: 'doughnut',
-                data: {
-                    labels: data.by_training_type?.labels || [],
-                    datasets: [{
-                        data: data.by_training_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                }
-            });
-        }
-
-        // Update certificate charts
-        function updateCertificateCharts(data) {
-            // Certificate Type Chart
-            updateOrCreateChart('certificateTypeChart', {
-                type: 'doughnut',
-                data: {
-                    labels: data.by_type?.labels || [],
-                    datasets: [{
-                        data: data.by_type?.values || [],
-                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                }
-            });
-
-            // Certificate Trend Chart
-            updateOrCreateChart('certificateTrendChart', {
-                type: 'line',
-                data: {
-                    labels: data.by_month?.labels || [],
-                    datasets: [{
-                        label: 'Số lượng',
-                        data: data.by_month?.values || [],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Helper function to update or create chart
-        function updateOrCreateChart(canvasId, config) {
-            if (charts[canvasId]) {
-                charts[canvasId].destroy();
-            }
-            const ctx = document.getElementById(canvasId);
-            if (ctx) {
-                // Add default options if not provided
-                if (!config.options) {
-                    config.options = {};
-                }
-
-                // Set default responsive options
-                config.options.responsive = true;
-                config.options.maintainAspectRatio = false;
-
-                // Add default plugins if not provided
-                if (!config.options.plugins) {
-                    config.options.plugins = {};
-                }
-
-                // Add legend configuration
-                if (!config.options.plugins.legend) {
-                    config.options.plugins.legend = {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    };
-                }
-
-                // Add tooltip configuration
-                if (!config.options.plugins.tooltip) {
-                    config.options.plugins.tooltip = {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14
-                        },
-                        bodyFont: {
-                            size: 13
-                        }
-                    };
-                }
-
-                charts[canvasId] = new Chart(ctx, config);
-            }
-        }
-
-        // Update diploma table
-        function updateDiplomaTable(details) {
-            const tbody = document.querySelector('#diplomaStatsTable tbody');
-            if (details.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="5" class="text-center text-gray-500">Không có dữ liệu</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = details.map((item, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.criteria}</td>
-                    <td>${item.value}</td>
-                    <td>${item.count}</td>
-                    <td>${item.percentage}%</td>
-                </tr>
-            `).join('');
-        }
-
-        // Update certificate table
-        function updateCertificateTable(details) {
-            const tbody = document.querySelector('#certificateStatsTable tbody');
-            if (details.length === 0) {
-                tbody.innerHTML =
-                    '<tr><td colspan="4" class="text-center text-gray-500">Không có dữ liệu</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = details.map((item, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.type}</td>
-                    <td>${item.count}</td>
-                    <td>${item.percentage}%</td>
-                </tr>
-            `).join('');
-        }
-
-        // Reset filters
-        function resetDiplomaFilters() {
-            document.getElementById('diplomaFilters').reset();
-        }
-
-        function resetCertificateFilters() {
-            document.getElementById('certificateFilters').reset();
-        }
-
-        function exportStatistics() {
-            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-            window.location.href = `/statistics/export-report?type=${activeTab}`;
-        }
-
-        function showLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.style.animation = 'overlayFadeOut 0.3s ease-in';
-            overlay.querySelector('.loading-spinner').style.animation = 'spinnerSlideOut 0.2s ease-in';
-
-            setTimeout(() => {
-                overlay.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                overlay.style.animation = '';
-                overlay.querySelector('.loading-spinner').style.animation = '';
-            }, 300);
-        }
-
-        // Add CSS for fade out animations
-        const fadeOutStyles = `
-            @keyframes overlayFadeOut {
-                from {
-                    opacity: 1;
-                    backdrop-filter: blur(8px);
-                    -webkit-backdrop-filter: blur(8px);
-                }
-                to {
-                    opacity: 0;
-                    backdrop-filter: blur(0px);
-                    -webkit-backdrop-filter: blur(0px);
-                }
-            }
-
-            @keyframes spinnerSlideOut {
-                from {
-                    transform: translateY(0) scale(1);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateY(-20px) scale(0.9);
-                    opacity: 0;
-                }
-            }
-        `;
-
-        // Inject fade out styles
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = fadeOutStyles;
-        document.head.appendChild(styleSheet);
+        window.generalStatistics = {
+            total_blanks: {{ $generalStatistics['total_blanks'] }},
+            available_blanks: {{ $generalStatistics['available_blanks'] }},
+            issued_blanks: {{ $generalStatistics['issued_blanks'] }},
+            recalled_blanks: {{ $generalStatistics['recalled_blanks'] }},
+            damaged_blanks: {{ $generalStatistics['damaged_blanks'] }},
+            issued_growth: "{{ $generalStatistics['issued_growth'] }}",
+            recalled_growth: "{{ $generalStatistics['recalled_growth'] }}"
+        };
     </script>
 @endsection

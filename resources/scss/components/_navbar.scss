@@ -48,6 +48,6 @@
     }
 }
 
-.active {
+.menu-item-active {
     @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)];
 }

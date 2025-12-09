@@ -39,7 +39,7 @@
   @apply text-base;
 }
 
-.active {
+.menu-item-active {
   @apply bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)];
 }
 
@@ -705,6 +705,12 @@
 }
 .btn-delete:hover {
   @apply bg-red-100 text-red-800;
+}
+.btn-info {
+  @apply bg-cyan-50 text-cyan-700;
+}
+.btn-info:hover {
+  @apply bg-cyan-100 text-cyan-800;
 }
 .btn-blanks {
   @apply bg-indigo-50 text-indigo-700;

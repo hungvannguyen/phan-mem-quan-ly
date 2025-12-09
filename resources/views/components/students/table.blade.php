@@ -118,6 +118,15 @@
                                     Xóa
                                 </button>
 
+                                {{-- Export diploma verification button --}}
+                                @if ($student->degrees && $student->degrees->count() > 0)
+                                    <a href="{{ route('student.export-verification', $student->student_id) }}" 
+                                        class="btn-action btn-info" 
+                                        title="Xuất công văn xác minh văn bằng">
+                                        <i class="fas fa-file-word"></i> Xác minh
+                                    </a>
+                                @endif
+
                                 {{-- Hiển thị nút cấp văn bằng dựa trên trạng thái học sinh --}}
                                 @if ($student->status && $student->status->value === 1)
                                     {{-- Sinh viên đã tốt nghiệp --}}
