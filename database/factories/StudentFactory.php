@@ -25,6 +25,8 @@ class StudentFactory extends Factory
             'full_name' => $this->faker->name(),
             'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-18 years')->format('Y-m-d'),
             'class_name' => $this->faker->regexify('[A-Z]{2}[0-9]{2}[A-Z]{1}'),
+            'course' => 'K' . $this->faker->numberBetween(45, 55),
+            'academic_year' => $this->faker->numberBetween(2015, 2024) . '-' . $this->faker->numberBetween(2019, 2028),
             'major_id' => 1, // Default major_id, will be overridden in seeder
             'place_of_birth' => $this->faker->city(),
             'gender' => $this->faker->randomElement(StudentGender::cases())->value,

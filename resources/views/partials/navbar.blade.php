@@ -12,8 +12,8 @@
             @endif
 
             @if (auth()->user()->hasPermission('diploma-blanks.view'))
-                <a href="{{ route('diploma-blank-management') }}"
-                    class="menu-item {{ request()->routeIs('diploma-blank-management') ? 'menu-item-active' : '' }}">
+                <a href="{{ route('diploma-blank-import.index') }}"
+                    class="menu-item {{ request()->routeIs('diploma-blank-import.*') || request()->routeIs('diploma-blanks.*') || request()->routeIs('diploma-blank-exports.*') || request()->routeIs('diploma-blank-recalls.*') ? 'menu-item-active' : '' }}">
                     <i class="fas fa-certificate"></i>
                     Quản lý phôi văn bằng
                 </a>

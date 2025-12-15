@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Create users using factory
         $adminUser = User::factory()->create([
-            'email' => 'admin@hvannd.edu.vn',
+            'email' => 'admin@gmail.com',
             'password' => bcrypt('password'),
             'full_name' => 'Quản trị viên',
             'is_active' => true,

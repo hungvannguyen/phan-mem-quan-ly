@@ -126,6 +126,18 @@
                                 placeholder="Nhập tên lớp" value="{{ request('class_name') }}">
                         </div>
 
+                        <div class="form-field">
+                            <label for="course" class="field-label">Khóa</label>
+                            <input type="text" id="course" name="course" class="field-input"
+                                placeholder="Nhập khóa (VD: K65)" value="{{ request('course') }}">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="academic_year" class="field-label">Niên khóa</label>
+                            <input type="text" id="academic_year" name="academic_year" class="field-input"
+                                placeholder="Nhập niên khóa (VD: 2020-2024)" value="{{ request('academic_year') }}">
+                        </div>
+
                         <x-flexible-date-search id="date_of_birth" name="date_of_birth" label="Ngày sinh"
                             placeholder="Nhập ngày sinh (VD: 15, 03/1995, 15/03/1995)"
                             value="{{ request('date_of_birth') }}" />
@@ -407,6 +419,8 @@
                 'full_name',
                 'student_code',
                 'class_name',
+                'course',
+                'academic_year',
                 'date_of_birth',
                 'major_id',
                 'diploma_blank_type_id'

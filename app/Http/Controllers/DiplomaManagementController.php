@@ -6,10 +6,15 @@ use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
+use App\Models\DiplomaBlankType;
 use App\Exports\DiplomaVerificationExport;
+use App\Exports\BachelorConfirmationExport;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Models\DiplomaBlank;
+use App\Enums\DiplomaBlankStatus;
+use Illuminate\Http\RedirectResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DiplomaManagementController extends Controller
 {
@@ -70,6 +75,16 @@ class DiplomaManagementController extends Controller
             }
         }
 
+        // Tìm kiếm theo khóa - chỉ khi có input
+        if ($request->filled('course')) {
+            $query->where('course', 'like', '%' . $request->course . '%');
+        }
+
+        // Tìm kiếm theo niên khóa - chỉ khi có input
+        if ($request->filled('academic_year')) {
+            $query->where('academic_year', 'like', '%' . $request->academic_year . '%');
+        }
+
         // Tìm kiếm theo ngành - chỉ khi có input
         if ($request->filled('major_id')) {
             $query->where('major_id', $request->major_id);
@@ -88,7 +103,7 @@ class DiplomaManagementController extends Controller
 
         $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
         $majors = Major::orderBy('major_name')->get();
-        $diplomaBlankTypes = \App\Models\DiplomaBlankType::orderBy('type_name')->get();
+        $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
         if ($request->ajax()) {
             return view('components.students.table', compact('students'))->render();
@@ -124,7 +139,7 @@ class DiplomaManagementController extends Controller
         $majors = Major::orderBy('major_name')->get();
 
         // Get all diploma blank types for dropdown
-        $diplomaBlankTypes = \App\Models\DiplomaBlankType::orderBy('type_name')->get();
+        $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
         // Get degrees issued to this student with all relationships
         $degrees = $student->degrees()->with(['major', 'diplomaBlank.type'])->get();
@@ -165,8 +180,8 @@ class DiplomaManagementController extends Controller
                 }
 
                 // Check diploma blank availability and lock it
-                $diplomaBlank = \App\Models\DiplomaBlank::where('diploma_blank_id', $validated['diploma_blank_id'])
-                    ->where('status', \App\Enums\DiplomaBlankStatus::IN_STOCK)
+                $diplomaBlank = DiplomaBlank::where('diploma_blank_id', $validated['diploma_blank_id'])
+                    ->where('status', DiplomaBlankStatus::IN_STOCK)
                     ->whereDoesntHave('degree') // Not already assigned
                     ->lockForUpdate() // Lock for atomic update
                     ->first();
@@ -188,7 +203,7 @@ class DiplomaManagementController extends Controller
 
                 // Update diploma blank status to ISSUED
                 $diplomaBlank->update([
-                    'status' => \App\Enums\DiplomaBlankStatus::ISSUED,
+                    'status' => DiplomaBlankStatus::ISSUED,
                     'issue_date' => $validated['granting_date'],
                     'issue_reason' => "Cấp văn bằng cho sinh viên: {$student->full_name}"
                 ]);
@@ -208,8 +223,8 @@ class DiplomaManagementController extends Controller
     {
         try {
             // Get the oldest available diploma blank for the specified type
-            $oldestBlank = \App\Models\DiplomaBlank::where('type_id', $typeId)
-                ->where('status', \App\Enums\DiplomaBlankStatus::IN_STOCK)
+            $oldestBlank = DiplomaBlank::where('type_id', $typeId)
+                ->where('status', DiplomaBlankStatus::IN_STOCK)
                 ->whereDoesntHave('degree') // Not assigned to any degree
                 ->orderBy('import_date', 'asc') // Oldest first by import date
                 ->orderBy('serial_number', 'asc') // Then by serial number
@@ -295,10 +310,10 @@ class DiplomaManagementController extends Controller
                 $degree->delete();
 
                 if ($degree->diploma_blank_id) {
-                    $diplomaBlank = \App\Models\DiplomaBlank::find($degree->diploma_blank_id);
+                    $diplomaBlank = DiplomaBlank::find($degree->diploma_blank_id);
                     if ($diplomaBlank) {
                         $diplomaBlank->update([
-                            'status' => \App\Enums\DiplomaBlankStatus::IN_STOCK->value,
+                            'status' => DiplomaBlankStatus::IN_STOCK->value,
                             'issue_date' => null,
                             'issue_reason' => null
                         ]);
@@ -329,10 +344,10 @@ class DiplomaManagementController extends Controller
 
             // If degree had a diploma blank, revert its status to IN_STOCK
             if ($degree->diploma_blank_id) {
-                $diplomaBlank = \App\Models\DiplomaBlank::find($degree->diploma_blank_id);
+                $diplomaBlank = DiplomaBlank::find($degree->diploma_blank_id);
                 if ($diplomaBlank) {
                     $diplomaBlank->update([
-                        'status' => \App\Enums\DiplomaBlankStatus::IN_STOCK->value,
+                        'status' => DiplomaBlankStatus::IN_STOCK->value,
                         'issue_date' => null,
                         'issue_reason' => null
                     ]);
@@ -353,36 +368,47 @@ class DiplomaManagementController extends Controller
      * Export diploma verification document for a student
      *
      * @param Student $student
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
+     * @return BinaryFileResponse|RedirectResponse
      */
     public function exportDiplomaVerification(Student $student)
     {
         try {
-            // Check if student has at least one degree
             if ($student->degrees->count() === 0) {
                 return redirect()->back()->with('error', 'Sinh viên chưa được cấp văn bằng nào!');
             }
 
-            // Generate the document
             $export = new DiplomaVerificationExport($student);
             $filePath = $export->generate();
 
-            \Log::info('About to download file', [
-                'path' => $filePath,
-                'exists' => file_exists($filePath),
-                'size' => file_exists($filePath) ? filesize($filePath) : 0
-            ]);
-
-            // Download the file and delete it after download
             return response()->download($filePath, basename($filePath), [
-                'Content-Type' => 'application/rtf',
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             ])->deleteFileAfterSend(true);
         } catch (\Exception $e) {
-            \Log::error('Export error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất văn bản xác minh: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export bachelor confirmation document for a student
+     *
+     * @param Student $student
+     * @return BinaryFileResponse|RedirectResponse
+     */
+    public function exportBachelorConfirmation(Student $student)
+    {
+        try {
+            if ($student->degrees->count() === 0) {
+                return redirect()->back()->with('error', 'Sinh viên chưa được cấp văn bằng nào!');
+            }
+
+            $export = new BachelorConfirmationExport($student);
+            $filePath = $export->generate();
+
+            return response()->download($filePath, basename($filePath), [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất giấy xác nhận: ' . $e->getMessage());
         }
     }
 }

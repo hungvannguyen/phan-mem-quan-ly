@@ -33,7 +33,7 @@
             <div class="diploma-page-header">
                 <div class="header-with-nav">
                     <div class="breadcrumb">
-                        <a href="{{ route('diploma-blank-management') }}" class="breadcrumb-item">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="breadcrumb-item">
                             <i class="fas fa-arrow-left"></i> Quay lại danh sách phôi
                         </a>
                     </div>
@@ -68,13 +68,8 @@
                                 </select>
                             </div>
 
-                            <x-vietnamese-date-input 
-                                id="import_date"
-                                name="import_date" 
-                                label="Ngày cấp"
-                                :required="true"
-                                value="{{ old('import_date', date('Y-m-d')) }}"
-                            />
+                            <x-vietnamese-date-input id="import_date" name="import_date" label="Ngày cấp" :required="true"
+                                value="{{ old('import_date', date('Y-m-d')) }}" />
                         </div>
 
                         <div class="form-field">
@@ -210,7 +205,7 @@
                             <i class="fas fa-save"></i>
                             Nhập phôi vào hệ thống
                         </button>
-                        <a href="{{ route('diploma-blank-management') }}" class="btn-cancel">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="btn-cancel">
                             <i class="fas fa-times"></i>
                             Hủy bỏ
                         </a>

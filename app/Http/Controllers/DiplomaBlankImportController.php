@@ -141,7 +141,7 @@ class DiplomaBlankImportController extends Controller
         // Note: Import sẽ được xử lý tự động bởi scheduled job (chạy mỗi phút)
         // Job ProcessDiplomaBlankImportJob sẽ tạo các DiplomaBlank records
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', "Đã tạo lệnh nhập phôi thành công. ID: {$import->id}, Số lượng: {$totalQuantity} phôi. Hệ thống sẽ tự động xử lý trong vài phút.");
     }
 

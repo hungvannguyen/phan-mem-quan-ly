@@ -71,7 +71,7 @@
                                 Đang cập nhật...
                             </button>
                         @endif
-                        <a href="{{ route('diploma-blank-management') }}" class="btn-back">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="btn-back">
                             Quay lại danh sách Import
                         </a>
                     @else

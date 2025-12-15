@@ -164,7 +164,7 @@
                         'import_date_to',
                         'issue_date_from',
                     ]))
-                    <a href="{{ route('diploma-blank-management') }}" class="btn-secondary">
+                    <a href="{{ route('diploma-blank-import.index') }}" class="btn-secondary">
                         Xóa bộ lọc
                     </a>
                 @endif

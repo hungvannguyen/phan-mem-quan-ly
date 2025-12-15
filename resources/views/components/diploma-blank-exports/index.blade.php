@@ -26,7 +26,7 @@
 
             <!-- Action Buttons -->
             <div class="page-actions">
-                <a href="{{ route('diploma-blank-management') }}" class="action-btn action-btn-secondary">
+                <a href="{{ route('diploma-blank-import.index') }}" class="action-btn action-btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại quản lý phôi
                 </a>
             </div>
@@ -98,7 +98,7 @@
                         </div>
                         <h3>Chưa có lịch sử xuất phôi</h3>
                         <p>Chưa có bản ghi xuất phôi nào trong hệ thống.</p>
-                        <a href="{{ route('diploma-blank-management') }}" class="btn btn-primary">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="btn btn-primary">
                             Quay lại quản lý phôi
                         </a>
                     </div>

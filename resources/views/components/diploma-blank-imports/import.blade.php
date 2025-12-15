@@ -36,7 +36,7 @@
                     <p class="page-subtitle">Nhập thông tin phôi văn bằng được X02 cấp vào hệ thống</p>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('diploma-blank-management') }}" class="btn-back">
+                    <a href="{{ route('diploma-blank-import.index') }}" class="btn-back">
                         Quay lại
                     </a>
                 </div>
@@ -166,7 +166,7 @@
                         <button type="submit" class="btn-submit">
                             Nhập phôi vào hệ thống
                         </button>
-                        <a href="{{ route('diploma-blank-management') }}" class="btn-cancel">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="btn-cancel">
                             Hủy bỏ
                         </a>
                     </div>

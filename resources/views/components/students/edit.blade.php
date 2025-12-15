@@ -294,6 +294,31 @@
                     </div>
 
                     <div class="form-field">
+                        <label for="course" class="field-label">Khóa</label>
+                        <input type="text" id="course" name="course" class="field-input"
+                            value="{{ old('course', $student->course) }}" placeholder="Nhập khóa (VD: K65)">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: K65, K66, K67</small>
+                        </div>
+                        @error('course')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
+                        <label for="academic_year" class="field-label">Niên khóa</label>
+                        <input type="text" id="academic_year" name="academic_year" class="field-input"
+                            value="{{ old('academic_year', $student->academic_year) }}"
+                            placeholder="Nhập niên khóa (VD: 2020-2024)">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: 2020-2024, 2021-2025</small>
+                        </div>
+                        @error('academic_year')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
                         <label for="major_id" class="field-label">Ngành đào tạo <span class="text-red-500">*</span></label>
                         <select id="major_id" name="major_id" class="field-select" required>
                             <option value="">-- Chọn ngành --</option>
@@ -328,7 +353,8 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="place_of_birth" class="field-label">Nơi sinh <span class="text-red-500">*</span></label>
+                        <label for="place_of_birth" class="field-label">Nơi sinh <span
+                                class="text-red-500">*</span></label>
                         <input type="text" id="place_of_birth" name="place_of_birth" class="field-input"
                             value="{{ old('place_of_birth', $student->place_of_birth) }}" placeholder="Nhập nơi sinh"
                             required>

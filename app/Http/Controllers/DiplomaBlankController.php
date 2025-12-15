@@ -205,7 +205,7 @@ class DiplomaBlankController extends Controller
         // Batch insert
         DiplomaBlank::insert($diplomaBlanks);
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', "Đã nhập thành công {$request->quantity} phôi văn bằng vào hệ thống.");
     }
 
@@ -262,7 +262,7 @@ class DiplomaBlankController extends Controller
 
         DiplomaBlank::create($request->all());
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', 'Phôi văn bằng đã được thêm thành công.');
     }
 
@@ -298,7 +298,7 @@ class DiplomaBlankController extends Controller
 
         $diplomaBlank->update($request->all());
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', 'Thông tin phôi văn bằng đã được cập nhật.');
     }
 
@@ -309,7 +309,7 @@ class DiplomaBlankController extends Controller
     {
         $diplomaBlank->delete();
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', 'Phôi văn bằng đã được xóa thành công.');
     }
 
@@ -328,7 +328,7 @@ class DiplomaBlankController extends Controller
             'issue_reason' => $request->issue_reason,
         ]);
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', 'Phôi văn bằng đã được cấp thành công.');
     }
 
@@ -347,7 +347,7 @@ class DiplomaBlankController extends Controller
             'recall_reason' => $request->recall_reason,
         ]);
 
-        return redirect()->route('diploma-blank-management')
+        return redirect()->route('diploma-blank-import.index')
             ->with('success', 'Phôi văn bằng đã được thu hồi thành công.');
     }
 

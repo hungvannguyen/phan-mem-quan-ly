@@ -107,7 +107,7 @@
                         </td>
                         <td class="td">
                             <div class="action-buttons">
-                                <a href="{{ route('student', $student->student_id) }}" class="btn-action btn-view"
+                                <a href="{{ route('student.show', $student->student_id) }}" class="btn-action btn-view"
                                     title="Chỉnh sửa thông tin sinh viên">
                                     Sửa
                                 </a>
@@ -123,6 +123,12 @@
                                     <a href="{{ route('student.export-verification', $student->student_id) }}"
                                         class="btn-action btn-info" title="Xuất công văn xác minh văn bằng">
                                         <i class="fas fa-file-word"></i> Xác minh
+                                    </a>
+
+                                    {{-- Export bachelor confirmation button --}}
+                                    <a href="{{ route('student.export-bachelor-confirmation', $student->student_id) }}"
+                                        class="btn-action btn-info" title="Xuất giấy xác nhận cử nhân">
+                                        <i class="fas fa-file-word"></i> Cử nhân
                                     </a>
                                 @endif
 

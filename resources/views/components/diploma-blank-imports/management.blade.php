@@ -37,7 +37,7 @@
 
             <!-- Search Form -->
             <div class="search-card">
-                <form class="search-form" method="GET" action="{{ route('diploma-blank-management') }}">
+                <form class="search-form" method="GET" action="{{ route('diploma-blank-import.index') }}">
                     <div class="form-grid">
                         <div class="form-field">
                             <label for="document_reference" class="field-label">Số văn bản</label>
@@ -94,7 +94,7 @@
                         <button type="submit" class="btn-search" id="search-btn" disabled>
                             Tìm kiếm
                         </button>
-                        <a href="{{ route('diploma-blank-management') }}" class="btn-reset">
+                        <a href="{{ route('diploma-blank-import.index') }}" class="btn-reset">
                             Xóa bộ lọc
                         </a>
                     </div>

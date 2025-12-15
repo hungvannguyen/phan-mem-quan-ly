@@ -110,7 +110,7 @@
                 <a href="{{ route('diploma-blank-recalls.index') }}" class="action-btn action-btn-warning">
                     <i class="fas fa-undo"></i> Thu hồi phôi mới
                 </a>
-                <a href="{{ route('diploma-blank-management') }}" class="action-btn action-btn-secondary">
+                <a href="{{ route('diploma-blank-import.index') }}" class="action-btn action-btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại quản lý
                 </a>
                 <button type="button" class="action-btn action-btn-success" onclick="exportRecalledBlanks()">

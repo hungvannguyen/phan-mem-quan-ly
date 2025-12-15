@@ -2,399 +2,319 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DiplomaBlankController;
+use App\Http\Controllers\DiplomaBlankExportController;
 use App\Http\Controllers\DiplomaBlankImportController;
+use App\Http\Controllers\DiplomaBlankRecallController;
 use App\Http\Controllers\DiplomaManagementController;
-use App\Http\Controllers\EmbryoManagementController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\RedirectIfAuthenticated;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [StatisticsController::class, 'index'])->middleware(['auth', 'permission:diplomas.view'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-    ->middleware(RedirectIfAuthenticated::class)->name('login');
+Route::get('/error', fn() => view('error'))->name('error');
+Route::get('/test-error', fn() => abort(404));
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::get(
-    '/diploma-management',
-    [DiplomaManagementController::class, 'index']
-)->middleware(['auth', 'permission:diplomas.view'])->name('diploma-management');
-
-Route::get(
-    '/diploma-blank-management',
-    [DiplomaBlankImportController::class, 'index']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-management');
-
-Route::get(
-    '/diploma-blanks',
-    [DiplomaBlankController::class, 'index']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blanks.index');
-
-Route::get(
-    '/diploma-blanks-management/{importId}',
-    [DiplomaBlankController::class, 'indexByImport']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blanks.management-by-import');
-
-Route::post(
-    '/diploma-blanks/{diplomaBlankId}/mark-damaged',
-    [DiplomaBlankController::class, 'markAsDamaged']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blanks.mark-damaged');
-
-Route::get(
-    '/diploma-blank-management/create',
-    [DiplomaBlankImportController::class, 'create']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blank-import.create');
-
-Route::post(
-    '/diploma-blank-management/store',
-    [DiplomaBlankImportController::class, 'store']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blank-import.store');
-
-Route::get(
-    '/diploma-blank-management/{import}',
-    [DiplomaBlankImportController::class, 'show']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-import.show');
-
-Route::post(
-    '/diploma-blank-management/{import}/start',
-    [DiplomaBlankImportController::class, 'start']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-import.start');
-
-Route::post(
-    '/diploma-blank-management/{import}/pause',
-    [DiplomaBlankImportController::class, 'pause']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-import.pause');
-
-Route::post(
-    '/diploma-blank-management/{import}/retry',
-    [DiplomaBlankImportController::class, 'retry']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-import.retry');
-
-Route::delete(
-    '/diploma-blank-management/{import}',
-    [DiplomaBlankImportController::class, 'destroy']
-)->middleware(['auth', 'permission:diploma-blanks.delete'])->name('diploma-blank-import.destroy');
-
-Route::get(
-    '/diploma-blank-management/api/statistics',
-    [DiplomaBlankImportController::class, 'statistics']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-import.statistics');
-
-Route::post(
-    '/diploma-blank-management/sync',
-    [DiplomaBlankImportController::class, 'sync']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-import.sync');
-
-Route::put(
-    '/diploma-blank-management/{import}/update',
-    [DiplomaBlankImportController::class, 'updateImport']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-import.update')
-    ->where('import', '[0-9]+');
-
-Route::get(
-    '/diploma-blank-management/{import}/status',
-    [DiplomaBlankImportController::class, 'checkUpdateStatus']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-import.status')
-    ->where('import', '[0-9]+');
-
-Route::get(
-    '/diploma-blank-management/import',
-    [DiplomaBlankController::class, 'showImportForm']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blank.import');
-
-Route::post(
-    '/diploma-blank-management/import',
-    [DiplomaBlankController::class, 'storeImport']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blank.import.store');
-
-Route::post(
-    '/diploma-blank-management/validate-range',
-    [DiplomaBlankController::class, 'validateRange']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank.validate-range');
-
-Route::get(
-    '/diploma-blanks/import',
-    [DiplomaBlankController::class, 'import']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blanks.import');
-
-Route::post(
-    '/diploma-blanks/import',
-    [DiplomaBlankController::class, 'processImport']
-)->middleware(['auth', 'permission:diploma-blanks.create'])->name('diploma-blanks.process-import');
-
-Route::post(
-    '/diploma-blanks/check-duplicates',
-    [DiplomaBlankController::class, 'checkDuplicates']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blanks.check-duplicates');
-
-// Diploma Blank Export routes
-Route::get(
-    '/diploma-blank-exports',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'index']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-exports.index');
-
-Route::get(
-    '/diploma-blank-exports/create',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'create']
-)->middleware(['auth', 'permission:diploma-blanks.export'])->name('diploma-blank-exports.create');
-
-Route::post(
-    '/diploma-blank-exports/suggested-ranges',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'getSuggestedRanges']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-exports.suggested-ranges');
-
-Route::post(
-    '/diploma-blank-exports/validate-range',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'validateCustomRange']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-exports.validate-range');
-
-Route::post(
-    '/diploma-blank-exports/store',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'store']
-)->middleware(['auth', 'permission:diploma-blanks.export'])->name('diploma-blank-exports.store');
-
-Route::get(
-    '/diploma-blank-exports/{export}',
-    [App\Http\Controllers\DiplomaBlankExportController::class, 'show']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-exports.show');
-
-Route::get('/certificate-management', function () {
-    return view('certificate-management');
-})->middleware(['auth', 'permission:certificates.view'])->name('certificate-management');
-
-// Settings Routes
-Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'index'])
-    ->middleware(['auth', 'permission:settings.view'])
-    ->name('settings.index');
-
-// Diploma Blank Type Routes
-Route::get('/settings/types/create', [App\Http\Controllers\SettingsController::class, 'createType'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.types.create');
-
-Route::post('/settings/types', [App\Http\Controllers\SettingsController::class, 'storeType'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.types.store');
-
-Route::get('/settings/types/{type:type_id}/edit', [App\Http\Controllers\SettingsController::class, 'editType'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.types.edit');
-
-Route::put('/settings/types/{type:type_id}', [App\Http\Controllers\SettingsController::class, 'updateType'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.types.update');
-
-Route::delete('/settings/types/{type:type_id}', [App\Http\Controllers\SettingsController::class, 'destroyType'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.types.destroy');
-
-// Major Routes
-Route::get('/settings/majors/create', [App\Http\Controllers\SettingsController::class, 'createMajor'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.majors.create');
-
-Route::post('/settings/majors', [App\Http\Controllers\SettingsController::class, 'storeMajor'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.majors.store');
-
-Route::get('/settings/majors/{major:major_id}/edit', [App\Http\Controllers\SettingsController::class, 'editMajor'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.majors.edit');
-
-Route::put('/settings/majors/{major:major_id}', [App\Http\Controllers\SettingsController::class, 'updateMajor'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.majors.update');
-
-Route::delete('/settings/majors/{major:major_id}', [App\Http\Controllers\SettingsController::class, 'destroyMajor'])
-    ->middleware(['auth', 'permission:settings.edit'])
-    ->name('settings.majors.destroy');
-
-// User Management Routes
-Route::get('/user-management', [App\Http\Controllers\UserController::class, 'index'])
-    ->middleware(['auth', 'permission:users.view'])
-    ->name('user-management');
-
-Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])
-    ->middleware(['auth', 'permission:users.create'])
-    ->name('user.create');
-
-Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])
-    ->middleware(['auth', 'permission:users.create'])
-    ->name('user.store');
-
-Route::get('/users/{user:user_id}/edit', [App\Http\Controllers\UserController::class, 'edit'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('user.edit');
-
-Route::put('/users/{user:user_id}', [App\Http\Controllers\UserController::class, 'update'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('user.update');
-
-Route::delete('/users/{user:user_id}', [App\Http\Controllers\UserController::class, 'destroy'])
-    ->middleware(['auth', 'permission:users.delete'])
-    ->name('user.destroy');
-
-Route::patch('/users/{user:user_id}/toggle-status', [App\Http\Controllers\UserController::class, 'toggleStatus'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('user.toggle-status');
-
-// Permission Management Routes (Admin Only)
-Route::get('/permissions', [App\Http\Controllers\PermissionController::class, 'index'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.index');
-
-Route::get('/permissions/create', [App\Http\Controllers\PermissionController::class, 'create'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.create');
-
-Route::post('/permissions', [App\Http\Controllers\PermissionController::class, 'store'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.store');
-
-Route::get('/permissions/{permission:permission_id}/edit', [App\Http\Controllers\PermissionController::class, 'edit'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.edit');
-
-Route::put('/permissions/{permission:permission_id}', [App\Http\Controllers\PermissionController::class, 'update'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.update');
-
-Route::delete('/permissions/{permission:permission_id}', [App\Http\Controllers\PermissionController::class, 'destroy'])
-    ->middleware(['auth', 'permission:users.edit'])
-    ->name('permissions.destroy');
-
-Route::get('/about', function () {
-    return view('about');
-})->middleware('auth')->name('about');
-
-Route::get('/error', function () {
-    return view('error');
-})->name('error');
-
-Route::get('/test-error', function () {
-    abort(404);
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+        ->middleware(RedirectIfAuthenticated::class)
+        ->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 });
 
-Route::get(
-    "student/create",
-    [DiplomaManagementController::class, 'create']
-)->middleware(['auth', 'permission:diplomas.create'])->name('student.create');
-
-Route::post(
-    "student/create",
-    [DiplomaManagementController::class, 'save']
-)->middleware(['auth', 'permission:diplomas.create'])->name('student.save');
-
-Route::get(
-    "student/{student:student_id}",
-    [DiplomaManagementController::class, 'student']
-)->middleware(['auth', 'permission:diplomas.view'])->name('student');
-
-Route::post(
-    "student/update/{student:student_id}",
-    [DiplomaManagementController::class, 'update']
-)->middleware(['auth', 'permission:diplomas.edit'])->name('student.update');
-
-Route::delete(
-    "student/{student:student_id}/delete",
-    [DiplomaManagementController::class, 'deleteStudent']
-)->middleware(['auth', 'permission:diplomas.delete'])->name('student.delete');
-
-// Export diploma verification document
-Route::get(
-    "student/{student:student_id}/export-verification",
-    [DiplomaManagementController::class, 'exportDiplomaVerification']
-)->middleware(['auth', 'permission:diplomas.view'])->name('student.export-verification');
-
-// Degree routes
-Route::post(
-    "degrees/store",
-    [DiplomaManagementController::class, 'storeDegree']
-)->middleware(['auth', 'permission:diplomas.create'])->name('degrees.store');
-
-Route::put(
-    "degrees/{degree}/update",
-    [DiplomaManagementController::class, 'updateDegree']
-)->middleware(['auth', 'permission:diplomas.edit'])->name('degrees.update');
-
-Route::delete(
-    "degrees/{degree}/delete",
-    [DiplomaManagementController::class, 'deleteDegree']
-)->middleware(['auth', 'permission:diplomas.delete'])->name('degrees.delete');
-
-// API route for getting available diploma blanks
-Route::get(
-    "api/diploma-blanks/available/{typeId}",
-    [DiplomaManagementController::class, 'getAvailableDiplomaBlanks']
-)->middleware(['auth', 'permission:diplomas.view'])->name('api.diploma-blanks.available');
-
-// Statistics routes
-Route::get(
-    '/',
-    [StatisticsController::class, 'index']
-)->middleware(['auth', 'permission:diplomas.view'])->name('home');
-
-Route::get(
-    '/statistics',
-    [StatisticsController::class, 'index']
-)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.index');
-
-Route::get(
-    '/statistics/diplomas',
-    [StatisticsController::class, 'getDiplomaStatistics']
-)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.diplomas');
-
-Route::get(
-    '/statistics/certificates',
-    [StatisticsController::class, 'getCertificateStatistics']
-)->middleware(['auth', 'permission:diplomas.view'])->name('statistics.certificates');
-
-Route::get(
-    '/statistics/export-report',
-    [StatisticsController::class, 'exportStatistics']
-)->middleware(['auth', 'permission:diplomas.export'])->name('statistics.export-report');
-
-// Diploma Blank Recall routes
-Route::get(
-    '/diploma-blank-recalls',
-    [App\Http\Controllers\DiplomaBlankRecallController::class, 'index']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-recalls.index');
-
-Route::get(
-    '/diploma-blank-recalls/management',
-    [App\Http\Controllers\DiplomaBlankRecallController::class, 'recalledList']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-recalls.management');
-
-Route::post(
-    '/diploma-blank-recalls/check-serial',
-    [App\Http\Controllers\DiplomaBlankRecallController::class, 'checkSerial']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-recalls.check-serial');
-
-Route::post(
-    '/diploma-blank-recalls/recall',
-    [App\Http\Controllers\DiplomaBlankRecallController::class, 'recall']
-)->middleware(['auth', 'permission:diploma-blanks.edit'])->name('diploma-blank-recalls.recall');
-
-Route::get(
-    '/diploma-blank-recalls/statistics',
-    [App\Http\Controllers\DiplomaBlankRecallController::class, 'statistics']
-)->middleware(['auth', 'permission:diploma-blanks.view'])->name('diploma-blank-recalls.statistics');
-
-// Profile routes
-Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])
-    ->middleware('auth')
-    ->name('profile.show');
-
-Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'updateProfile'])
-    ->middleware('auth')
-    ->name('profile.update');
-
-Route::patch('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
-    ->middleware('auth')
-    ->name('profile.password');
-
-// Logout route
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
     ->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+
+    // Home / Dashboard
+    Route::get('/', [StatisticsController::class, 'index'])
+        ->middleware('permission:diplomas.view')
+        ->name('home');
+
+    // About Page
+    Route::get('/about', fn() => view('about'))->name('about');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::patch('/', [ProfileController::class, 'updateProfile'])->name('update');
+        Route::patch('/password', [ProfileController::class, 'updatePassword'])->name('password');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Statistics Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('statistics')->name('statistics.')->middleware('permission:diplomas.view')->group(function () {
+        Route::get('/', [StatisticsController::class, 'index'])->name('index');
+        Route::get('/diplomas', [StatisticsController::class, 'getDiplomaStatistics'])->name('diplomas');
+        Route::get('/certificates', [StatisticsController::class, 'getCertificateStatistics'])->name('certificates');
+        Route::get('/export-report', [StatisticsController::class, 'exportStatistics'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-report');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Diploma Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('permission:diplomas.view')->group(function () {
+        Route::get('/diploma-management', [DiplomaManagementController::class, 'index'])->name('diploma-management');
+
+        // Students
+        Route::prefix('student')->name('student.')->group(function () {
+            Route::get('/create', [DiplomaManagementController::class, 'create'])
+                ->middleware('permission:diplomas.create')
+                ->name('create');
+            Route::post('/create', [DiplomaManagementController::class, 'save'])
+                ->middleware('permission:diplomas.create')
+                ->name('save');
+            Route::get('/{student:student_id}', [DiplomaManagementController::class, 'student'])->name('show');
+            Route::post('/update/{student:student_id}', [DiplomaManagementController::class, 'update'])
+                ->middleware('permission:diplomas.edit')
+                ->name('update');
+            Route::delete('/{student:student_id}/delete', [DiplomaManagementController::class, 'deleteStudent'])
+                ->middleware('permission:diplomas.delete')
+                ->name('delete');
+            Route::get('/{student:student_id}/export-verification', [DiplomaManagementController::class, 'exportDiplomaVerification'])
+                ->name('export-verification');
+            Route::get('/{student:student_id}/export-bachelor-confirmation', [DiplomaManagementController::class, 'exportBachelorConfirmation'])
+                ->name('export-bachelor-confirmation');
+        });
+
+        // Degrees
+        Route::prefix('degrees')->name('degrees.')->group(function () {
+            Route::post('/store', [DiplomaManagementController::class, 'storeDegree'])
+                ->middleware('permission:diplomas.create')
+                ->name('store');
+            Route::put('/{degree}/update', [DiplomaManagementController::class, 'updateDegree'])
+                ->middleware('permission:diplomas.edit')
+                ->name('update');
+            Route::delete('/{degree}/delete', [DiplomaManagementController::class, 'deleteDegree'])
+                ->middleware('permission:diplomas.delete')
+                ->name('delete');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Diploma Blanks Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('permission:diploma-blanks.view')->group(function () {
+
+        // Diploma Blanks - General
+        Route::prefix('diploma-blanks')->name('diploma-blanks.')->group(function () {
+            Route::get('/', [DiplomaBlankController::class, 'index'])->name('index');
+            Route::get('/import', [DiplomaBlankController::class, 'import'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('import');
+            Route::post('/import', [DiplomaBlankController::class, 'processImport'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('process-import');
+            Route::post('/check-duplicates', [DiplomaBlankController::class, 'checkDuplicates'])->name('check-duplicates');
+            Route::get('-management/{importId}', [DiplomaBlankController::class, 'indexByImport'])->name('management-by-import');
+            Route::post('/{diplomaBlankId}/mark-damaged', [DiplomaBlankController::class, 'markAsDamaged'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('mark-damaged');
+        });
+
+        // Diploma Blank Import Management
+        Route::prefix('diploma-blank-management')->name('diploma-blank-import.')->group(function () {
+            Route::get('/', [DiplomaBlankImportController::class, 'index'])->name('index');
+            Route::get('/create', [DiplomaBlankImportController::class, 'create'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('create');
+            Route::post('/store', [DiplomaBlankImportController::class, 'store'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('store');
+            Route::get('/import', [DiplomaBlankController::class, 'showImportForm'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('show-import-form');
+            Route::post('/import', [DiplomaBlankController::class, 'storeImport'])
+                ->middleware('permission:diploma-blanks.create')
+                ->name('store-import');
+            Route::post('/validate-range', [DiplomaBlankController::class, 'validateRange'])->name('validate-range');
+            Route::post('/sync', [DiplomaBlankImportController::class, 'sync'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('sync');
+            Route::get('/api/statistics', [DiplomaBlankImportController::class, 'statistics'])->name('statistics');
+
+            // Specific Import Operations
+            Route::get('/{import}', [DiplomaBlankImportController::class, 'show'])->name('show');
+            Route::get('/{import}/status', [DiplomaBlankImportController::class, 'checkUpdateStatus'])
+                ->where('import', '[0-9]+')
+                ->name('status');
+            Route::put('/{import}/update', [DiplomaBlankImportController::class, 'updateImport'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->where('import', '[0-9]+')
+                ->name('update');
+            Route::post('/{import}/start', [DiplomaBlankImportController::class, 'start'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('start');
+            Route::post('/{import}/pause', [DiplomaBlankImportController::class, 'pause'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('pause');
+            Route::post('/{import}/retry', [DiplomaBlankImportController::class, 'retry'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('retry');
+            Route::delete('/{import}', [DiplomaBlankImportController::class, 'destroy'])
+                ->middleware('permission:diploma-blanks.delete')
+                ->name('destroy');
+        });
+
+        // Diploma Blank Exports
+        Route::prefix('diploma-blank-exports')->name('diploma-blank-exports.')->group(function () {
+            Route::get('/', [DiplomaBlankExportController::class, 'index'])->name('index');
+            Route::get('/create', [DiplomaBlankExportController::class, 'create'])
+                ->middleware('permission:diploma-blanks.export')
+                ->name('create');
+            Route::post('/suggested-ranges', [DiplomaBlankExportController::class, 'getSuggestedRanges'])->name('suggested-ranges');
+            Route::post('/validate-range', [DiplomaBlankExportController::class, 'validateCustomRange'])->name('validate-range');
+            Route::post('/store', [DiplomaBlankExportController::class, 'store'])
+                ->middleware('permission:diploma-blanks.export')
+                ->name('store');
+            Route::get('/{export}', [DiplomaBlankExportController::class, 'show'])->name('show');
+        });
+
+        // Diploma Blank Recalls
+        Route::prefix('diploma-blank-recalls')->name('diploma-blank-recalls.')->group(function () {
+            Route::get('/', [DiplomaBlankRecallController::class, 'index'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('index');
+            Route::get('/management', [DiplomaBlankRecallController::class, 'recalledList'])->name('management');
+            Route::post('/check-serial', [DiplomaBlankRecallController::class, 'checkSerial'])->name('check-serial');
+            Route::post('/recall', [DiplomaBlankRecallController::class, 'recall'])
+                ->middleware('permission:diploma-blanks.edit')
+                ->name('recall');
+            Route::get('/statistics', [DiplomaBlankRecallController::class, 'statistics'])->name('statistics');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Certificate Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/certificate-management', fn() => view('certificate-management'))
+        ->middleware('permission:certificates.view')
+        ->name('certificate-management');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('settings')->name('settings.')->middleware('permission:settings.view')->group(function () {
+        Route::get('/', [SettingsController::class, 'index'])->name('index');
+
+        // Diploma Blank Types
+        Route::middleware('permission:settings.edit')->prefix('types')->name('types.')->group(function () {
+            Route::get('/create', [SettingsController::class, 'createType'])->name('create');
+            Route::post('/', [SettingsController::class, 'storeType'])->name('store');
+            Route::get('/{type:type_id}/edit', [SettingsController::class, 'editType'])->name('edit');
+            Route::put('/{type:type_id}', [SettingsController::class, 'updateType'])->name('update');
+            Route::delete('/{type:type_id}', [SettingsController::class, 'destroyType'])->name('destroy');
+        });
+
+        // Majors
+        Route::middleware('permission:settings.edit')->prefix('majors')->name('majors.')->group(function () {
+            Route::get('/create', [SettingsController::class, 'createMajor'])->name('create');
+            Route::post('/', [SettingsController::class, 'storeMajor'])->name('store');
+            Route::get('/{major:major_id}/edit', [SettingsController::class, 'editMajor'])->name('edit');
+            Route::put('/{major:major_id}', [SettingsController::class, 'updateMajor'])->name('update');
+            Route::delete('/{major:major_id}', [SettingsController::class, 'destroyMajor'])->name('destroy');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('permission:users.view')->group(function () {
+        Route::get('/user-management', [UserController::class, 'index'])->name('user-management');
+
+        Route::prefix('users')->name('user.')->group(function () {
+            Route::get('/create', [UserController::class, 'create'])
+                ->middleware('permission:users.create')
+                ->name('create');
+            Route::post('/', [UserController::class, 'store'])
+                ->middleware('permission:users.create')
+                ->name('store');
+            Route::get('/{user:user_id}/edit', [UserController::class, 'edit'])
+                ->middleware('permission:users.edit')
+                ->name('edit');
+            Route::put('/{user:user_id}', [UserController::class, 'update'])
+                ->middleware('permission:users.edit')
+                ->name('update');
+            Route::patch('/{user:user_id}/toggle-status', [UserController::class, 'toggleStatus'])
+                ->middleware('permission:users.edit')
+                ->name('toggle-status');
+            Route::delete('/{user:user_id}', [UserController::class, 'destroy'])
+                ->middleware('permission:users.delete')
+                ->name('destroy');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Permission Management Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('permissions')->name('permissions.')->middleware('permission:users.edit')->group(function () {
+        Route::get('/', [PermissionController::class, 'index'])->name('index');
+        Route::get('/create', [PermissionController::class, 'create'])->name('create');
+        Route::post('/', [PermissionController::class, 'store'])->name('store');
+        Route::get('/{permission:permission_id}/edit', [PermissionController::class, 'edit'])->name('edit');
+        Route::put('/{permission:permission_id}', [PermissionController::class, 'update'])->name('update');
+        Route::delete('/{permission:permission_id}', [PermissionController::class, 'destroy'])->name('destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Routes (Internal)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('api')->name('api.')->middleware('permission:diplomas.view')->group(function () {
+        Route::get('/diploma-blanks/available/{typeId}', [DiplomaManagementController::class, 'getAvailableDiplomaBlanks'])
+            ->name('diploma-blanks.available');
+    });
+});

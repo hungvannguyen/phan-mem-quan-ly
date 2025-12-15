@@ -30,6 +30,8 @@ class Student extends Model
         'full_name',
         'date_of_birth',
         'class_name',
+        'course',
+        'academic_year',
         'major_id',
         'place_of_birth',
         'gender',

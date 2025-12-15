@@ -35,6 +35,8 @@ class StudentRequest extends FormRequest
             'full_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'class_name' => 'required|string|max:100',
+            'course' => 'nullable|string|max:20',
+            'academic_year' => 'nullable|string|max:20',
             'major_id' => 'required|exists:majors,major_id',
             'place_of_birth' => 'required|string|max:255',
             'gender' => 'nullable|integer|in:0,1',
@@ -63,6 +65,12 @@ class StudentRequest extends FormRequest
             'class_name.required' => 'Vui lòng nhập tên lớp.',
             'class_name.string' => 'Tên lớp phải là một chuỗi ký tự.',
             'class_name.max' => 'Tên lớp không được vượt quá :max ký tự.',
+
+            'course.string' => 'Khóa phải là một chuỗi ký tự.',
+            'course.max' => 'Khóa không được vượt quá :max ký tự.',
+
+            'academic_year.string' => 'Niên khóa phải là một chuỗi ký tự.',
+            'academic_year.max' => 'Niên khóa không được vượt quá :max ký tự.',
 
             'major_id.required' => 'Vui lòng chọn ngành đào tạo.',
             'major_id.exists' => 'Ngành đào tạo không tồn tại.',
