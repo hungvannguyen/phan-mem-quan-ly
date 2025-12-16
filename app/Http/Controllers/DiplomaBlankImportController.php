@@ -345,11 +345,12 @@ class DiplomaBlankImportController extends Controller
                 $issuedToRemove = array_diff($issuedSerials, $expectedSerials);
 
                 if (!empty($issuedToRemove)) {
-                    return back()->with('error', 
-                        'Không thể cập nhật! Import này có ' . count($issuedToRemove) . 
-                        ' phôi đã được cấp văn bằng sẽ bị loại bỏ. Vui lòng điều chỉnh lại dải số để bao gồm các phôi đã cấp: ' . 
-                        implode(', ', array_slice($issuedToRemove, 0, 5)) . 
-                        (count($issuedToRemove) > 5 ? '...' : '')
+                    return back()->with(
+                        'error',
+                        'Không thể cập nhật! Import này có ' . count($issuedToRemove) .
+                            ' phôi đã được cấp văn bằng sẽ bị loại bỏ. Vui lòng điều chỉnh lại dải số để bao gồm các phôi đã cấp: ' .
+                            implode(', ', array_slice($issuedToRemove, 0, 5)) .
+                            (count($issuedToRemove) > 5 ? '...' : '')
                     );
                 }
             }

@@ -213,7 +213,7 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
         if (!empty($issuedBlanks)) {
             // Có phôi đã cấp, không thể xóa
             $errorMessage = "Không thể cập nhật Import vì có " . count($issuedBlanks) . " phôi đã được cấp văn bằng: " . implode(', ', array_slice($issuedBlanks, 0, 5));
-            
+
             Log::error("Cannot remove issued diploma blanks", [
                 'import_id' => $this->import->id,
                 'issued_count' => count($issuedBlanks),
