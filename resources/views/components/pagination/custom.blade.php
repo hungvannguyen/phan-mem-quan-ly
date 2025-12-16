@@ -147,14 +147,17 @@
             paginationBtns.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const url = new URL(this.dataset.url);
-                    // Preserve current per_page value
-                    const currentPerPage = new URLSearchParams(window.location.search).get(
-                        'per_page');
-                    if (currentPerPage) {
-                        url.searchParams.set('per_page', currentPerPage);
-                    }
-                    window.location.href = url.toString();
+                    const targetUrl = new URL(this.dataset.url);
+                    const currentUrl = new URL(window.location.href);
+
+                    // Preserve ALL current query parameters except 'page'
+                    currentUrl.searchParams.forEach((value, key) => {
+                        if (key !== 'page') {
+                            targetUrl.searchParams.set(key, value);
+                        }
+                    });
+
+                    window.location.href = targetUrl.toString();
                 });
             });
         });

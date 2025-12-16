@@ -10,6 +10,7 @@ use App\Enums\DiplomaBlankStatus;
 use App\Exports\DiplomaStatisticsExport;
 use App\Exports\DiplomaStatisticsSummaryExport;
 use App\Exports\CertificateStatisticsExport;
+use App\Exports\BachelorInfoExport;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -632,5 +633,29 @@ class StatisticsController extends Controller
             'certificate' => 'Chứng chỉ',
             default => $type
         };
+    }
+
+    /**
+     * Export bachelor degree information
+     */
+    public function exportBachelorInfo(Request $request)
+    {
+        try {
+            // Prepare filters
+            $filters = [
+                'graduation_year' => $request->get('graduation_year'),
+                'start_date' => $request->get('start_date'),
+                'end_date' => $request->get('end_date'),
+                'major_id' => $request->get('major_id'),
+                'gender' => $request->get('gender'),
+                'ranking' => $request->get('ranking'),
+                'training_type' => $request->get('training_type'),
+            ];
+
+            $export = new BachelorInfoExport($filters);
+            return $export->download();
+        } catch (\Exception $e) {
+            return back()->with('error', 'Lỗi xuất file: ' . $e->getMessage());
+        }
     }
 }

@@ -24,9 +24,11 @@ class DegreeFactory extends Factory
         return [
             'student_id' => Student::factory(),
             'diploma_blank_id' => DiplomaBlank::factory()->available(),
+            'degree_type' => $this->faker->randomElement(['bachelor', 'master', 'doctor']),
             'registration_number' => $this->faker->unique()->regexify('[0-9]{4}/[A-Z]{2}-[0-9]{4}'),
             'granting_date' => $this->faker->dateTimeBetween($graduationYear . '-06-01', $graduationYear . '-12-31')->format('Y-m-d'),
             'graduation_year' => $graduationYear,
+            'defense_date' => null, // Will be set for master/doctor degrees
             'ranking' => $this->faker->randomElement(['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình']),
             'decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-[A-Z]{2}'),
         ];

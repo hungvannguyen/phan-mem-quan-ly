@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-report', [StatisticsController::class, 'exportStatistics'])
             ->middleware('permission:diplomas.export')
             ->name('export-report');
+        Route::get('/export-bachelor-info', [StatisticsController::class, 'exportBachelorInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-bachelor-info');
     });
 
     /*

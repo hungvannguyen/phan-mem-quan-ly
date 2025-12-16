@@ -769,6 +769,11 @@
                     </div>
 
                     <div class="field-group">
+                        <x-vietnamese-date-input id="defense_date" name="defense_date" label="Ngày bảo vệ"
+                            :required="false" value="{{ old('defense_date') }}" inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
                         <label for="ranking" class="field-label">Xếp loại</label>
                         <select name="ranking" id="ranking" class="field-input">
                             <option value="">Chọn xếp loại</option>
@@ -864,6 +869,11 @@
                     <div class="field-group">
                         <x-vietnamese-date-input id="edit_granting_date" name="granting_date" label="Ngày cấp"
                             :required="true" value="" inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="edit_defense_date" name="defense_date" label="Ngày bảo vệ"
+                            :required="false" value="" inputClass="field-input" />
                     </div>
 
                     <div class="field-group">
@@ -1158,6 +1168,23 @@
                     displayInput.value = `${day}/${month}/${year}`;
                 }
             }
+
+            // Set defense date
+            const defenseDate = degree.defense_date ? degree.defense_date.split('T')[0] : '';
+            document.getElementById('edit_defense_date').value = defenseDate;
+
+            // Format and set display input for defense date
+            if (defenseDate) {
+                const displayInput = document.getElementById('edit_defense_date_display');
+                if (displayInput) {
+                    const date = new Date(defenseDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
+
             document.getElementById('edit_ranking').value = degree.ranking || '';
             document.getElementById('edit_decision_number').value = degree.decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';

@@ -1,0 +1,316 @@
+<?php
+
+namespace App\Exports;
+
+use App\Models\Student;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+class BachelorInfoExport
+{
+    protected $filters;
+
+    public function __construct(array $filters = [])
+    {
+        $this->filters = $filters;
+    }
+
+    /**
+     * Generate bachelor info report from template
+     *
+     * @return string Path to the generated file
+     */
+    public function generate()
+    {
+        // Increase execution time for large exports
+        set_time_limit(300); // 5 minutes
+        
+        // Template path
+        $templatePath = resource_path('templates/[Mau TT01] Thong tin cap bang cu nhan.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        // Load template
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Query students with bachelor degrees - students must have at least one degree
+        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+            ->whereHas('degrees', function ($q) {
+                // Chỉ lấy students có ít nhất 1 degree với registration_number
+                $q->whereNotNull('registration_number');
+            });
+
+        // Apply filters
+        if (!empty($this->filters['graduation_year'])) {
+            $query->whereHas('degrees', function ($q) {
+                $q->whereYear('granting_date', $this->filters['graduation_year'])
+                  ->whereNotNull('registration_number');
+            });
+        }
+
+        if (!empty($this->filters['start_date'])) {
+            $query->whereHas('degrees', function ($q) {
+                $q->whereDate('granting_date', '>=', $this->filters['start_date'])
+                  ->whereNotNull('registration_number');
+            });
+        }
+
+        if (!empty($this->filters['end_date'])) {
+            $query->whereHas('degrees', function ($q) {
+                $q->whereDate('granting_date', '<=', $this->filters['end_date'])
+                  ->whereNotNull('registration_number');
+            });
+        }
+
+        if (!empty($this->filters['major_id'])) {
+            $query->where('major_id', $this->filters['major_id']);
+        }
+
+        if (!empty($this->filters['ranking'])) {
+            $query->whereHas('degrees', function ($q) {
+                $q->where('ranking', $this->filters['ranking'])
+                  ->whereNotNull('registration_number');
+            });
+        }
+
+        if (!empty($this->filters['training_type'])) {
+            $query->where('training_type', $this->filters['training_type']);
+        }
+
+        if (!empty($this->filters['gender'])) {
+            $query->where('gender', $this->filters['gender']);
+        }
+
+        // Get students and eager load their degrees
+        $students = $query->get();
+        
+        // Filter students to only include those with valid degrees
+        $students = $students->filter(function ($student) {
+            return $student->degrees->isNotEmpty() && 
+                   $student->degrees->first()->registration_number !== null;
+        });
+
+        // Find the starting row (looking for ${stt} placeholder)
+        $startRow = $this->findStartRow($sheet);
+
+        if (!$startRow) {
+            throw new \Exception('Không tìm thấy dòng bắt đầu trong template (${stt})');
+        }
+
+        // Debug: Log template placeholders
+        $this->debugTemplatePlaceholders($sheet, $startRow);
+
+        // Populate data - replace placeholders directly
+        $currentRow = $startRow;
+        $stt = 1;
+
+        // Debug: Log number of students
+        \Log::info('BachelorInfoExport: Found ' . $students->count() . ' students with degrees');
+        \Log::info('BachelorInfoExport: Start row is ' . $startRow);
+
+        // Build placeholder map from template row (scan once for all placeholders)
+        $placeholderMap = $this->buildPlaceholderMap($sheet, $startRow);
+        \Log::info('BachelorInfoExport: Found ' . count($placeholderMap) . ' placeholders in template');
+        
+        // Pre-calculate total rows needed and insert them all at once for better performance
+        $totalStudents = $students->count();
+        if ($totalStudents > 1) {
+            $sheet->insertNewRowBefore($startRow + 1, $totalStudents - 1);
+        }
+        
+        // Copy template row style to all data rows at once (much faster)
+        if ($totalStudents > 1) {
+            $templateRowStyle = $sheet->getStyle($startRow . ':' . $startRow);
+            $endRow = $startRow + $totalStudents - 1;
+            $sheet->duplicateStyle($templateRowStyle, ($startRow + 1) . ':' . $endRow);
+        }
+        
+        // Copy row height for all rows
+        $rowHeight = $sheet->getRowDimension($startRow)->getRowHeight();
+
+        foreach ($students as $student) {
+            // Get the first degree (bachelor degree)
+            $degree = $student->degrees->first();
+
+            if (!$degree) {
+                \Log::warning('BachelorInfoExport: Student ' . $student->student_id . ' has no degrees');
+                continue; // Skip students without degrees
+            }
+
+            // Set row height
+            if ($rowHeight) {
+                $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
+            }
+
+            // Prepare data mapping - using placeholder names
+            $dataMap = [
+                'stt' => $stt,
+                'ho_ten' => $student->full_name ?? '',
+                'ngay_sinh' => $student->date_of_birth ? $student->date_of_birth->format('d/m/Y') : '',
+                'noi_sinh' => $student->place_of_birth ?? '',
+                'gioi_tinh' => $this->getGenderLabel($student->gender),
+                'dan_toc' => $student->nation ?? '',
+                'quoc_tich' => $student->nationality ?? '',
+                'lop' => $student->class_name ?? '',
+                'nganh_dao_tao' => $degree->major->major_name ?? $student->major->major_name ?? '',
+                'he_dao_tao' => $student->training_type ?? 'Chính quy',
+                'nam_tn' => $degree->granting_date ? $degree->granting_date->format('Y') : '',
+                'xep_loai' => $degree->ranking ?? '',
+                'so_hieu_bang' => $degree->registration_number ?? '',
+                'so_vao_so' => $student->number_in_the_book ?? '',
+                'quyet_dinh_tn' => $degree->decision_number ?? '',
+                'ngay_ky_qd' => $degree->granting_date ? $degree->granting_date->format('d/m/Y') : '',
+                'khoa' => $student->course ?? '',
+                'nien_khoa' => $student->academic_year ?? '',
+            ];
+
+            // Replace placeholders with actual data
+            foreach ($placeholderMap as $col => $placeholder) {
+                $value = $dataMap[$placeholder] ?? '';
+                $sheet->setCellValue($col . $currentRow, $value);
+            }
+
+            $stt++;
+            $currentRow++;
+        }
+
+        \Log::info('BachelorInfoExport: Finished processing. Total rows: ' . ($stt - 1));
+
+        // Generate filename and output path
+        $filename = $this->generateFilename();
+        $outputPath = storage_path('app/temp/' . $filename);
+
+        // Ensure temp directory exists
+        if (!file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+
+        // Auto-size all columns that have data for better readability
+        $highestColumn = $sheet->getHighestColumn();
+        for ($col = 'A'; $col <= $highestColumn; $col++) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Save the document
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($outputPath);
+
+        if (!file_exists($outputPath) || filesize($outputPath) === 0) {
+            throw new \Exception('Không thể tạo file xuất');
+        }
+
+        return $outputPath;
+    }
+
+    /**
+     * Find the starting row in the template
+     */
+    protected function findStartRow($sheet)
+    {
+        // Look for ${stt} placeholder in any column
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+
+        \Log::info("BachelorInfoExport: Searching for start row in range A1:{$highestColumn}{$highestRow}");
+
+        for ($row = 1; $row <= min($highestRow, 50); $row++) {
+            for ($col = 'A'; $col <= $highestColumn; $col++) {
+                $cellValue = (string) $sheet->getCell($col . $row)->getValue();
+                
+                // Log first 5 rows for debugging
+                if ($row <= 5 && $col == 'A') {
+                    \Log::info("BachelorInfoExport: Row $row, Col A: '$cellValue'");
+                }
+                
+                if (strpos($cellValue, '${stt}') !== false) {
+                    \Log::info("BachelorInfoExport: Found start row at $row (column $col): '$cellValue'");
+                    return $row;
+                }
+            }
+        }
+
+        // If not found, log warning and assume row 2 (after header)
+        \Log::warning('BachelorInfoExport: ${stt} placeholder not found in template, using row 2 as default');
+        return 2;
+    }
+
+    /**
+     * Build placeholder map from template row
+     * Returns array mapping column letters to placeholder names (without ${})
+     */
+    protected function buildPlaceholderMap($sheet, $row)
+    {
+        $highestColumn = $sheet->getHighestColumn();
+        $placeholderMap = [];
+        
+        for ($col = 'A'; $col <= $highestColumn; $col++) {
+            $cellValue = (string) $sheet->getCell($col . $row)->getValue();
+            
+            // Extract placeholder name: ${placeholder_name} -> placeholder_name
+            if (preg_match('/\$\{([^}]+)\}/', $cellValue, $matches)) {
+                $placeholderName = trim($matches[1]); // Trim whitespace
+                $placeholderMap[$col] = $placeholderName;
+            }
+        }
+        
+        return $placeholderMap;
+    }
+    
+    /**
+     * Debug: Log all placeholders in template
+     */
+    protected function debugTemplatePlaceholders($sheet, $row)
+    {
+        $placeholderMap = $this->buildPlaceholderMap($sheet, $row);
+        \Log::info('BachelorInfoExport: Placeholders in row ' . $row . ': ' . json_encode($placeholderMap));
+    }
+
+    /**
+     * Get gender label from enum
+     */
+    protected function getGenderLabel($gender)
+    {
+        if (is_null($gender)) {
+            return '';
+        }
+
+        // If gender is an enum object
+        if (is_object($gender)) {
+            return $gender->value === 0 ? 'Nam' : 'Nữ';
+        }
+
+        // If gender is a string
+        if (strtolower($gender) === 'male' || $gender === '0') {
+            return 'Nam';
+        } elseif (strtolower($gender) === 'female' || $gender === '1') {
+            return 'Nữ';
+        }
+
+        return '';
+    }
+
+    /**
+     * Generate filename for the export
+     */
+    protected function generateFilename()
+    {
+        $timestamp = now()->format('Y-m-d_His');
+        return "Thong_tin_cap_bang_cu_nhan_{$timestamp}.xlsx";
+    }
+
+    /**
+     * Download the generated file
+     */
+    public function download()
+    {
+        $filePath = $this->generate();
+
+        return response()->download($filePath, basename($filePath), [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    }
+}

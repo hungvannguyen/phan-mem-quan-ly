@@ -203,13 +203,33 @@ class UpdateDiplomaBlankImportJob implements ShouldQueue
      */
     private function removeUnwantedDiplomaBlanks(array $serialsToRemove): void
     {
-        // Chỉ xóa những diploma blanks có status IN_STOCK
+        // Kiểm tra xem có phôi nào đã được cấp (ISSUED) không
+        $issuedBlanks = $this->import->diplomaBlanks()
+            ->whereIn('serial_number', $serialsToRemove)
+            ->where('status', DiplomaBlankStatus::ISSUED->value)
+            ->pluck('serial_number')
+            ->toArray();
+
+        if (!empty($issuedBlanks)) {
+            // Có phôi đã cấp, không thể xóa
+            $errorMessage = "Không thể cập nhật Import vì có " . count($issuedBlanks) . " phôi đã được cấp văn bằng: " . implode(', ', array_slice($issuedBlanks, 0, 5));
+            
+            Log::error("Cannot remove issued diploma blanks", [
+                'import_id' => $this->import->id,
+                'issued_count' => count($issuedBlanks),
+                'issued_serials' => $issuedBlanks
+            ]);
+
+            throw new Exception($errorMessage);
+        }
+
+        // Chỉ xóa những diploma blanks có status IN_STOCK (chưa cấp)
         $deletedCount = $this->import->diplomaBlanks()
             ->whereIn('serial_number', $serialsToRemove)
             ->where('status', DiplomaBlankStatus::IN_STOCK->value)
             ->delete();
 
-        Log::info("Removed {$deletedCount} unwanted diploma blanks");
+        Log::info("Removed {$deletedCount} unwanted diploma blanks (all IN_STOCK)");
     }
 
     /**

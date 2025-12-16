@@ -18,7 +18,7 @@
             </thead>
             <tbody>
                 <tr id="loading" class="loading-overlay hidden">
-                    <td colspan="11" class="loading-cell">
+                    <td colspan="12" class="loading-cell">
                         <div class="spinner"></div>
                         <span class="loading-text">Đang tải dữ liệu...</span>
                     </td>
@@ -131,36 +131,12 @@
                                         <i class="fas fa-file-word"></i> Cử nhân
                                     </a>
                                 @endif
-
-                                {{-- Hiển thị nút cấp văn bằng dựa trên trạng thái học sinh --}}
-                                @if ($student->status && $student->status->value === 1)
-                                    {{-- Sinh viên đã tốt nghiệp --}}
-                                    @if ($student->degrees && $student->degrees->count() > 0)
-                                        <button class="btn-action btn-retry" title="Cấp lại văn bằng">
-                                            Cấp lại
-                                        </button>
-                                    @else
-                                        <button class="btn-action btn-start" title="Cấp văn bằng">
-                                            Cấp văn bằng
-                                        </button>
-                                    @endif
-                                @elseif ($student->status && $student->status->value === 0)
-                                    {{-- Sinh viên đang học --}}
-                                    <button class="btn-action btn-pause" disabled title="Sinh viên chưa tốt nghiệp">
-                                        Chưa tốt nghiệp
-                                    </button>
-                                @else
-                                    {{-- Sinh viên bỏ học --}}
-                                    <button class="btn-action btn-delete" disabled title="Sinh viên đã bỏ học">
-                                        Đã bỏ học
-                                    </button>
-                                @endif
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="11" class="td">
+                        <td colspan="12" class="td">
                             <div class="empty-state">
                                 <div class="empty-icon">
                                     <i class="fas fa-user-graduate"></i>

@@ -362,6 +362,10 @@
                             <i class="fas fa-file-excel"></i>
                             Xuất chi tiết văn bằng
                         </button>
+                        <button type="button" class="btn btn-primary" onclick="exportBachelorInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp bằng cử nhân
+                        </button>
                         <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('degree_type')">
                             <i class="fas fa-file-excel"></i>
                             Tổng hợp theo loại bằng

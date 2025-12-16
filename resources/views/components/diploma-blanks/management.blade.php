@@ -464,7 +464,8 @@
                                         <p class="mb-1 font-medium">Lưu ý quan trọng:</p>
                                         <ul class="list-inside list-disc space-y-1">
                                             <li>Nếu tăng số lượng: Sẽ thêm phôi mới từ số cuối cùng đã xử lý</li>
-                                            <li>Nếu giảm số lượng: Sẽ xóa các phôi chưa sử dụng (chỉ status IN_STOCK)</li>
+                                            <li>Nếu giảm số lượng: Sẽ xóa các phôi chưa sử dụng (chỉ trạng thái Trong Kho)
+                                            </li>
                                             <li>Thay đổi prefix/suffix sẽ cập nhật tất cả phôi hiện có</li>
                                         </ul>
                                     </div>

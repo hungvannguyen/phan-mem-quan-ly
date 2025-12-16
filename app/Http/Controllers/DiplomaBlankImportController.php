@@ -317,6 +317,43 @@ class DiplomaBlankImportController extends Controller
                 return back()->with('error', 'Không có thay đổi nào để cập nhật!');
             }
 
+            // Kiểm tra xem có phôi nào đã được cấp không
+            $issuedCount = $import->diplomaBlanks()
+                ->where('status', \App\Enums\DiplomaBlankStatus::ISSUED->value)
+                ->count();
+
+            if ($issuedCount > 0) {
+                // Nếu có phôi đã cấp, cảnh báo người dùng
+                $newFromNumber = intval($validated['from_number']);
+                $newToNumber = intval($validated['to_number']);
+                $newPrefix = $validated['prefix'] ?? '';
+                $newSuffix = $validated['suffix'] ?? '';
+
+                // Tạo danh sách serial mới
+                $expectedSerials = [];
+                for ($i = $newFromNumber; $i <= $newToNumber; $i++) {
+                    $expectedSerials[] = $newPrefix . $i . $newSuffix;
+                }
+
+                // Lấy danh sách serial của phôi đã cấp
+                $issuedSerials = $import->diplomaBlanks()
+                    ->where('status', \App\Enums\DiplomaBlankStatus::ISSUED->value)
+                    ->pluck('serial_number')
+                    ->toArray();
+
+                // Kiểm tra xem có phôi đã cấp nào bị loại bỏ không
+                $issuedToRemove = array_diff($issuedSerials, $expectedSerials);
+
+                if (!empty($issuedToRemove)) {
+                    return back()->with('error', 
+                        'Không thể cập nhật! Import này có ' . count($issuedToRemove) . 
+                        ' phôi đã được cấp văn bằng sẽ bị loại bỏ. Vui lòng điều chỉnh lại dải số để bao gồm các phôi đã cấp: ' . 
+                        implode(', ', array_slice($issuedToRemove, 0, 5)) . 
+                        (count($issuedToRemove) > 5 ? '...' : '')
+                    );
+                }
+            }
+
             // Lưu thông tin update vào import và đặt trạng thái về PROCESSING
             // Schedule sẽ tự động phát hiện và dispatch UpdateDiplomaBlankImportJob
             $import->update([

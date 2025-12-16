@@ -210,11 +210,11 @@ class DiplomaManagementController extends Controller
             });
 
             // Redirect back to student page with success message
-            return redirect()->route('student', ['student' => $validated['student_id']])
+            return redirect()->route('student.show', ['student' => $validated['student_id']])
                 ->with('success', 'Thêm văn bằng thành công!');
         } catch (\Exception $e) {
             // Redirect back to student page with error message
-            return redirect()->route('student', ['student' => $validated['student_id']])
+            return redirect()->route('student.show', ['student' => $validated['student_id']])
                 ->with('error', 'Có lỗi xảy ra khi thêm văn bằng: ' . $e->getMessage());
         }
     }
@@ -274,7 +274,7 @@ class DiplomaManagementController extends Controller
             $student = Student::findOrFail($validated['student_id']);
 
             if ($student->status->value !== 1) {
-                return redirect()->route('student', ['student' => $validated['student_id']])
+                return redirect()->route('student.show', ['student' => $validated['student_id']])
                     ->with('error', 'Chỉ có thể cập nhật văn bằng cho sinh viên đã tốt nghiệp!');
             }
 
@@ -290,11 +290,11 @@ class DiplomaManagementController extends Controller
             $degree->update($validated);
 
             // Redirect back to student page with success message
-            return redirect()->route('student', ['student' => $validated['student_id']])
+            return redirect()->route('student.show', ['student' => $validated['student_id']])
                 ->with('success', 'Cập nhật văn bằng thành công!');
         } catch (\Exception $e) {
             // Redirect back to student page with error message
-            return redirect()->route('student', ['student' => $validated['student_id']])
+            return redirect()->route('student.show', ['student' => $validated['student_id']])
                 ->with('error', 'Có lỗi xảy ra khi cập nhật văn bằng: ' . $e->getMessage());
         }
     }
@@ -329,7 +329,7 @@ class DiplomaManagementController extends Controller
                 ->with('success', 'Xóa sinh viên thành công! Tất cả văn bằng và phôi đã được trả về kho.');
         } catch (\Exception $e) {
             // Redirect back to student page with error message
-            return redirect()->route('student', ['student' => $student->student_id])
+            return redirect()->route('student.show', ['student' => $student->student_id])
                 ->with('error', 'Có lỗi xảy ra khi xóa sinh viên: ' . $e->getMessage());
         }
     }
@@ -355,11 +355,11 @@ class DiplomaManagementController extends Controller
             }
 
             // Redirect back to student page with success message
-            return redirect()->route('student', ['student' => $degree->student_id])
+            return redirect()->route('student.show', ['student' => $degree->student_id])
                 ->with('success', 'Xóa văn bằng thành công! Phôi văn bằng đã được trả về kho.');
         } catch (\Exception $e) {
             // Redirect back to student page with error message
-            return redirect()->route('student', ['student' => $degree->student_id])
+            return redirect()->route('student.show', ['student' => $degree->student_id])
                 ->with('error', 'Có lỗi xảy ra khi xóa văn bằng: ' . $e->getMessage());
         }
     }

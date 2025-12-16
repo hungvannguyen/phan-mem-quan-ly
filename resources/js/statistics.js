@@ -549,6 +549,57 @@ function exportCertificateDetailed() {
     window.location.href = `/statistics/export-report?${params.toString()}`;
 }
 
+async function exportBachelorInfo() {
+    showLoading();
+
+    try {
+        const formData = new FormData(document.getElementById('diplomaFilters'));
+        const params = new URLSearchParams(formData);
+
+        // Use fetch to download file
+        const response = await fetch(`/statistics/export-bachelor-info?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi xuất file: ' + response.statusText);
+        }
+
+        // Get filename from Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'Thong_tin_cap_bang_cu_nhan.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert response to blob and trigger download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        hideLoading();
+    } catch (error) {
+        console.error('Export error:', error);
+        hideLoading();
+        alert('Có lỗi xảy ra khi xuất file: ' + error.message);
+    }
+}
+
 function exportStatistics() {
     const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
     window.location.href = `/statistics/export-report?type=${activeTab}`;
@@ -558,6 +609,7 @@ function exportStatistics() {
 window.exportDiplomaDetailed = exportDiplomaDetailed;
 window.exportDiplomaSummary = exportDiplomaSummary;
 window.exportCertificateDetailed = exportCertificateDetailed;
+window.exportBachelorInfo = exportBachelorInfo;
 window.exportStatistics = exportStatistics;
 window.applyDiplomaFilters = applyDiplomaFilters;
 window.applyCertificateFilters = applyCertificateFilters;
