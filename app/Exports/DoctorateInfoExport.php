@@ -110,16 +110,9 @@ class DoctorateInfoExport
         // Disable automatic calculation for better performance
         $spreadsheet->getActiveSheet()->setSelectedCell('A1');
 
-        // Save template row style before inserting new rows
-        $templateRowStyle = $sheet->getStyle($startRow . ':' . $startRow);
-
         // Insert rows at once (for students 2, 3, 4, ...)
         if ($totalStudents > 1) {
             $sheet->insertNewRowBefore($startRow + 1, $totalStudents - 1);
-
-            // Copy style to all new rows at once
-            $endRow = $startRow + $totalStudents - 1;
-            $sheet->duplicateStyle($templateRowStyle, ($startRow + 1) . ':' . $endRow);
         }
 
         // Get row height from template
@@ -173,25 +166,25 @@ class DoctorateInfoExport
 
         // Set fixed column widths instead of AutoSize (much faster)
         $columnWidths = [
-            'A' => 5,   // STT
-            'B' => 25,  // Họ và tên
-            'C' => 12,  // Ngày sinh
-            'D' => 20,  // Nơi sinh
-            'E' => 10,  // Giới tính
-            'F' => 12,  // Dân tộc
-            'G' => 12,  // Quốc tịch
-            'H' => 35,  // Ngành đào tạo
-            'I' => 15,  // Số QĐ đánh giá luận án
-            'J' => 12,  // Ngày QĐ
-            'K' => 12,  // Ngày bảo vệ
-            'L' => 15,  // Số hiệu văn bằng
-            'M' => 12,  // Số vào sổ
-            'N' => 8,   // Khoá
-            'O' => 18,  // Hình thức
-            'P' => 15,  // Số quyết định
-            'Q' => 12,  // Ngày tháng
-            'R' => 12,  // Ngày cấp
-            'S' => 12,  // Tình trạng
+            'A' => 6,   // STT
+            'B' => 30,  // Họ và tên
+            'C' => 13,  // Ngày sinh
+            'D' => 25,  // Nơi sinh
+            'E' => 11,  // Giới tính
+            'F' => 13,  // Dân tộc
+            'G' => 13,  // Quốc tịch
+            'H' => 40,  // Ngành đào tạo
+            'I' => 18,  // Số QĐ đánh giá luận án
+            'J' => 13,  // Ngày QĐ
+            'K' => 13,  // Ngày bảo vệ
+            'L' => 18,  // Số hiệu văn bằng
+            'M' => 13,  // Số vào sổ
+            'N' => 9,   // Khoá
+            'O' => 20,  // Hình thức
+            'P' => 18,  // Số quyết định
+            'Q' => 13,  // Ngày tháng
+            'R' => 13,  // Ngày cấp
+            'S' => 13,  // Tình trạng
         ];
 
         foreach ($columnWidths as $col => $width) {

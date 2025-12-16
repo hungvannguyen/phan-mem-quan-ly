@@ -165,6 +165,8 @@ class DiplomaManagementController extends Controller
             'registration_number' => 'required|string|max:255|unique:degrees,registration_number',
             'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
             'granting_date' => 'required|date|before_or_equal:today',
+            'training_start_date' => 'nullable|date',
+            'training_end_date' => 'nullable|date|after_or_equal:training_start_date',
             'ranking' => 'nullable|string|max:100',
             'decision_number' => 'nullable|string|max:255',
             'major_id' => 'nullable|exists:majors,major_id',
@@ -264,6 +266,8 @@ class DiplomaManagementController extends Controller
             'registration_number' => 'required|string|max:255|unique:degrees,registration_number,' . $degree->degree_id . ',degree_id',
             'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
             'granting_date' => 'required|date|before_or_equal:today',
+            'training_start_date' => 'nullable|date',
+            'training_end_date' => 'nullable|date|after_or_equal:training_start_date',
             'ranking' => 'nullable|string|max:100',
             'decision_number' => 'nullable|string|max:255',
             'major_id' => 'nullable|exists:majors,major_id',
@@ -271,12 +275,14 @@ class DiplomaManagementController extends Controller
         ]);
 
         try {
-            // Check if student exists and has graduated status
+            // Check if student exists
             $student = Student::findOrFail($validated['student_id']);
 
-            if ($student->status->value !== 1) {
+            // Only check graduation status for bachelor, master, doctor degrees
+            // Certificates can be issued to students regardless of graduation status
+            if (in_array($validated['degree_type'], ['bachelor', 'master', 'doctor']) && $student->status->value !== 1) {
                 return redirect()->route('student.show', ['student' => $validated['student_id']])
-                    ->with('error', 'Chỉ có thể cập nhật văn bằng cho sinh viên đã tốt nghiệp!');
+                    ->with('error', 'Chỉ có thể cập nhật văn bằng Cử nhân/Thạc sĩ/Tiến sĩ cho sinh viên đã tốt nghiệp!');
             }
 
             // If major_id is provided, get major_name from Major model

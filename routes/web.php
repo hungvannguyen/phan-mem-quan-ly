@@ -93,6 +93,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-intermediate-political-theory-info', [StatisticsController::class, 'exportIntermediatePoliticalTheoryInfo'])
             ->middleware('permission:diplomas.export')
             ->name('export-intermediate-political-theory-info');
+        Route::get('/export-all-certificates-info', [StatisticsController::class, 'exportAllCertificatesInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-all-certificates-info');
     });
 
     /*

@@ -603,6 +603,19 @@
                                             @endif
                                         </span>
                                     </div>
+                                    @if ($degree->training_start_date)
+                                        <div class="detail-item">
+                                            <span class="label">Thời gian đào tạo từ:</span>
+                                            <span
+                                                class="value">{{ $degree->training_start_date->format('d/m/Y') }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($degree->training_end_date)
+                                        <div class="detail-item">
+                                            <span class="label">Thời gian đào tạo đến:</span>
+                                            <span class="value">{{ $degree->training_end_date->format('d/m/Y') }}</span>
+                                        </div>
+                                    @endif
                                     <div class="detail-item">
                                         <span class="label">Mã phôi:</span>
                                         <span class="value">
@@ -792,6 +805,18 @@
                     </div>
 
                     <div class="field-group">
+                        <x-vietnamese-date-input id="training_start_date" name="training_start_date"
+                            label="Thời gian đào tạo từ ngày" :required="false" value="{{ old('training_start_date') }}"
+                            inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="training_end_date" name="training_end_date"
+                            label="Thời gian đào tạo đến ngày" :required="false" value="{{ old('training_end_date') }}"
+                            inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
                         <label for="ranking" class="field-label">Xếp loại</label>
                         <select name="ranking" id="ranking" class="field-input">
                             <option value="">Chọn xếp loại</option>
@@ -892,6 +917,18 @@
                     <div class="field-group">
                         <x-vietnamese-date-input id="edit_defense_date" name="defense_date" label="Ngày bảo vệ"
                             :required="false" value="" inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="edit_training_start_date" name="training_start_date"
+                            label="Thời gian đào tạo từ ngày" :required="false" value=""
+                            inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="edit_training_end_date" name="training_end_date"
+                            label="Thời gian đào tạo đến ngày" :required="false" value=""
+                            inputClass="field-input" />
                     </div>
 
                     <div class="field-group">
@@ -1196,6 +1233,38 @@
                 const displayInput = document.getElementById('edit_defense_date_display');
                 if (displayInput) {
                     const date = new Date(defenseDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
+
+            // Set training start date
+            const trainingStartDate = degree.training_start_date ? degree.training_start_date.split('T')[0] : '';
+            document.getElementById('edit_training_start_date').value = trainingStartDate;
+
+            // Format and set display input for training start date
+            if (trainingStartDate) {
+                const displayInput = document.getElementById('edit_training_start_date_display');
+                if (displayInput) {
+                    const date = new Date(trainingStartDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
+
+            // Set training end date
+            const trainingEndDate = degree.training_end_date ? degree.training_end_date.split('T')[0] : '';
+            document.getElementById('edit_training_end_date').value = trainingEndDate;
+
+            // Format and set display input for training end date
+            if (trainingEndDate) {
+                const displayInput = document.getElementById('edit_training_end_date_display');
+                if (displayInput) {
+                    const date = new Date(trainingEndDate);
                     const day = String(date.getDate()).padStart(2, '0');
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const year = date.getFullYear();

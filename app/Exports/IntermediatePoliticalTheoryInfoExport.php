@@ -131,16 +131,9 @@ class IntermediatePoliticalTheoryInfoExport
         // Disable automatic calculation for better performance
         $spreadsheet->getActiveSheet()->setSelectedCell('A1');
 
-        // Save template row style before inserting new rows
-        $templateRowStyle = $sheet->getStyle($startRow . ':' . $startRow);
-
         // Insert rows at once (for students 2, 3, 4, ...)
         if ($totalStudents > 1) {
             $sheet->insertNewRowBefore($startRow + 1, $totalStudents - 1);
-
-            // Copy style to all new rows at once
-            $endRow = $startRow + $totalStudents - 1;
-            $sheet->duplicateStyle($templateRowStyle, ($startRow + 1) . ':' . $endRow);
         }
 
         // Get row height from template
@@ -203,23 +196,23 @@ class IntermediatePoliticalTheoryInfoExport
 
         // Set fixed column widths instead of AutoSize (much faster)
         $columnWidths = [
-            'A' => 5,   // TT
-            'B' => 25,  // Họ và tên
-            'C' => 12,  // Ngày sinh
-            'D' => 20,  // Nơi sinh
-            'E' => 10,  // Giới tính
-            'F' => 12,  // Dân tộc
-            'G' => 15,  // Xếp loại
-            'H' => 10,  // Năm tốt nghiệp
-            'I' => 15,  // Số hiệu văn bằng
-            'J' => 12,  // Số vào sổ
-            'K' => 12,  // Lớp
-            'L' => 8,   // Khóa
-            'M' => 18,  // Loại hình đào tạo
-            'N' => 15,  // Số quyết định
-            'O' => 12,  // Ngày công nhận
-            'P' => 12,  // Ngày cấp
-            'Q' => 12,  // Tình trạng
+            'A' => 6,   // TT
+            'B' => 30,  // Họ và tên
+            'C' => 13,  // Ngày sinh
+            'D' => 25,  // Nơi sinh
+            'E' => 11,  // Giới tính
+            'F' => 13,  // Dân tộc
+            'G' => 16,  // Xếp loại
+            'H' => 11,  // Năm tốt nghiệp
+            'I' => 18,  // Số hiệu văn bằng
+            'J' => 13,  // Số vào sổ
+            'K' => 13,  // Lớp
+            'L' => 9,   // Khóa
+            'M' => 20,  // Loại hình đào tạo
+            'N' => 18,  // Số quyết định
+            'O' => 13,  // Ngày công nhận
+            'P' => 13,  // Ngày cấp
+            'Q' => 13,  // Tình trạng
         ];
 
         foreach ($columnWidths as $col => $width) {

@@ -20,5 +20,6 @@ return [
         'doctorate-info' => \App\Services\DoctorateInfoService::class,
         'advanced-political-theory-info' => \App\Services\AdvancedPoliticalTheoryInfoService::class,
         'intermediate-political-theory-info' => \App\Services\IntermediatePoliticalTheoryInfoService::class,
+        'all-certificates-info' => \App\Services\AllCertificatesInfoService::class,
     ],
 ];

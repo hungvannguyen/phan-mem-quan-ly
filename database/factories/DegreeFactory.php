@@ -20,15 +20,23 @@ class DegreeFactory extends Factory
     public function definition(): array
     {
         $graduationYear = $this->faker->numberBetween(2020, date('Y'));
+        $grantingDate = $this->faker->dateTimeBetween($graduationYear . '-06-01', $graduationYear . '-12-31');
+
+        // Generate training dates (typical 3-5 years of training before granting date)
+        $trainingYears = $this->faker->numberBetween(3, 5);
+        $trainingStartDate = (clone $grantingDate)->modify("-{$trainingYears} years");
+        $trainingEndDate = (clone $grantingDate)->modify('-2 months');
 
         return [
             'student_id' => Student::factory(),
             'diploma_blank_id' => DiplomaBlank::factory()->available(),
             'degree_type' => $this->faker->randomElement(['bachelor', 'master', 'doctor']),
             'registration_number' => $this->faker->unique()->regexify('[0-9]{4}/[A-Z]{2}-[0-9]{4}'),
-            'granting_date' => $this->faker->dateTimeBetween($graduationYear . '-06-01', $graduationYear . '-12-31')->format('Y-m-d'),
+            'granting_date' => $grantingDate->format('Y-m-d'),
             'graduation_year' => $graduationYear,
             'defense_date' => null, // Will be set for master/doctor degrees
+            'training_start_date' => $trainingStartDate->format('Y-m-d'),
+            'training_end_date' => $trainingEndDate->format('Y-m-d'),
             'ranking' => $this->faker->randomElement(['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình']),
             'decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-[A-Z]{2}'),
         ];

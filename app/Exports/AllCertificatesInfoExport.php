@@ -7,7 +7,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class AdvancedPoliticalTheoryInfoExport
+class AllCertificatesInfoExport
 {
     protected $filters;
 
@@ -17,7 +17,7 @@ class AdvancedPoliticalTheoryInfoExport
     }
 
     /**
-     * Generate advanced political theory certificate info report from template
+     * Generate all certificates info report from template
      * Logic: Load file -> Xác định dòng 5 -> Duyệt sinh viên -> Ghi từng ô -> Đẩy footer xuống
      */
     public function generate()
@@ -26,7 +26,7 @@ class AdvancedPoliticalTheoryInfoExport
         set_time_limit(300); // 5 minutes
 
         // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT04] Thong tin cap bang cao cap LLCT.xlsx');
+        $templatePath = resource_path('templates/[Mau TT06] Thong tin cap chung chi.xlsx');
 
         if (!file_exists($templatePath)) {
             throw new \Exception('Template file not found: ' . $templatePath);
@@ -35,14 +35,11 @@ class AdvancedPoliticalTheoryInfoExport
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Query students with certificate degrees (Cao cấp lý luận chính trị)
+        // Query students with certificate degrees (all types)
         $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
-                    ->where('degree_type', 'certificate')
-                    ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Cao cấp lý luận chính trị%');
-                    });
+                    ->where('degree_type', 'certificate');
             });
 
         // Apply filters
@@ -50,10 +47,7 @@ class AdvancedPoliticalTheoryInfoExport
             $query->whereHas('degrees', function ($q) {
                 $q->whereYear('granting_date', $this->filters['graduation_year'])
                     ->whereNotNull('registration_number')
-                    ->where('degree_type', 'certificate')
-                    ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Cao cấp lý luận chính trị%');
-                    });
+                    ->where('degree_type', 'certificate');
             });
         }
 
@@ -61,10 +55,7 @@ class AdvancedPoliticalTheoryInfoExport
             $query->whereHas('degrees', function ($q) {
                 $q->whereDate('granting_date', '>=', $this->filters['start_date'])
                     ->whereNotNull('registration_number')
-                    ->where('degree_type', 'certificate')
-                    ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Cao cấp lý luận chính trị%');
-                    });
+                    ->where('degree_type', 'certificate');
             });
         }
 
@@ -72,10 +63,7 @@ class AdvancedPoliticalTheoryInfoExport
             $query->whereHas('degrees', function ($q) {
                 $q->whereDate('granting_date', '<=', $this->filters['end_date'])
                     ->whereNotNull('registration_number')
-                    ->where('degree_type', 'certificate')
-                    ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Cao cấp lý luận chính trị%');
-                    });
+                    ->where('degree_type', 'certificate');
             });
         }
 
@@ -87,10 +75,7 @@ class AdvancedPoliticalTheoryInfoExport
             $query->whereHas('degrees', function ($q) {
                 $q->where('ranking', $this->filters['ranking'])
                     ->whereNotNull('registration_number')
-                    ->where('degree_type', 'certificate')
-                    ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Cao cấp lý luận chính trị%');
-                    });
+                    ->where('degree_type', 'certificate');
             });
         }
 
@@ -103,18 +88,25 @@ class AdvancedPoliticalTheoryInfoExport
 
         // Filter out students without certificate degrees
         $students = $students->filter(function ($student) {
-            $certificateDegree = $student->degrees->where('degree_type', 'certificate')->first();
-            return $certificateDegree && $certificateDegree->registration_number !== null;
+            foreach ($student->degrees as $degree) {
+                if (
+                    $degree->degree_type === 'certificate'
+                    && $degree->registration_number !== null
+                ) {
+                    return true;
+                }
+            }
+            return false;
         });
 
-        \Log::info('AdvancedPoliticalTheoryInfoExport: Found ' . $students->count() . ' students with certificates');
+        \Log::info('AllCertificatesInfoExport: Found ' . $students->count() . ' students with certificates');
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
 
         if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu chứng chỉ cao cấp lý luận chính trị để xuất');
+            throw new \Exception('Không có dữ liệu chứng chỉ để xuất');
         }
 
         // Step 3: Insert rows và copy style (tối ưu tốc độ)
@@ -134,14 +126,12 @@ class AdvancedPoliticalTheoryInfoExport
         $stt = 1;
 
         foreach ($students as $student) {
-            // Get advanced political theory certificate degree specifically
+            // Get first certificate degree
             $degree = null;
             foreach ($student->degrees as $d) {
                 if (
                     $d->degree_type === 'certificate'
-                    && $d->diplomaBlank
-                    && $d->diplomaBlank->type
-                    && stripos($d->diplomaBlank->type->type_name, 'Cao cấp lý luận chính trị') !== false
+                    && $d->registration_number !== null
                 ) {
                     $degree = $d;
                     break;
@@ -157,21 +147,29 @@ class AdvancedPoliticalTheoryInfoExport
                 $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
             }
 
+            // Get training program name from diploma blank type or major
+            $trainingProgram = '';
+            if ($degree->diplomaBlank && $degree->diplomaBlank->type) {
+                $trainingProgram = $degree->diplomaBlank->type->type_name;
+            } elseif ($degree->major) {
+                $trainingProgram = $degree->major->major_name;
+            }
+
             // Ghi data vào các cột A-P theo mapping
-            $sheet->setCellValue('A' . $currentRow, $stt); // STT
+            $sheet->setCellValue('A' . $currentRow, $stt); // TT (STT)
             $sheet->setCellValue('B' . $currentRow, $student->full_name ?? ''); // Họ và tên
             $sheet->setCellValue('C' . $currentRow, $student->date_of_birth ? $student->date_of_birth->format('d/m/Y') : ''); // Ngày sinh
             $sheet->setCellValue('D' . $currentRow, $student->place_of_birth ?? ''); // Nơi sinh
             $sheet->setCellValue('E' . $currentRow, $this->getGenderLabel($student->gender)); // Giới tính
             $sheet->setCellValue('F' . $currentRow, $student->nation ?? ''); // Dân tộc
-            $sheet->setCellValue('G' . $currentRow, $student->training_type ?? 'Chính quy'); // Loại hình đào tạo
-            $sheet->setCellValue('H' . $currentRow, $student->course ?? ''); // Khóa
-            $sheet->setCellValue('I' . $currentRow, $degree->ranking ?? ''); // Xếp loại tốt nghiệp
-            $sheet->setCellValue('J' . $currentRow, $degree->registration_number ?? ''); // Số hiệu văn bằng
-            $sheet->setCellValue('K' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
-            $sheet->setCellValue('L' . $currentRow, $student->academic_year ?? ''); // Khóa học
-            $sheet->setCellValue('M' . $currentRow, $degree->decision_number ?? ''); // Số Quyết định
-            $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng
+            $sheet->setCellValue('G' . $currentRow, $trainingProgram); // Chương trình bồi dưỡng
+            $sheet->setCellValue('H' . $currentRow, $degree->ranking ?? ''); // Xếp loại
+            $sheet->setCellValue('I' . $currentRow, $degree->registration_number ?? ''); // Số hiệu chứng chỉ
+            $sheet->setCellValue('J' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
+            $sheet->setCellValue('K' . $currentRow, $degree->training_start_date ? $degree->training_start_date->format('d/m/Y') : ''); // Thời gian đào tạo từ ngày
+            $sheet->setCellValue('L' . $currentRow, $degree->training_end_date ? $degree->training_end_date->format('d/m/Y') : ''); // Thời gian đào tạo đến ngày
+            $sheet->setCellValue('M' . $currentRow, $degree->decision_number ?? ''); // Số quyết định công nhận tốt nghiệp
+            $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng công nhận tốt nghiệp
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng
 
@@ -179,26 +177,26 @@ class AdvancedPoliticalTheoryInfoExport
             $currentRow++;
         }
 
-        \Log::info('AdvancedPoliticalTheoryInfoExport: Processed ' . ($stt - 1) . ' students');
+        \Log::info('AllCertificatesInfoExport: Processed ' . ($stt - 1) . ' students');
 
         // Step 5: Footer được tự động đẩy xuống khi insert rows
 
         // Set fixed column widths instead of AutoSize (much faster)
         $columnWidths = [
-            'A' => 6,   // STT
+            'A' => 6,   // TT
             'B' => 30,  // Họ và tên
             'C' => 13,  // Ngày sinh
             'D' => 25,  // Nơi sinh
             'E' => 11,  // Giới tính
             'F' => 13,  // Dân tộc
-            'G' => 20,  // Loại hình đào tạo
-            'H' => 9,   // Khóa
-            'I' => 16,  // Xếp loại
-            'J' => 18,  // Số hiệu văn bằng
-            'K' => 13,  // Số vào sổ
-            'L' => 13,  // Khóa học
-            'M' => 18,  // Số quyết định
-            'N' => 13,  // Ngày tháng
+            'G' => 35,  // Chương trình bồi dưỡng
+            'H' => 16,  // Xếp loại
+            'I' => 20,  // Số hiệu chứng chỉ
+            'J' => 13,  // Số vào sổ
+            'K' => 13,  // Từ ngày
+            'L' => 13,  // Đến ngày
+            'M' => 20,  // Số quyết định
+            'N' => 13,  // Ngày công nhận
             'O' => 13,  // Ngày cấp
             'P' => 13,  // Tình trạng
         ];
@@ -224,7 +222,7 @@ class AdvancedPoliticalTheoryInfoExport
             throw new \Exception('Không thể tạo file xuất');
         }
 
-        \Log::info('AdvancedPoliticalTheoryInfoExport: File saved to ' . $outputPath);
+        \Log::info('AllCertificatesInfoExport: File saved to ' . $outputPath);
 
         return $outputPath;
     }
@@ -234,7 +232,7 @@ class AdvancedPoliticalTheoryInfoExport
      */
     protected function generateFilename()
     {
-        return 'Thong_tin_cap_bang_cao_cap_LLCT_' . date('Y-m-d_His') . '.xlsx';
+        return 'Thong_tin_cap_chung_chi_' . date('Y-m-d_His') . '.xlsx';
     }
 
     /**

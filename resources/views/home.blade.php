@@ -376,6 +376,10 @@
                             <i class="fas fa-file-excel"></i>
                             Thông tin cấp bằng trung cấp LLCT
                         </button>
+                        <button type="button" class="btn btn-dark ms-2" onclick="exportAllCertificatesInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp tất cả chứng chỉ
+                        </button>
                     </div>
                 </div>
             </div>

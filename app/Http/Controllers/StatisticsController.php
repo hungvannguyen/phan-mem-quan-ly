@@ -686,6 +686,25 @@ class StatisticsController extends Controller
     }
 
     /**
+     * Export all certificates information
+     */
+    public function exportAllCertificatesInfo(Request $request)
+    {
+        // Prepare filters
+        $filters = [
+            'graduation_year' => $request->get('graduation_year'),
+            'start_date' => $request->get('start_date'),
+            'end_date' => $request->get('end_date'),
+            'major_id' => $request->get('major_id'),
+            'gender' => $request->get('gender'),
+            'ranking' => $request->get('ranking'),
+            'training_type' => $request->get('training_type'),
+        ];
+
+        return $this->handleExport('all-certificates-info', $filters);
+    }
+
+    /**
      * Handle export using factory pattern
      *
      * @param string $type Export type key from config
