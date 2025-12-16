@@ -522,33 +522,6 @@ function resetCertificateFilters() {
 }
 
 // Export functions
-function exportDiplomaDetailed() {
-    const formData = new FormData(document.getElementById('diplomaFilters'));
-    formData.append('type', 'diplomas');
-    formData.append('export_type', 'detailed');
-
-    const params = new URLSearchParams(formData);
-    window.location.href = `/statistics/export-report?${params.toString()}`;
-}
-
-function exportDiplomaSummary(groupBy) {
-    const formData = new FormData(document.getElementById('diplomaFilters'));
-    formData.append('type', 'diplomas');
-    formData.append('export_type', 'summary');
-    formData.append('group_by', groupBy);
-
-    const params = new URLSearchParams(formData);
-    window.location.href = `/statistics/export-report?${params.toString()}`;
-}
-
-function exportCertificateDetailed() {
-    const formData = new FormData(document.getElementById('certificateFilters'));
-    formData.append('type', 'certificates');
-
-    const params = new URLSearchParams(formData);
-    window.location.href = `/statistics/export-report?${params.toString()}`;
-}
-
 async function exportBachelorInfo() {
     showLoading();
 
@@ -600,17 +573,8 @@ async function exportBachelorInfo() {
     }
 }
 
-function exportStatistics() {
-    const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
-    window.location.href = `/statistics/export-report?type=${activeTab}`;
-}
-
 // Expose functions to global scope for inline onclick handlers
-window.exportDiplomaDetailed = exportDiplomaDetailed;
-window.exportDiplomaSummary = exportDiplomaSummary;
-window.exportCertificateDetailed = exportCertificateDetailed;
 window.exportBachelorInfo = exportBachelorInfo;
-window.exportStatistics = exportStatistics;
 window.applyDiplomaFilters = applyDiplomaFilters;
 window.applyCertificateFilters = applyCertificateFilters;
 window.resetDiplomaFilters = resetDiplomaFilters;

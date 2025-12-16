@@ -7,8 +7,6 @@ use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
 use App\Models\DiplomaBlankType;
-use App\Exports\DiplomaVerificationExport;
-use App\Exports\BachelorConfirmationExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\DiplomaBlank;
@@ -372,20 +370,7 @@ class DiplomaManagementController extends Controller
      */
     public function exportDiplomaVerification(Student $student)
     {
-        try {
-            if ($student->degrees->count() === 0) {
-                return redirect()->back()->with('error', 'Sinh viên chưa được cấp văn bằng nào!');
-            }
-
-            $export = new DiplomaVerificationExport($student);
-            $filePath = $export->generate();
-
-            return response()->download($filePath, basename($filePath), [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            ])->deleteFileAfterSend(true);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất văn bản xác minh: ' . $e->getMessage());
-        }
+        return $this->handleExport('diploma-verification', $student);
     }
 
     /**
@@ -396,19 +381,35 @@ class DiplomaManagementController extends Controller
      */
     public function exportBachelorConfirmation(Student $student)
     {
+        return $this->handleExport('bachelor-confirmation', $student);
+    }
+
+    /**
+     * Handle export using factory pattern
+     *
+     * @param string $type Export type key from config
+     * @param Student $student Student instance
+     * @return BinaryFileResponse|RedirectResponse
+     */
+    protected function handleExport(string $type, Student $student)
+    {
         try {
-            if ($student->degrees->count() === 0) {
-                return redirect()->back()->with('error', 'Sinh viên chưa được cấp văn bằng nào!');
+            // Get service class from config
+            $serviceClass = config("export.services.{$type}");
+
+            if (!$serviceClass) {
+                throw new \Exception("Export type '{$type}' không được hỗ trợ");
             }
 
-            $export = new BachelorConfirmationExport($student);
-            $filePath = $export->generate();
+            // Resolve service from container
+            $service = app($serviceClass);
 
-            return response()->download($filePath, basename($filePath), [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            ])->deleteFileAfterSend(true);
+            // Call export method with data
+            return $service->export([
+                'student' => $student,
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất giấy xác nhận: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất file: ' . $e->getMessage());
         }
     }
 }

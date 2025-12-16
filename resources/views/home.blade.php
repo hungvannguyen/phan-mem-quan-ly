@@ -20,10 +20,6 @@
                     <i class="fas fa-sync-alt"></i>
                     Làm mới
                 </button>
-                <button class="btn btn-primary" onclick="exportStatistics()">
-                    <i class="fas fa-download"></i>
-                    Xuất báo cáo
-                </button>
             </div>
         </div>
 
@@ -358,37 +354,9 @@
                         <h3><i class="fas fa-file-export"></i> Xuất báo cáo Excel</h3>
                     </div>
                     <div class="export-actions">
-                        <button type="button" class="btn btn-success" onclick="exportDiplomaDetailed()">
-                            <i class="fas fa-file-excel"></i>
-                            Xuất chi tiết văn bằng
-                        </button>
                         <button type="button" class="btn btn-primary" onclick="exportBachelorInfo()">
                             <i class="fas fa-file-excel"></i>
                             Thông tin cấp bằng cử nhân
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('degree_type')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo loại bằng
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('graduation_year')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo khóa
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('major')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo ngành
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('ranking')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo xếp loại
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('gender')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo giới tính
-                        </button>
-                        <button type="button" class="btn btn-info" onclick="exportDiplomaSummary('training_type')">
-                            <i class="fas fa-file-excel"></i>
-                            Tổng hợp theo hình thức
                         </button>
                     </div>
                 </div>
@@ -444,7 +412,7 @@
                 </div>
 
                 <!-- Export Section -->
-                <div class="chart-card full-width">
+                {{-- <div class="chart-card full-width">
                     <div class="chart-header">
                         <h3><i class="fas fa-file-export"></i> Xuất báo cáo Excel</h3>
                     </div>
@@ -454,7 +422,7 @@
                             Xuất chi tiết chứng chỉ
                         </button>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

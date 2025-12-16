@@ -7,14 +7,9 @@ use App\Models\DiplomaBlankType;
 use App\Models\Degree;
 use App\Models\Major;
 use App\Enums\DiplomaBlankStatus;
-use App\Exports\DiplomaStatisticsExport;
-use App\Exports\DiplomaStatisticsSummaryExport;
-use App\Exports\CertificateStatisticsExport;
-use App\Exports\BachelorInfoExport;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
 use SaKanjo\EasyMetrics\Metrics\Value;
 use SaKanjo\EasyMetrics\Metrics\Doughnut;
 use SaKanjo\EasyMetrics\Metrics\Trend;
@@ -505,46 +500,6 @@ class StatisticsController extends Controller
     }
 
     /**
-     * Export statistics report
-     */
-    public function exportStatistics(Request $request)
-    {
-        $type = $request->get('type', 'diplomas');
-        $exportType = $request->get('export_type', 'detailed'); // detailed or summary
-        $groupBy = $request->get('group_by', 'degree_type'); // For summary export
-
-        // Prepare filters
-        $filters = [
-            'graduation_year' => $request->get('graduation_year'),
-            'start_date' => $request->get('start_date'),
-            'end_date' => $request->get('end_date'),
-            'degree_type' => $request->get('degree_type'),
-            'major_id' => $request->get('major_id'),
-            'gender' => $request->get('gender'),
-            'ranking' => $request->get('ranking'),
-            'training_type' => $request->get('training_type'),
-            'certificate_type' => $request->get('certificate_type'),
-        ];
-
-        // Generate filename with timestamp
-        $timestamp = now()->format('Y-m-d_His');
-
-        if ($type === 'certificates') {
-            $filename = "Thong_ke_chung_chi_{$timestamp}.xlsx";
-            return Excel::download(new CertificateStatisticsExport($filters), $filename);
-        }
-
-        // Diploma statistics export
-        if ($exportType === 'summary') {
-            $filename = "Tong_hop_van_bang_{$timestamp}.xlsx";
-            return Excel::download(new DiplomaStatisticsSummaryExport($filters, $groupBy), $filename);
-        }
-
-        $filename = "Thong_ke_van_bang_{$timestamp}.xlsx";
-        return Excel::download(new DiplomaStatisticsExport($filters), $filename);
-    }
-
-    /**
      * Helper: Get statistics by column
      */
     private function getStatsByColumn($query, $column)
@@ -640,20 +595,44 @@ class StatisticsController extends Controller
      */
     public function exportBachelorInfo(Request $request)
     {
-        try {
-            // Prepare filters
-            $filters = [
-                'graduation_year' => $request->get('graduation_year'),
-                'start_date' => $request->get('start_date'),
-                'end_date' => $request->get('end_date'),
-                'major_id' => $request->get('major_id'),
-                'gender' => $request->get('gender'),
-                'ranking' => $request->get('ranking'),
-                'training_type' => $request->get('training_type'),
-            ];
+        // Prepare filters
+        $filters = [
+            'graduation_year' => $request->get('graduation_year'),
+            'start_date' => $request->get('start_date'),
+            'end_date' => $request->get('end_date'),
+            'major_id' => $request->get('major_id'),
+            'gender' => $request->get('gender'),
+            'ranking' => $request->get('ranking'),
+            'training_type' => $request->get('training_type'),
+        ];
 
-            $export = new BachelorInfoExport($filters);
-            return $export->download();
+        return $this->handleExport('bachelor-info', $filters);
+    }
+
+    /**
+     * Handle export using factory pattern
+     *
+     * @param string $type Export type key from config
+     * @param array $filters Filter parameters
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
+     */
+    protected function handleExport(string $type, array $filters)
+    {
+        try {
+            // Get service class from config
+            $serviceClass = config("export.services.{$type}");
+
+            if (!$serviceClass) {
+                throw new \Exception("Export type '{$type}' không được hỗ trợ");
+            }
+
+            // Resolve service from container
+            $service = app($serviceClass);
+
+            // Call export method with data
+            return $service->export([
+                'filters' => $filters,
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Lỗi xuất file: ' . $e->getMessage());
         }
