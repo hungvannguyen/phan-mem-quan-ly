@@ -22,6 +22,13 @@ use Illuminate\Support\Facades\DB;
 
 class DevelopmentSeeder extends Seeder
 {
+    // Constants for seeding quantities
+    private const STUDENTS_GRADUATED = 150;
+    private const STUDENTS_STUDYING = 30;
+    private const STUDENTS_DROPPED_OUT = 20;
+    private const DEGREES_TO_ISSUE = 70;
+    private const CERTIFICATES_TO_ISSUE = 75;
+
     /**
      * Seed the database for development/local environment.
      * Creates comprehensive demo data with proper relationships.
@@ -56,6 +63,28 @@ class DevelopmentSeeder extends Seeder
             // 9. Damage Reasons
             $this->seedDamageReasons();
         });
+    }
+
+    /**
+     * Helper method to create diploma blanks for an import.
+     */
+    private function createDiplomaBlanks(DiplomaBlankImport $import, int $quantity, string $serialPrefix = ''): void
+    {
+        $blanks = [];
+        $prefix = $serialPrefix ?: $import->prefix;
+
+        for ($i = 1; $i <= $quantity; $i++) {
+            $blanks[] = [
+                'type_id' => $import->type_id,
+                'import_id' => $import->id,
+                'serial_number' => $prefix . '-' . str_pad($i, 5, '0', STR_PAD_LEFT),
+                'status' => DiplomaBlankStatus::IN_STOCK,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DiplomaBlank::insert($blanks);
     }
 
     private function seedRolesAndPermissions(): void
@@ -161,383 +190,208 @@ class DevelopmentSeeder extends Seeder
 
     private function seedDiplomaBlankImports(): void
     {
-        $bachelorType = DiplomaBlankType::where('prefix', 'BCN')->first();
-        $engineerType = DiplomaBlankType::where('prefix', 'BKS')->first();
-        $masterType = DiplomaBlankType::where('prefix', 'BTS')->first();
-        $doctorType = DiplomaBlankType::where('prefix', 'BTSI')->first();
-        $intermediatePoliticalType = DiplomaBlankType::where('prefix', 'TC-LLCT')->first();
-        $advancedPoliticalType = DiplomaBlankType::where('prefix', 'CC-LLCT')->first();
-        $sixMonthCertType = DiplomaBlankType::where('prefix', 'NV-6T')->first();
+        // Get diploma blank types
+        $types = [
+            'BCN' => DiplomaBlankType::where('prefix', 'BCN')->first(),
+            'BKS' => DiplomaBlankType::where('prefix', 'BKS')->first(),
+            'BTS' => DiplomaBlankType::where('prefix', 'BTS')->first(),
+            'BTSI' => DiplomaBlankType::where('prefix', 'BTSI')->first(),
+            'TC-LLCT' => DiplomaBlankType::where('prefix', 'TC-LLCT')->first(),
+            'CC-LLCT' => DiplomaBlankType::where('prefix', 'CC-LLCT')->first(),
+            'NV-6T' => DiplomaBlankType::where('prefix', 'NV-6T')->first(),
+            'TD-TC-LLCT' => DiplomaBlankType::where('prefix', 'TD-TC-LLCT')->first(),
+            'QSVT-45N' => DiplomaBlankType::where('prefix', 'QSVT-45N')->first(),
+            'BSKT' => DiplomaBlankType::where('prefix', 'BSKT')->first(),
+            'BD-KHAC' => DiplomaBlankType::where('prefix', 'BD-KHAC')->first(),
+        ];
 
-        // Import 1: 50 Bằng Cử nhân
-        $import1 = DiplomaBlankImport::create([
-            'type_id' => $bachelorType->type_id,
-            'document_reference' => 'CV-HVANND-2023-001',
-            'issue_date' => now()->subMonths(12),
-            'import_date' => now()->subMonths(12),
-            'total_quantity' => 50,
-            'prefix' => 'IMP1',
-            'from_number' => '00001',
-            'to_number' => '00050',
-            'status' => 2, // completed
-            'processed_count' => 50,
-        ]);
+        // Data-driven import configuration
+        $imports = [
+            // Bằng tốt nghiệp
+            ['type' => 'BCN', 'doc' => '001', 'months' => 12, 'qty' => 50, 'prefix' => 'IMP1'],
+            ['type' => 'BCN', 'doc' => '002', 'months' => 6, 'qty' => 60, 'prefix' => 'IMP2'],
+            ['type' => 'BTS', 'doc' => '003', 'months' => 3, 'qty' => 30, 'prefix' => 'IMP3'],
+            ['type' => 'BKS', 'doc' => '004', 'months' => 10, 'qty' => 40, 'prefix' => 'IMP4'],
+            ['type' => 'TC-LLCT', 'doc' => '005', 'months' => 8, 'qty' => 30, 'prefix' => 'IMP5'],
+            ['type' => 'CC-LLCT', 'doc' => '006', 'months' => 7, 'qty' => 20, 'prefix' => 'IMP6'],
+            ['type' => 'NV-6T', 'doc' => '007', 'months' => 5, 'qty' => 50, 'prefix' => 'IMP7'],
+            ['type' => 'BTSI', 'doc' => '008', 'months' => 4, 'qty' => 10, 'prefix' => 'IMP8'],
 
-        // Create 50 blanks for import 1
-        for ($i = 1; $i <= 50; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $bachelorType->type_id,
-                'import_id' => $import1->id,
-                'serial_number' => 'IMP1-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
+            // Chứng chỉ
+            ['type' => 'NV-6T', 'doc' => '009', 'months' => 2, 'qty' => 50, 'prefix' => 'IMP9'],
+            ['type' => 'TD-TC-LLCT', 'doc' => '010', 'months' => 9, 'qty' => 30, 'prefix' => 'IMP10'],
+            ['type' => 'QSVT-45N', 'doc' => '011', 'months' => 11, 'qty' => 40, 'prefix' => 'IMP11'],
+            ['type' => 'BSKT', 'doc' => '012', 'months' => 13, 'qty' => 35, 'prefix' => 'IMP12'],
+            ['type' => 'BD-KHAC', 'doc' => '013', 'months' => 14, 'qty' => 45, 'prefix' => 'IMP13'],
+        ];
+
+        foreach ($imports as $idx => $config) {
+            $type = $types[$config['type']];
+            $quantity = $config['qty'];
+
+            // Create import record
+            $import = DiplomaBlankImport::create([
+                'type_id' => $type->type_id,
+                'document_reference' => 'CV-HVANND-2024-' . $config['doc'],
+                'issue_date' => now()->subMonths($config['months']),
+                'import_date' => now()->subMonths($config['months']),
+                'total_quantity' => $quantity,
+                'prefix' => $config['prefix'],
+                'from_number' => '00001',
+                'to_number' => str_pad($quantity, 5, '0', STR_PAD_LEFT),
+                'status' => 2, // completed
+                'processed_count' => $quantity,
             ]);
-        }
 
-        // Import 2: 60 Bằng Cử nhân
-        $import2 = DiplomaBlankImport::create([
-            'type_id' => $bachelorType->type_id,
-            'document_reference' => 'CV-HVANND-2024-002',
-            'issue_date' => now()->subMonths(6),
-            'import_date' => now()->subMonths(6),
-            'total_quantity' => 60,
-            'prefix' => 'IMP2',
-            'from_number' => '00001',
-            'to_number' => '00060',
-            'status' => 2, // completed
-            'processed_count' => 60,
-        ]);
-
-        // Create 60 blanks for import 2
-        for ($i = 1; $i <= 60; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $bachelorType->type_id,
-                'import_id' => $import2->id,
-                'serial_number' => 'IMP2-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 3: 40 Bằng Thạc sĩ
-        $import3 = DiplomaBlankImport::create([
-            'type_id' => $masterType->type_id,
-            'document_reference' => 'CV-HVANND-2024-003',
-            'issue_date' => now()->subMonths(3),
-            'import_date' => now()->subMonths(3),
-            'total_quantity' => 40,
-            'prefix' => 'IMP3',
-            'from_number' => '00001',
-            'to_number' => '00040',
-            'status' => 2, // completed
-            'processed_count' => 40,
-        ]);
-
-        // Create 30 Master blanks
-        for ($i = 1; $i <= 30; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $masterType->type_id,
-                'import_id' => $import3->id,
-                'serial_number' => 'IMP3-MS-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 4: 40 Bằng Kỹ sư
-        $import4 = DiplomaBlankImport::create([
-            'type_id' => $engineerType->type_id,
-            'document_reference' => 'CV-HVANND-2024-004',
-            'issue_date' => now()->subMonths(10),
-            'import_date' => now()->subMonths(10),
-            'total_quantity' => 40,
-            'prefix' => 'IMP4',
-            'from_number' => '00001',
-            'to_number' => '00040',
-            'status' => 2, // completed
-            'processed_count' => 40,
-        ]);
-
-        for ($i = 1; $i <= 40; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $engineerType->type_id,
-                'import_id' => $import4->id,
-                'serial_number' => 'IMP4-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 5: 30 Bằng Trung cấp lý luận chính trị
-        $import5 = DiplomaBlankImport::create([
-            'type_id' => $intermediatePoliticalType->type_id,
-            'document_reference' => 'CV-HVANND-2024-005',
-            'issue_date' => now()->subMonths(8),
-            'import_date' => now()->subMonths(8),
-            'total_quantity' => 30,
-            'prefix' => 'IMP5',
-            'from_number' => '00001',
-            'to_number' => '00030',
-            'status' => 2, // completed
-            'processed_count' => 30,
-        ]);
-
-        for ($i = 1; $i <= 30; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $intermediatePoliticalType->type_id,
-                'import_id' => $import5->id,
-                'serial_number' => 'IMP5-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 6: 20 Bằng Cao cấp lý luận chính trị
-        $import6 = DiplomaBlankImport::create([
-            'type_id' => $advancedPoliticalType->type_id,
-            'document_reference' => 'CV-HVANND-2024-006',
-            'issue_date' => now()->subMonths(7),
-            'import_date' => now()->subMonths(7),
-            'total_quantity' => 20,
-            'prefix' => 'IMP6',
-            'from_number' => '00001',
-            'to_number' => '00020',
-            'status' => 2, // completed
-            'processed_count' => 20,
-        ]);
-
-        for ($i = 1; $i <= 20; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $advancedPoliticalType->type_id,
-                'import_id' => $import6->id,
-                'serial_number' => 'IMP6-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 7: 50 Chứng chỉ Nghiệp vụ 6 tháng
-        $import7 = DiplomaBlankImport::create([
-            'type_id' => $sixMonthCertType->type_id,
-            'document_reference' => 'CV-HVANND-2024-007',
-            'issue_date' => now()->subMonths(5),
-            'import_date' => now()->subMonths(5),
-            'total_quantity' => 50,
-            'prefix' => 'IMP7',
-            'from_number' => '00001',
-            'to_number' => '00050',
-            'status' => 2, // completed
-            'processed_count' => 50,
-        ]);
-
-        for ($i = 1; $i <= 50; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $sixMonthCertType->type_id,
-                'import_id' => $import7->id,
-                'serial_number' => 'IMP7-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
-        }
-
-        // Import 8: 10 Bằng Tiến sĩ (thêm)
-        $import8 = DiplomaBlankImport::create([
-            'type_id' => $doctorType->type_id,
-            'document_reference' => 'CV-HVANND-2024-008',
-            'issue_date' => now()->subMonths(4),
-            'import_date' => now()->subMonths(4),
-            'total_quantity' => 10,
-            'prefix' => 'IMP8',
-            'from_number' => '00001',
-            'to_number' => '00010',
-            'status' => 2, // completed
-            'processed_count' => 10,
-        ]);
-
-        for ($i = 1; $i <= 10; $i++) {
-            DiplomaBlank::create([
-                'type_id' => $doctorType->type_id,
-                'import_id' => $import8->id,
-                'serial_number' => 'IMP8-' . str_pad($i, 5, '0', STR_PAD_LEFT),
-                'status' => DiplomaBlankStatus::IN_STOCK->value,
-            ]);
+            // Create blanks using helper method
+            $this->createDiplomaBlanks($import, $quantity);
         }
     }
 
     private function seedStudents(): void
     {
         $majors = Major::all();
+        $studentsPerMajor = (int)ceil(self::STUDENTS_GRADUATED / $majors->count());
+        $studyingPerMajor = (int)ceil(self::STUDENTS_STUDYING / $majors->count());
+        $droppedPerMajor = (int)ceil(self::STUDENTS_DROPPED_OUT / $majors->count());
 
-        // 100 students đã tốt nghiệp (70 sẽ có văn bằng, 30 chưa có văn bằng)
         foreach ($majors as $major) {
-            $yearStart = rand(2015, 2019);
-            $yearEnd = $yearStart + 4;
-
-            // Tạo khoảng 10 sinh viên đã tốt nghiệp cho mỗi ngành
+            // Graduated students (2015-2019)
             Student::factory()
-                ->count(10)
+                ->count($studentsPerMajor)
                 ->graduated()
                 ->create([
                     'major_id' => $major->major_id,
-                    'class_name' => 'K' . substr($yearStart, 2) . '-' . $major->major_code,
-                    'course' => 'K' . substr($yearStart, 2),
-                    'academic_year' => $yearStart . ' - ' . $yearEnd,
+                    'class_name' => 'K' . rand(15, 19) . '-' . $major->major_code,
                 ]);
-        }
 
-        // 30 students đang học
-        foreach ($majors as $major) {
-            $yearStart = rand(2021, 2023);
-            $yearEnd = $yearStart + 4;
-
+            // Studying students (2021-2023)
             Student::factory()
-                ->count(3)
+                ->count($studyingPerMajor)
                 ->studying()
                 ->create([
                     'major_id' => $major->major_id,
-                    'class_name' => 'K' . substr($yearStart, 2) . '-' . $major->major_code,
-                    'course' => 'K' . substr($yearStart, 2),
-                    'academic_year' => $yearStart . ' - ' . $yearEnd,
+                    'class_name' => 'K' . rand(21, 23) . '-' . $major->major_code,
                 ]);
-        }
 
-        // 20 students đã bỏ học
-        foreach ($majors as $major) {
-            $yearStart = rand(2018, 2021);
-            $yearEnd = $yearStart + 4;
-
+            // Dropped out students (2018-2021)
             Student::factory()
-                ->count(2)
+                ->count($droppedPerMajor)
                 ->droppedOut()
                 ->create([
                     'major_id' => $major->major_id,
-                    'class_name' => 'K' . substr($yearStart, 2) . '-' . $major->major_code,
-                    'course' => 'K' . substr($yearStart, 2),
-                    'academic_year' => $yearStart . ' - ' . $yearEnd,
+                    'class_name' => 'K' . rand(18, 21) . '-' . $major->major_code,
                 ]);
         }
     }
 
     private function seedDegrees(): void
     {
-        // Get graduated students (first 80)
         $graduatedStudents = Student::where('status', StudentStatus::Graduate->value)
-            ->limit(70)
+            ->limit(self::DEGREES_TO_ISSUE + self::CERTIFICATES_TO_ISSUE)
             ->get();
 
-        // Get diploma blank types
-        $bachelorType = DiplomaBlankType::where('prefix', 'BCN')->first();
-        $engineerType = DiplomaBlankType::where('prefix', 'BKS')->first();
-        $masterType = DiplomaBlankType::where('prefix', 'BTS')->first();
-        $doctorType = DiplomaBlankType::where('prefix', 'BTSI')->first();
+        // Define degree types configuration
+        $degreeConfigs = [
+            ['type' => 'BCN', 'count' => 40, 'degree_type' => 'bachelor', 'prefix' => 'CN', 'ranking' => ['Giỏi', 'Khá', 'Trung bình']],
+            ['type' => 'BKS', 'count' => 15, 'degree_type' => 'bachelor', 'prefix' => 'KS', 'ranking' => ['Giỏi', 'Khá', 'Trung bình']],
+            ['type' => 'BTS', 'count' => 10, 'degree_type' => 'master', 'prefix' => 'TS', 'ranking' => ['Giỏi', 'Khá'], 'has_defense' => true],
+            ['type' => 'BTSI', 'count' => 5, 'degree_type' => 'doctor', 'prefix' => 'TSI', 'ranking' => ['Giỏi'], 'has_defense' => true],
+        ];
 
-        // Get available blanks (InStock status)
-        $bachelorBlanks = DiplomaBlank::where('type_id', $bachelorType->type_id)
-            ->where('status', DiplomaBlankStatus::IN_STOCK->value)->get();
+        $studentOffset = 0;
 
-        $engineerBlanks = DiplomaBlank::where('type_id', $engineerType->type_id)
-            ->where('status', DiplomaBlankStatus::IN_STOCK->value)->get();
+        foreach ($degreeConfigs as $config) {
+            $type = DiplomaBlankType::where('prefix', $config['type'])->first();
+            $blanks = DiplomaBlank::where('type_id', $type->type_id)
+                ->where('status', DiplomaBlankStatus::IN_STOCK)
+                ->limit($config['count'])
+                ->get();
 
-        $masterBlanks = DiplomaBlank::where('type_id', $masterType->type_id)
-            ->where('status', DiplomaBlankStatus::IN_STOCK->value)->get();
+            foreach ($graduatedStudents->slice($studentOffset, $config['count'])->values() as $index => $student) {
+                if ($index >= $blanks->count()) break;
 
-        $doctorBlanks = DiplomaBlank::where('type_id', $doctorType->type_id)
-            ->where('status', DiplomaBlankStatus::IN_STOCK->value)->get();
+                $blank = $blanks[$index];
+                $grantingDate = now()->subMonths(rand(1, 12));
 
-        $degreeIndex = 0;
-
-        // Create 40 Bachelor degrees
-        foreach ($graduatedStudents->take(40) as $student) {
-            if ($degreeIndex >= $bachelorBlanks->count()) break;
-
-            $blank = $bachelorBlanks[$degreeIndex];
-            $grantingDate = now()->subMonths(rand(1, 12));
-
-            Degree::factory()
-                ->forStudent($student)
-                ->withDiplomaBlank($blank)
-                ->create([
-                    'degree_type' => 'bachelor',
-                    'registration_number' => 'CN' . now()->year . str_pad($degreeIndex + 1, 6, '0', STR_PAD_LEFT),
+                $degreeData = [
+                    'degree_type' => $config['degree_type'],
+                    'registration_number' => $config['prefix'] . now()->year . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
                     'granting_date' => $grantingDate,
                     'graduation_year' => $grantingDate->year,
-                    'decision_number' => 'QĐ-HVANND-CN-' . now()->year . '-' . str_pad($degreeIndex + 1, 4, '0', STR_PAD_LEFT),
-                    'ranking' => collect(['Giỏi', 'Khá', 'Trung bình'])->random(),
+                    'decision_number' => 'QĐ-HVANND-' . $config['prefix'] . '-' . now()->year . '-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                    'ranking' => collect($config['ranking'])->random(),
                     'major_id' => $student->major_id,
-                ]);
+                ];
 
-            $blank->update(['status' => DiplomaBlankStatus::ISSUED->value]);
-            $degreeIndex++;
+                if (isset($config['has_defense']) && $config['has_defense']) {
+                    $degreeData['defense_date'] = $grantingDate->copy()->subMonths(rand(1, 6));
+                }
+
+                Degree::factory()
+                    ->forStudent($student)
+                    ->withDiplomaBlank($blank)
+                    ->create($degreeData);
+
+                $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
+            }
+
+            $studentOffset += $config['count'];
         }
 
-        // Create 15 Engineer degrees
-        $engineerIndex = 0;
-        foreach ($graduatedStudents->skip(40)->take(15) as $student) {
-            if ($engineerIndex >= $engineerBlanks->count()) break;
+        // Issue certificates for remaining graduated students
+        $this->seedCertificates($graduatedStudents->slice($studentOffset, self::CERTIFICATES_TO_ISSUE));
+    }
 
-            $blank = $engineerBlanks[$engineerIndex];
-            $grantingDate = now()->subMonths(rand(1, 12));
+    private function seedCertificates($students): void
+    {
+        if ($students->isEmpty()) return;
 
-            Degree::factory()
-                ->forStudent($student)
-                ->withDiplomaBlank($blank)
-                ->create([
-                    'degree_type' => 'bachelor',
-                    'registration_number' => 'KS' . now()->year . str_pad($engineerIndex + 1, 6, '0', STR_PAD_LEFT),
-                    'granting_date' => $grantingDate,
-                    'graduation_year' => $grantingDate->year,
-                    'decision_number' => 'QĐ-HVANND-KS-' . now()->year . '-' . str_pad($engineerIndex + 1, 4, '0', STR_PAD_LEFT),
-                    'ranking' => collect(['Giỏi', 'Khá', 'Trung bình'])->random(),
-                    'major_id' => $student->major_id,
-                ]);
+        $certificateConfigs = [
+            ['type' => 'NV-6T', 'count' => 25, 'prefix' => 'NV'],
+            ['type' => 'TD-TC-LLCT', 'count' => 15, 'prefix' => 'TDTC'],
+            ['type' => 'QSVT-45N', 'count' => 15, 'prefix' => 'QSVT'],
+            ['type' => 'BSKT', 'count' => 10, 'prefix' => 'BSKT', 'subtypes' => ['Tin học', 'Ngoại ngữ', 'Chuyên môn', 'Chính trị']],
+            ['type' => 'BD-KHAC', 'count' => 10, 'prefix' => 'BD', 'subtypes' => ['Giao tiếp', 'Lãnh đạo', 'Văn phòng', 'Quản lý', 'Kỹ năng mềm']],
+        ];
 
-            $blank->update(['status' => DiplomaBlankStatus::ISSUED->value]);
-            $engineerIndex++;
-        }
+        $studentOffset = 0;
 
-        // Create 10 Master degrees with defense_date
-        $masterIndex = 0;
-        foreach ($graduatedStudents->skip(55)->take(10) as $student) {
-            if ($masterIndex >= $masterBlanks->count()) break;
+        foreach ($certificateConfigs as $config) {
+            $type = DiplomaBlankType::where('prefix', $config['type'])->first();
+            $blanks = DiplomaBlank::where('type_id', $type->type_id)
+                ->where('status', DiplomaBlankStatus::IN_STOCK)
+                ->limit($config['count'])
+                ->get();
 
-            $blank = $masterBlanks[$masterIndex];
-            $grantingDate = now()->subMonths(rand(1, 12));
+            foreach ($students->slice($studentOffset, $config['count'])->values() as $index => $student) {
+                if ($index >= $blanks->count()) break;
 
-            Degree::factory()
-                ->forStudent($student)
-                ->withDiplomaBlank($blank)
-                ->create([
-                    'degree_type' => 'master',
-                    'registration_number' => 'TS' . now()->year . str_pad($masterIndex + 1, 6, '0', STR_PAD_LEFT),
-                    'granting_date' => $grantingDate,
-                    'graduation_year' => $grantingDate->year,
-                    'defense_date' => $grantingDate->copy()->subMonths(rand(1, 3)),
-                    'decision_number' => 'QĐ-HVANND-TS-' . now()->year . '-' . str_pad($masterIndex + 1, 4, '0', STR_PAD_LEFT),
-                    'ranking' => collect(['Giỏi', 'Khá'])->random(),
-                    'major_id' => $student->major_id,
-                ]);
+                $blank = $blanks[$index];
+                $grantingDate = now()->subMonths(rand(1, 18));
 
-            $blank->update(['status' => DiplomaBlankStatus::ISSUED->value]);
-            $masterIndex++;
-        }
+                $notes = $type->type_name;
+                if (isset($config['subtypes'])) {
+                    $notes .= ' - ' . collect($config['subtypes'])->random();
+                }
 
-        // Create 5 Doctor degrees with defense_date
-        $doctorIndex = 0;
-        foreach ($graduatedStudents->skip(65)->take(5) as $student) {
-            if ($doctorIndex >= $doctorBlanks->count()) break;
+                Degree::factory()
+                    ->forStudent($student)
+                    ->withDiplomaBlank($blank)
+                    ->create([
+                        'degree_type' => 'certificate',
+                        'registration_number' => $config['prefix'] . now()->year . str_pad($index + 1, 6, '0', STR_PAD_LEFT),
+                        'granting_date' => $grantingDate,
+                        'graduation_year' => $grantingDate->year,
+                        'decision_number' => 'QĐ-HVANND-CC-' . now()->year . '-' . str_pad($studentOffset + $index + 1, 4, '0', STR_PAD_LEFT),
+                        'major_id' => $student->major_id,
+                        'notes' => $notes,
+                    ]);
 
-            $blank = $doctorBlanks[$doctorIndex];
-            $grantingDate = now()->subMonths(rand(1, 12));
+                $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
+            }
 
-            Degree::factory()
-                ->forStudent($student)
-                ->withDiplomaBlank($blank)
-                ->create([
-                    'degree_type' => 'doctor',
-                    'registration_number' => 'TSI' . now()->year . str_pad($doctorIndex + 1, 6, '0', STR_PAD_LEFT),
-                    'granting_date' => $grantingDate,
-                    'graduation_year' => $grantingDate->year,
-                    'defense_date' => $grantingDate->copy()->subMonths(rand(3, 6)),
-                    'decision_number' => 'QĐ-HVANND-TSI-' . now()->year . '-' . str_pad($doctorIndex + 1, 4, '0', STR_PAD_LEFT),
-                    'ranking' => 'Giỏi',
-                    'major_id' => $student->major_id,
-                ]);
-
-            $blank->update(['status' => DiplomaBlankStatus::ISSUED->value]);
-            $doctorIndex++;
+            $studentOffset += $config['count'];
         }
     }
 

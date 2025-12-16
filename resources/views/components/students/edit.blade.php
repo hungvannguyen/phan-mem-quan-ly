@@ -541,7 +541,25 @@
                                             Cấp ngày: {{ $degree->granting_date?->format('d/m/Y') ?? 'Chưa cập nhật' }}
                                         </small>
                                     </div>
+
+                                    {{-- Action Button --}}
                                     <div class="degree-actions">
+                                        {{-- Export diploma verification button --}}
+                                        <a href="{{ route('student.export-verification', $student->student_id) }}"
+                                            class="inline-flex items-center rounded border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            title="Xuất công văn xác minh văn bằng">
+                                            <i class="fas fa-file-word mr-1"></i>
+                                            Xác minh
+                                        </a>
+
+                                        {{-- Export bachelor confirmation button --}}
+                                        <a href="{{ route('student.export-bachelor-confirmation', $student->student_id) }}"
+                                            class="inline-flex items-center rounded border border-green-300 bg-white px-3 py-1.5 text-xs font-medium text-green-700 shadow-sm hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                            title="Xuất giấy xác nhận cử nhân">
+                                            <i class="fas fa-file-word mr-1"></i>
+                                            Cử nhân
+                                        </a>
+
                                         <button type="button" onclick="openEditDegreeModal({{ $degree->degree_id }})"
                                             class="inline-flex items-center rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                                             <i class="fas fa-edit mr-1"></i>

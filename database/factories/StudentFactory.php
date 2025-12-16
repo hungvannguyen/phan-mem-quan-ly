@@ -34,13 +34,24 @@ class StudentFactory extends Factory
             $this->faker->randomElement($middleNames) . ' ' .
             $firstName;
 
-        $yearStart = $this->faker->numberBetween(2015, 2022);
+        // Nhiều khóa hơn: từ 2010 đến 2023 (14 khóa)
+        $yearStart = $this->faker->numberBetween(2010, 2023);
         $yearEnd = $yearStart + 4;
+
+        // Nhiều hình thức đào tạo hơn (must match enum in migration)
+        $trainingTypes = [
+            'Chính quy',
+            'Chính quy',
+            'Chính quy', // Tăng tỷ lệ chính quy
+            'Liên thông',
+            'Vừa làm vừa học',
+            'Từ xa',
+        ];
 
         return [
             'student_code' => $this->faker->unique()->regexify('SV[0-9]{6}'),
             'full_name' => $fullName,
-            'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-18 years')->format('Y-m-d'),
+            'date_of_birth' => $this->faker->dateTimeBetween('-35 years', '-18 years')->format('Y-m-d'),
             'class_name' => 'K' . substr($yearStart, 2) . '-' . $this->faker->regexify('[A-Z]{3}'),
             'course' => 'K' . substr($yearStart, 2),
             'academic_year' => $yearStart . ' - ' . $yearEnd,
@@ -49,6 +60,7 @@ class StudentFactory extends Factory
             'gender' => $gender->value,
             'nation' => $this->faker->randomElement(['Kinh', 'Tày', 'Thái', 'Mường', 'Khmer', 'Hoa', 'Nùng', 'H\'Mông']),
             'nationality' => 'Việt Nam',
+            'training_type' => $this->faker->randomElement($trainingTypes),
             'number_in_the_book' => 'VB-' . $this->faker->unique()->numberBetween(100000, 999999),
             'status' => $this->faker->randomElement(StudentStatus::cases())->value,
         ];

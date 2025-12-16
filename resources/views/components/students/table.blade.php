@@ -117,20 +117,6 @@
                                     title="Xóa sinh viên">
                                     Xóa
                                 </button>
-
-                                {{-- Export diploma verification button --}}
-                                @if ($student->degrees && $student->degrees->count() > 0)
-                                    <a href="{{ route('student.export-verification', $student->student_id) }}"
-                                        class="btn-action btn-info" title="Xuất công văn xác minh văn bằng">
-                                        <i class="fas fa-file-word"></i> Xác minh
-                                    </a>
-
-                                    {{-- Export bachelor confirmation button --}}
-                                    <a href="{{ route('student.export-bachelor-confirmation', $student->student_id) }}"
-                                        class="btn-action btn-info" title="Xuất giấy xác nhận cử nhân">
-                                        <i class="fas fa-file-word"></i> Cử nhân
-                                    </a>
-                                @endif
                             </div>
                         </td>
                     </tr>

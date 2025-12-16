@@ -99,7 +99,10 @@ class DiplomaManagementController extends Controller
         $perPage = $request->get('per_page', 15);
         $perPage = in_array($perPage, [5, 10, 15, 25, 50]) ? $perPage : 15;
 
-        $students = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $students = $query->orderBy('created_at', 'desc')
+            ->orderBy('student_id', 'asc')
+            ->paginate($perPage)
+            ->appends($request->all());
         $majors = Major::orderBy('major_name')->get();
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
