@@ -358,6 +358,24 @@
                             <i class="fas fa-file-excel"></i>
                             Thông tin cấp bằng cử nhân
                         </button>
+                        <button type="button" class="btn btn-success ms-2" onclick="exportMasterInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp bằng thạc sĩ
+                        </button>
+                        <button type="button" class="btn btn-info ms-2" onclick="exportDoctorateInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp bằng tiến sĩ
+                        </button>
+                        <button type="button" class="btn btn-warning ms-2"
+                            onclick="exportAdvancedPoliticalTheoryInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp bằng cao cấp LLCT
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2"
+                            onclick="exportIntermediatePoliticalTheoryInfo()">
+                            <i class="fas fa-file-excel"></i>
+                            Thông tin cấp bằng trung cấp LLCT
+                        </button>
                     </div>
                 </div>
             </div>

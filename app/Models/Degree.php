@@ -33,6 +33,7 @@ class Degree extends Model
         'decision_number',
         'major_id',
         'major_name',
+        'defense_date',
         'notes',
     ];
 
@@ -47,6 +48,7 @@ class Degree extends Model
             'degree_type' => 'string',
             'registration_number' => 'string',
             'granting_date' => 'date',
+            'defense_date' => 'date',
             'graduation_year' => 'integer',
             'ranking' => 'string',
             'decision_number' => 'string',

@@ -16,5 +16,9 @@ return [
         'diploma-verification' => \App\Services\DiplomaVerificationService::class,
         'bachelor-confirmation' => \App\Services\BachelorConfirmationService::class,
         'bachelor-info' => \App\Services\BachelorInfoService::class,
+        'master-info' => \App\Services\MasterInfoService::class,
+        'doctorate-info' => \App\Services\DoctorateInfoService::class,
+        'advanced-political-theory-info' => \App\Services\AdvancedPoliticalTheoryInfoService::class,
+        'intermediate-political-theory-info' => \App\Services\IntermediatePoliticalTheoryInfoService::class,
     ],
 ];

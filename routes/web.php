@@ -81,6 +81,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-bachelor-info', [StatisticsController::class, 'exportBachelorInfo'])
             ->middleware('permission:diplomas.export')
             ->name('export-bachelor-info');
+        Route::get('/export-master-info', [StatisticsController::class, 'exportMasterInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-master-info');
+        Route::get('/export-doctorate-info', [StatisticsController::class, 'exportDoctorateInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-doctorate-info');
+        Route::get('/export-advanced-political-theory-info', [StatisticsController::class, 'exportAdvancedPoliticalTheoryInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-advanced-political-theory-info');
+        Route::get('/export-intermediate-political-theory-info', [StatisticsController::class, 'exportIntermediatePoliticalTheoryInfo'])
+            ->middleware('permission:diplomas.export')
+            ->name('export-intermediate-political-theory-info');
     });
 
     /*

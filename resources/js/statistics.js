@@ -573,8 +573,220 @@ async function exportBachelorInfo() {
     }
 }
 
+// Export master info
+async function exportMasterInfo() {
+    showLoading();
+
+    try {
+        const formData = new FormData(document.getElementById('diplomaFilters'));
+        const params = new URLSearchParams(formData);
+
+        // Use fetch to download file
+        const response = await fetch(`/statistics/export-master-info?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi xuất file: ' + response.statusText);
+        }
+
+        // Get filename from Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'Thong_tin_cap_bang_thac_si.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert response to blob and trigger download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        hideLoading();
+    } catch (error) {
+        console.error('Export error:', error);
+        hideLoading();
+        alert('Có lỗi xảy ra khi xuất file: ' + error.message);
+    }
+}
+
+// Export doctorate info
+async function exportDoctorateInfo() {
+    showLoading();
+
+    try {
+        const formData = new FormData(document.getElementById('diplomaFilters'));
+        const params = new URLSearchParams(formData);
+
+        // Use fetch to download file
+        const response = await fetch(`/statistics/export-doctorate-info?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi xuất file: ' + response.statusText);
+        }
+
+        // Get filename from Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'Thong_tin_cap_bang_tien_si.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert response to blob and trigger download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        hideLoading();
+    } catch (error) {
+        console.error('Export error:', error);
+        hideLoading();
+        alert('Có lỗi xảy ra khi xuất file: ' + error.message);
+    }
+}
+
+// Export advanced political theory info
+async function exportAdvancedPoliticalTheoryInfo() {
+    showLoading();
+
+    try {
+        const formData = new FormData(document.getElementById('diplomaFilters'));
+        const params = new URLSearchParams(formData);
+
+        // Use fetch to download file
+        const response = await fetch(`/statistics/export-advanced-political-theory-info?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi xuất file: ' + response.statusText);
+        }
+
+        // Get filename from Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'Thong_tin_cap_bang_cao_cap_LLCT.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert response to blob and trigger download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        hideLoading();
+    } catch (error) {
+        console.error('Export error:', error);
+        hideLoading();
+        alert('Có lỗi xảy ra khi xuất file: ' + error.message);
+    }
+}
+
+// Export intermediate political theory info
+async function exportIntermediatePoliticalTheoryInfo() {
+    showLoading();
+
+    try {
+        const formData = new FormData(document.getElementById('diplomaFilters'));
+        const params = new URLSearchParams(formData);
+
+        // Use fetch to download file
+        const response = await fetch(`/statistics/export-intermediate-political-theory-info?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Lỗi khi xuất file: ' + response.statusText);
+        }
+
+        // Get filename from Content-Disposition header
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'Thong_tin_cap_bang_trung_cap_LLCT.xlsx';
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+            if (filenameMatch) {
+                filename = filenameMatch[1];
+            }
+        }
+
+        // Convert response to blob and trigger download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        hideLoading();
+    } catch (error) {
+        console.error('Export error:', error);
+        hideLoading();
+        alert('Có lỗi xảy ra khi xuất file: ' + error.message);
+    }
+}
+
 // Expose functions to global scope for inline onclick handlers
 window.exportBachelorInfo = exportBachelorInfo;
+window.exportMasterInfo = exportMasterInfo;
+window.exportDoctorateInfo = exportDoctorateInfo;
+window.exportAdvancedPoliticalTheoryInfo = exportAdvancedPoliticalTheoryInfo;
+window.exportIntermediatePoliticalTheoryInfo = exportIntermediatePoliticalTheoryInfo;
 window.applyDiplomaFilters = applyDiplomaFilters;
 window.applyCertificateFilters = applyCertificateFilters;
 window.resetDiplomaFilters = resetDiplomaFilters;
