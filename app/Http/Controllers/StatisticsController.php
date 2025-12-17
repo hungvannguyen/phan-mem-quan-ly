@@ -525,56 +525,56 @@ class StatisticsController extends Controller
 
         // Get the base query builder and modify it to use table-qualified column names
         $baseQuery = clone $query;
-        
+
         // Get the SQL with bindings to check existing WHERE conditions
         $sql = $baseQuery->toSql();
         $bindings = $baseQuery->getBindings();
-        
+
         // Rebuild query with proper table qualification
         $stats = Degree::query()
             ->join($tableName, $tableName . '.' . $foreignKey, '=', 'degrees.' . $foreignKey)
             ->select($tableName . '.' . $column, DB::raw('count(*) as count'))
             ->whereNotNull('degrees.diploma_blank_id'); // Base condition
-        
+
         // Apply same filters from original query, but with explicit table names
         $request = request();
-        
+
         if ($request->filled('graduation_year')) {
             $stats->where('degrees.graduation_year', $request->graduation_year);
         }
-        
+
         if ($request->filled('start_date')) {
             $stats->whereDate('degrees.granting_date', '>=', $request->start_date);
         }
-        
+
         if ($request->filled('end_date')) {
             $stats->whereDate('degrees.granting_date', '<=', $request->end_date);
         }
-        
+
         if ($request->filled('degree_type')) {
             $stats->where('degrees.degree_type', $request->degree_type);
         }
-        
+
         if ($request->filled('major_id')) {
             $stats->where('degrees.major_id', $request->major_id);
         }
-        
+
         if ($request->filled('gender')) {
             $stats->whereHas('student', function ($q) use ($request) {
                 $q->where('gender', $request->gender);
             });
         }
-        
+
         if ($request->filled('ranking')) {
             $stats->where('degrees.ranking', $request->ranking);
         }
-        
+
         if ($request->filled('training_type')) {
             $stats->whereHas('student', function ($q) use ($request) {
                 $q->where('training_type', $request->training_type);
             });
         }
-        
+
         $result = $stats->groupBy($tableName . '.' . $column)->get();
 
         return [
@@ -617,42 +617,42 @@ class StatisticsController extends Controller
             ->join('students', 'students.student_id', '=', 'degrees.student_id')
             ->select('students.training_type', DB::raw('count(*) as count'))
             ->whereNotNull('degrees.diploma_blank_id'); // Base condition
-        
+
         // Apply same filters from original query
         $request = request();
-        
+
         if ($request->filled('graduation_year')) {
             $stats->where('degrees.graduation_year', $request->graduation_year);
         }
-        
+
         if ($request->filled('start_date')) {
             $stats->whereDate('degrees.granting_date', '>=', $request->start_date);
         }
-        
+
         if ($request->filled('end_date')) {
             $stats->whereDate('degrees.granting_date', '<=', $request->end_date);
         }
-        
+
         if ($request->filled('degree_type')) {
             $stats->where('degrees.degree_type', $request->degree_type);
         }
-        
+
         if ($request->filled('major_id')) {
             $stats->where('degrees.major_id', $request->major_id);
         }
-        
+
         if ($request->filled('gender')) {
             $stats->where('students.gender', $request->gender);
         }
-        
+
         if ($request->filled('ranking')) {
             $stats->where('degrees.ranking', $request->ranking);
         }
-        
+
         if ($request->filled('training_type')) {
             $stats->where('students.training_type', $request->training_type);
         }
-        
+
         $result = $stats->groupBy('students.training_type')->get();
 
         return [
