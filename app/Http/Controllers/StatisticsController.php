@@ -523,15 +523,63 @@ class StatisticsController extends Controller
         $tableName = $relation === 'major' ? 'majors' : $relation . 's';
         $foreignKey = $relation . '_id';
 
-        $stats = (clone $query)
+        // Get the base query builder and modify it to use table-qualified column names
+        $baseQuery = clone $query;
+        
+        // Get the SQL with bindings to check existing WHERE conditions
+        $sql = $baseQuery->toSql();
+        $bindings = $baseQuery->getBindings();
+        
+        // Rebuild query with proper table qualification
+        $stats = Degree::query()
             ->join($tableName, $tableName . '.' . $foreignKey, '=', 'degrees.' . $foreignKey)
             ->select($tableName . '.' . $column, DB::raw('count(*) as count'))
-            ->groupBy($tableName . '.' . $column)
-            ->get();
+            ->whereNotNull('degrees.diploma_blank_id'); // Base condition
+        
+        // Apply same filters from original query, but with explicit table names
+        $request = request();
+        
+        if ($request->filled('graduation_year')) {
+            $stats->where('degrees.graduation_year', $request->graduation_year);
+        }
+        
+        if ($request->filled('start_date')) {
+            $stats->whereDate('degrees.granting_date', '>=', $request->start_date);
+        }
+        
+        if ($request->filled('end_date')) {
+            $stats->whereDate('degrees.granting_date', '<=', $request->end_date);
+        }
+        
+        if ($request->filled('degree_type')) {
+            $stats->where('degrees.degree_type', $request->degree_type);
+        }
+        
+        if ($request->filled('major_id')) {
+            $stats->where('degrees.major_id', $request->major_id);
+        }
+        
+        if ($request->filled('gender')) {
+            $stats->whereHas('student', function ($q) use ($request) {
+                $q->where('gender', $request->gender);
+            });
+        }
+        
+        if ($request->filled('ranking')) {
+            $stats->where('degrees.ranking', $request->ranking);
+        }
+        
+        if ($request->filled('training_type')) {
+            $stats->whereHas('student', function ($q) use ($request) {
+                $q->where('training_type', $request->training_type);
+            });
+        }
+        
+        $result = $stats->groupBy($tableName . '.' . $column)->get();
 
         return [
-            'labels' => $stats->pluck($column)->toArray(),
-            'values' => $stats->pluck('count')->toArray()
+            'labels' => $result->pluck($column)->toArray(),
+            'values' => $result->pluck('count')->toArray()
         ];
     }
 
@@ -564,15 +612,52 @@ class StatisticsController extends Controller
      */
     private function getTrainingTypeStats($query)
     {
-        $stats = (clone $query)
+        // Rebuild query with proper table qualification to avoid ambiguous column errors
+        $stats = Degree::query()
             ->join('students', 'students.student_id', '=', 'degrees.student_id')
             ->select('students.training_type', DB::raw('count(*) as count'))
-            ->groupBy('students.training_type')
-            ->get();
+            ->whereNotNull('degrees.diploma_blank_id'); // Base condition
+        
+        // Apply same filters from original query
+        $request = request();
+        
+        if ($request->filled('graduation_year')) {
+            $stats->where('degrees.graduation_year', $request->graduation_year);
+        }
+        
+        if ($request->filled('start_date')) {
+            $stats->whereDate('degrees.granting_date', '>=', $request->start_date);
+        }
+        
+        if ($request->filled('end_date')) {
+            $stats->whereDate('degrees.granting_date', '<=', $request->end_date);
+        }
+        
+        if ($request->filled('degree_type')) {
+            $stats->where('degrees.degree_type', $request->degree_type);
+        }
+        
+        if ($request->filled('major_id')) {
+            $stats->where('degrees.major_id', $request->major_id);
+        }
+        
+        if ($request->filled('gender')) {
+            $stats->where('students.gender', $request->gender);
+        }
+        
+        if ($request->filled('ranking')) {
+            $stats->where('degrees.ranking', $request->ranking);
+        }
+        
+        if ($request->filled('training_type')) {
+            $stats->where('students.training_type', $request->training_type);
+        }
+        
+        $result = $stats->groupBy('students.training_type')->get();
 
         return [
-            'labels' => $stats->pluck('training_type')->toArray(),
-            'values' => $stats->pluck('count')->toArray()
+            'labels' => $result->pluck('training_type')->toArray(),
+            'values' => $result->pluck('count')->toArray()
         ];
     }
 
