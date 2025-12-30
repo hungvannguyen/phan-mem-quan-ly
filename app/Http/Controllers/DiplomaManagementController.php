@@ -152,7 +152,9 @@ class DiplomaManagementController extends Controller
     {
         $student->update($request->validated());
 
-        return redirect()->route('diploma-management')->with('success', 'Cập nhật thông tin sinh viên thành công!');
+        // After updating, redirect back to the student's edit page
+        return redirect()->route('student.show', ['student' => $student->student_id])
+            ->with('success', 'Cập nhật thông tin sinh viên thành công!');
     }
 
     public function storeDegree(Request $request)
