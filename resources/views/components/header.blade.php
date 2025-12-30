@@ -1,4 +1,3 @@
 <div class="header">
-    <img src="https://hvannd.edu.vn/Content/images/banner.jpg" alt="Header Image" loading="lazy"
-        onerror="this.style.display='none'">
+    <img src="{{ asset('images/banner.jpg') }}" alt="Banner" loading="lazy" onerror="this.style.display='none'">
 </div>
