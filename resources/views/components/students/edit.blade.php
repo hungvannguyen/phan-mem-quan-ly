@@ -995,6 +995,53 @@
         </div>
     </div>
 
+    <!-- Export Verification Modal -->
+    <div id="exportVerificationModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-800">
+                    <i class="fas fa-file-word mr-2 text-blue-600"></i>
+                    Xuất công văn xác minh văn bằng
+                </h3>
+                <button type="button" onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="exportVerificationForm" method="GET"
+                action="{{ route('student.export-verification', $student->student_id) }}">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="field-group">
+                        <label for="don_vi_yeu_cau" class="field-label">Đơn vị yêu cầu</label>
+                        <input type="text" name="don_vi_yeu_cau" id="don_vi_yeu_cau" class="field-input"
+                            value="">
+                    </div>
+
+                    <div class="field-group">
+                        <label for="so_cv_den" class="field-label">Số công văn đến</label>
+                        <input type="text" name="so_cv_den" id="so_cv_den" class="field-input" value="">
+                    </div>
+
+                    <div class="field-group">
+                        <label for="ngay_cv_den" class="field-label">Ngày công văn đến</label>
+                        <input type="date" name="ngay_cv_den" id="ngay_cv_den" class="field-input" value="">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <button type="button" onclick="closeExportModal()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                        Hủy
+                    </button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                        Xuất file
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Auto-hide success/error messages after 5 seconds
         setTimeout(() => {
@@ -1335,10 +1382,65 @@
             form.submit();
         }
 
+        // Export Verification Modal Functions
+        const exportUrl = "{{ route('student.export-verification', $student->student_id) }}";
+
+        function openExportModal() {
+            const modal = document.getElementById('exportVerificationModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('exportVerificationModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        }
+
+        // Attach click interception to the existing export link(s)
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                document.querySelectorAll(`a[href="${exportUrl}"]`).forEach(a => {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        openExportModal();
+                    });
+                });
+            } catch (err) {
+                // silently ignore if route not present
+            }
+            // Close modal immediately when export form submits and disable submit button
+            try {
+                const exportForm = document.getElementById('exportVerificationForm');
+                if (exportForm) {
+                    exportForm.addEventListener('submit', function(e) {
+                        // Close UI modal immediately so user sees it closed
+                        closeExportModal();
+
+                        // Disable submit button to prevent double submits
+                        const submitBtn = exportForm.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        }
+
+                        // allow normal form submission to proceed
+                    });
+                }
+            } catch (err) {
+                // ignore
+            }
+        });
+
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const addModal = document.getElementById('addDegreeModal');
             const editModal = document.getElementById('editDegreeModal');
+            const exportModal = document.getElementById('exportVerificationModal');
 
             if (event.target === addModal) {
                 closeAddDegreeModal();
@@ -1346,6 +1448,10 @@
 
             if (event.target === editModal) {
                 closeEditDegreeModal();
+            }
+
+            if (event.target === exportModal) {
+                closeExportModal();
             }
         });
     </script>

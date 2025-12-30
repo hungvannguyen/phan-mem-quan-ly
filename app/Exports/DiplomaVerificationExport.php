@@ -9,10 +9,12 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class DiplomaVerificationExport
 {
     protected $student;
+    protected $params = [];
 
-    public function __construct(Student $student)
+    public function __construct(Student $student, array $params = [])
     {
         $this->student = $student;
+        $this->params = $params;
     }
 
     /**
@@ -53,9 +55,23 @@ class DiplomaVerificationExport
         $trainingType = $this->student->training_type ?? 'Chính quy';
 
         // Set values for template placeholders
-        $templateProcessor->setValue('don_vi_yeu_cau', '');  // Để trống hoặc có thể thêm form input sau
-        $templateProcessor->setValue('so_cv_den', '');       // Để trống hoặc có thể thêm form input sau
-        $templateProcessor->setValue('ngay_cv_den', '');     // Để trống hoặc có thể thêm form input sau
+        $donVi = $this->params['don_vi_yeu_cau'] ?? '';
+        $soCv = $this->params['so_cv_den'] ?? '';
+        $ngayCv = $this->params['ngay_cv_den'] ?? '';
+
+        // If date provided in ISO format, convert to dd/mm/YYYY for template
+        if (!empty($ngayCv)) {
+            try {
+                $d = new \DateTime($ngayCv);
+                $ngayCv = $d->format('d/m/Y');
+            } catch (\Exception $e) {
+                // keep original if parsing fails
+            }
+        }
+
+        $templateProcessor->setValue('don_vi_yeu_cau', $donVi);
+        $templateProcessor->setValue('so_cv_den', $soCv);
+        $templateProcessor->setValue('ngay_cv_den', $ngayCv);
         $templateProcessor->setValue('noi_dung_yeu_cau', 'xác minh văn bằng');
         $templateProcessor->setValue('nganh_dao_tao', $majorName);
         $templateProcessor->setValue('so_hieu_bang', $registrationNumber);

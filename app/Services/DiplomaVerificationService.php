@@ -28,7 +28,10 @@ class DiplomaVerificationService implements ExportServiceContract
             throw new \Exception('Sinh viên chưa được cấp văn bằng nào!');
         }
 
-        $export = new DiplomaVerificationExport($student);
+        // Collect optional parameters from provided data or current request
+        $params = $data['params'] ?? request()->only(['don_vi_yeu_cau', 'so_cv_den', 'ngay_cv_den']);
+
+        $export = new DiplomaVerificationExport($student, $params);
         $filePath = $export->generate();
 
         return response()->download($filePath, basename($filePath), [
