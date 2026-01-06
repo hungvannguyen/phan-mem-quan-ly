@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->string('academic_year', 20)->nullable();
             $table->foreignId('major_id')->constrained('majors', 'major_id');
             $table->string('place_of_birth');
+            $table->string('hometown')->nullable();
+            $table->string('place_of_origin')->nullable();
             $table->tinyInteger('gender');
             $table->string('nation');
             $table->string('nationality');

@@ -11,6 +11,7 @@ use App\Models\DiplomaBlankImport;
 use App\Models\DiplomaBlank;
 use App\Models\Student;
 use App\Models\Degree;
+use App\Models\DegreeAdjustment;
 use App\Models\SystemSetting;
 use App\Models\DamageReason;
 use App\Enums\StudentGender;
@@ -287,7 +288,8 @@ class DevelopmentSeeder extends Seeder
 
     private function seedDegrees(): void
     {
-        $graduatedStudents = Student::where('status', StudentStatus::Graduate->value)
+        $graduatedStudents = Student::with('major')
+            ->where('status', StudentStatus::Graduate->value)
             ->limit(self::DEGREES_TO_ISSUE + self::CERTIFICATES_TO_ISSUE)
             ->get();
 
@@ -322,18 +324,24 @@ class DevelopmentSeeder extends Seeder
                     'decision_number' => 'QĐ-HVANND-' . $config['prefix'] . '-' . now()->year . '-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
                     'ranking' => collect($config['ranking'])->random(),
                     'major_id' => $student->major_id,
+                    'major_name' => $student->major->major_name,
                 ];
 
                 if (isset($config['has_defense']) && $config['has_defense']) {
                     $degreeData['defense_date'] = $grantingDate->copy()->subMonths(rand(1, 6));
                 }
 
-                Degree::factory()
+                $degree = Degree::factory()
                     ->forStudent($student)
                     ->withDiplomaBlank($blank)
                     ->create($degreeData);
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
+
+                // Create adjustments for 30% of degrees
+                if (rand(1, 100) <= 30) {
+                    $this->createAdjustmentsForDegree($degree);
+                }
             }
 
             $studentOffset += $config['count'];
@@ -375,7 +383,7 @@ class DevelopmentSeeder extends Seeder
                     $notes .= ' - ' . collect($config['subtypes'])->random();
                 }
 
-                Degree::factory()
+                $degree = Degree::factory()
                     ->forStudent($student)
                     ->withDiplomaBlank($blank)
                     ->create([
@@ -385,13 +393,54 @@ class DevelopmentSeeder extends Seeder
                         'graduation_year' => $grantingDate->year,
                         'decision_number' => 'QĐ-HVANND-CC-' . now()->year . '-' . str_pad($studentOffset + $index + 1, 4, '0', STR_PAD_LEFT),
                         'major_id' => $student->major_id,
+                        'major_name' => $student->major->major_name,
                         'notes' => $notes,
                     ]);
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
+
+                // Create adjustments for 20% of certificates
+                if (rand(1, 100) <= 20) {
+                    $this->createAdjustmentsForDegree($degree);
+                }
             }
 
             $studentOffset += $config['count'];
+        }
+    }
+
+    /**
+     * Create sample adjustments for a degree
+     */
+    private function createAdjustmentsForDegree(Degree $degree): void
+    {
+        $adminUser = User::where('email', 'admin@hvannd.edu.vn')->first();
+        $adjustmentCount = rand(1, 3);
+
+        $adjustmentContents = [
+            'Điều chỉnh thông tin do sai sót trong hồ sơ gốc',
+            'Cập nhật ngày cấp bằng theo quyết định mới',
+            'Thay đổi xếp loại tốt nghiệp theo quyết định của hội đồng',
+            'Điều chỉnh họ tên sinh viên theo giấy khai sinh',
+            'Cập nhật thông tin ngành đào tạo',
+            'Điều chỉnh số hiệu văn bằng',
+            'Cập nhật thông tin theo yêu cầu của sinh viên',
+            'Thay đổi ngày tốt nghiệp theo hồ sơ đào tạo',
+        ];
+
+        for ($i = 0; $i < $adjustmentCount; $i++) {
+            $adjustmentDate = now()->subDays(rand(10, 365));
+
+            DegreeAdjustment::factory()
+                ->forDegree($degree)
+                ->byUser($adminUser)
+                ->create([
+                    'adjustment_content' => collect($adjustmentContents)->random(),
+                    'decision_number' => 'QĐ-DC-' . now()->year . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
+                    'decision_date' => $adjustmentDate,
+                    'created_at' => $adjustmentDate,
+                    'updated_at' => $adjustmentDate,
+                ]);
         }
     }
 

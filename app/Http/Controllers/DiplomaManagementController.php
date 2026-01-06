@@ -6,6 +6,7 @@ use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
+use App\Models\DegreeAdjustment;
 use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -142,8 +143,8 @@ class DiplomaManagementController extends Controller
         // Get all diploma blank types for dropdown
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
-        // Get degrees issued to this student with all relationships
-        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type'])->get();
+        // Get degrees issued to this student with all relationships including adjustments
+        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type', 'adjustments.adjustedBy'])->get();
 
         return view('components.students.edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
     }
@@ -171,6 +172,10 @@ class DiplomaManagementController extends Controller
             'training_end_date' => 'nullable|date|after_or_equal:training_start_date',
             'ranking' => 'nullable|string|max:100',
             'decision_number' => 'nullable|string|max:255',
+            'council_decision_number' => 'nullable|string|max:255',
+            'council_decision_date' => 'nullable|date',
+            'graduation_decision_number' => 'nullable|string|max:255',
+            'graduation_decision_date' => 'nullable|date',
             'major_id' => 'nullable|exists:majors,major_id',
             'notes' => 'nullable|string',
         ]);
@@ -272,6 +277,10 @@ class DiplomaManagementController extends Controller
             'training_end_date' => 'nullable|date|after_or_equal:training_start_date',
             'ranking' => 'nullable|string|max:100',
             'decision_number' => 'nullable|string|max:255',
+            'council_decision_number' => 'nullable|string|max:255',
+            'council_decision_date' => 'nullable|date',
+            'graduation_decision_number' => 'nullable|string|max:255',
+            'graduation_decision_date' => 'nullable|date',
             'major_id' => 'nullable|exists:majors,major_id',
             'notes' => 'nullable|string',
         ]);
@@ -421,6 +430,66 @@ class DiplomaManagementController extends Controller
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi xuất file: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Store a new degree adjustment
+     */
+    public function storeAdjustment(Request $request, Degree $degree)
+    {
+        $validated = $request->validate([
+            'adjusted_field' => 'required|string',
+            'old_value' => 'nullable|string|max:500',
+            'new_value' => 'required|string|max:500',
+            'adjustment_content' => 'required|string|max:1000',
+            'decision_number' => 'nullable|string|max:100',
+            'decision_date' => 'nullable|date',
+        ]);
+
+        try {
+            $validated['degree_id'] = $degree->degree_id;
+            $validated['adjusted_by'] = auth()->user()->user_id;
+
+            // Create adjustment record
+            DegreeAdjustment::create($validated);
+
+            // Update the actual field value in degrees table
+            $fieldName = $validated['adjusted_field'];
+            $newValue = $validated['new_value'];
+
+            // Check if the field exists in the fillable array to prevent mass assignment issues
+            if (in_array($fieldName, $degree->getFillable())) {
+                $degree->update([
+                    $fieldName => $newValue
+                ]);
+            }
+
+            return redirect()->route('student.show', ['student' => $degree->student_id])
+                ->with('success', 'Đã điều chỉnh thông tin văn bằng thành công!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi điều chỉnh: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get adjustments for a degree
+     */
+    public function getAdjustments(Degree $degree)
+    {
+        try {
+            $adjustments = $degree->adjustments()->with('adjustedBy')->get();
+
+            return response()->json([
+                'success' => true,
+                'adjustments' => $adjustments
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi tải lịch sử điều chỉnh'
+            ], 500);
         }
     }
 }

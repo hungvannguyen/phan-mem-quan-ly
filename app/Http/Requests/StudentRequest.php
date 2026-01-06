@@ -39,6 +39,8 @@ class StudentRequest extends FormRequest
             'academic_year' => 'nullable|string|max:20',
             'major_id' => 'required|exists:majors,major_id',
             'place_of_birth' => 'required|string|max:255',
+            'hometown' => 'nullable|string|max:255',
+            'place_of_origin' => 'nullable|string|max:255',
             'gender' => 'nullable|integer|in:0,1',
             'nation' => 'required|string|max:100',
             'nationality' => 'required|string|max:100',
@@ -78,6 +80,12 @@ class StudentRequest extends FormRequest
             'place_of_birth.required' => 'Vui lòng nhập nơi sinh.',
             'place_of_birth.string' => 'Nơi sinh phải là một chuỗi ký tự.',
             'place_of_birth.max' => 'Nơi sinh không được vượt quá :max ký tự.',
+
+            'hometown.string' => 'Quê quán phải là một chuỗi ký tự.',
+            'hometown.max' => 'Quê quán không được vượt quá :max ký tự.',
+
+            'place_of_origin.string' => 'Nguyên quán phải là một chuỗi ký tự.',
+            'place_of_origin.max' => 'Nguyên quán không được vượt quá :max ký tự.',
 
             'gender.integer' => 'Giới tính không hợp lệ.',
             'gender.in' => 'Giới tính phải là Nam hoặc Nữ.',

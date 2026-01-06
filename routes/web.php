@@ -139,6 +139,13 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{degree}/delete', [DiplomaManagementController::class, 'deleteDegree'])
                 ->middleware('permission:diplomas.delete')
                 ->name('delete');
+
+            // Degree Adjustments
+            Route::post('/{degree}/adjustments', [DiplomaManagementController::class, 'storeAdjustment'])
+                ->middleware('permission:diplomas.edit')
+                ->name('adjustments.store');
+            Route::get('/{degree}/adjustments', [DiplomaManagementController::class, 'getAdjustments'])
+                ->name('adjustments.index');
         });
     });
 

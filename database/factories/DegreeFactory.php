@@ -27,11 +27,31 @@ class DegreeFactory extends Factory
         $trainingStartDate = (clone $grantingDate)->modify("-{$trainingYears} years");
         $trainingEndDate = (clone $grantingDate)->modify('-2 months');
 
+        // Generate council decision date (for master/doctor degrees, typically 2-4 months before granting)
+        $councilDecisionDate = (clone $grantingDate)->modify('-' . $this->faker->numberBetween(2, 4) . ' months');
+
+        // Generate graduation decision date (typically 1-2 months before granting)
+        $graduationDecisionDate = (clone $grantingDate)->modify('-' . $this->faker->numberBetween(1, 2) . ' months');
+
+        $majorNames = [
+            'Công nghệ thông tin',
+            'Kế toán',
+            'Quản trị kinh doanh',
+            'Luật kinh tế',
+            'Ngôn ngữ Anh',
+            'Du lịch',
+            'Tài chính - Ngân hàng',
+            'Marketing',
+            'Quản lý đất đai',
+            'Xây dựng dân dụng',
+        ];
+
         return [
             'student_id' => Student::factory(),
             'diploma_blank_id' => DiplomaBlank::factory()->available(),
             'degree_type' => $this->faker->randomElement(['bachelor', 'master', 'doctor']),
             'registration_number' => $this->faker->unique()->regexify('[0-9]{4}/[A-Z]{2}-[0-9]{4}'),
+            'major_name' => $this->faker->randomElement($majorNames),
             'granting_date' => $grantingDate->format('Y-m-d'),
             'graduation_year' => $graduationYear,
             'defense_date' => null, // Will be set for master/doctor degrees
@@ -39,6 +59,10 @@ class DegreeFactory extends Factory
             'training_end_date' => $trainingEndDate->format('Y-m-d'),
             'ranking' => $this->faker->randomElement(['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình']),
             'decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-[A-Z]{2}'),
+            'council_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-HĐ-[0-9]{4}'),
+            'council_decision_date' => $councilDecisionDate->format('Y-m-d'),
+            'graduation_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-TN-[0-9]{4}'),
+            'graduation_decision_date' => $graduationDecisionDate->format('Y-m-d'),
         ];
     }
 

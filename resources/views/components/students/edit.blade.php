@@ -367,6 +367,31 @@
                     </div>
 
                     <div class="form-field">
+                        <label for="hometown" class="field-label">Quê quán</label>
+                        <input type="text" id="hometown" name="hometown" class="field-input"
+                            value="{{ old('hometown', $student->hometown) }}" placeholder="Nhập quê quán">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Hà Nội, Nghệ An, Thanh Hóa</small>
+                        </div>
+                        @error('hometown')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
+                        <label for="place_of_origin" class="field-label">Nguyên quán</label>
+                        <input type="text" id="place_of_origin" name="place_of_origin" class="field-input"
+                            value="{{ old('place_of_origin', $student->place_of_origin) }}"
+                            placeholder="Nhập nguyên quán">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Hà Nội, Hải Phòng, Huế</small>
+                        </div>
+                        @error('place_of_origin')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
                         <label for="status" class="field-label">Trạng thái học tập <span
                                 class="text-red-500">*</span></label>
                         <select id="status" name="status" class="field-select" required>
@@ -540,6 +565,12 @@
                                         <small>
                                             Cấp ngày: {{ $degree->granting_date?->format('d/m/Y') ?? 'Chưa cập nhật' }}
                                         </small>
+                                        @if ($degree->updated_at && $degree->created_at->ne($degree->updated_at))
+                                            <small class="text-xs text-gray-500">
+                                                <i class="fas fa-edit mr-1 text-purple-600"></i>
+                                                Sửa đổi: {{ $degree->updated_at->format('d/m/Y H:i') }}
+                                            </small>
+                                        @endif
                                     </div>
 
                                     {{-- Action Button --}}
@@ -570,6 +601,11 @@
                                             class="inline-flex items-center rounded border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                                             <i class="fas fa-trash mr-1"></i>
                                             Xóa
+                                        </button>
+                                        <button type="button" onclick="openAdjustmentModal({{ $degree->degree_id }})"
+                                            class="inline-flex items-center rounded border border-purple-300 bg-white px-3 py-1.5 text-xs font-medium text-purple-700 shadow-sm hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                            <i class="fas fa-history mr-1"></i>
+                                            Điều chỉnh
                                         </button>
                                     </div>
                                 </div>
@@ -641,6 +677,99 @@
                                         </span>
                                     </div>
                                 </div>
+
+                                {{-- Adjustment History Section --}}
+                                @if ($degree->adjustments && $degree->adjustments->count() > 0)
+                                    <div class="mt-4 border-t pt-4">
+                                        <div class="mb-2 flex items-center justify-between">
+                                            <h4 class="text-sm font-semibold text-gray-700">
+                                                <i class="fas fa-history mr-1 text-purple-600"></i>
+                                                Lịch sử điều chỉnh ({{ $degree->adjustments->count() }})
+                                            </h4>
+                                        </div>
+                                        <div class="space-y-2">
+                                            @foreach ($degree->adjustments->take(3) as $adjustment)
+                                                <div class="flex gap-3 rounded-lg bg-purple-50 p-3 text-sm">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-edit text-purple-600"></i>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        @if ($adjustment->adjusted_field)
+                                                            @php
+                                                                $fieldLabels = [
+                                                                    'registration_number' => 'Số đăng ký',
+                                                                    'degree_type' => 'Loại văn bằng',
+                                                                    'major_name' => 'Ngành/Chuyên ngành',
+                                                                    'ranking' => 'Xếp loại',
+                                                                    'granting_date' => 'Ngày cấp',
+                                                                    'graduation_year' => 'Năm tốt nghiệp',
+                                                                    'decision_number' => 'Số quyết định',
+                                                                    'council_decision_number' =>
+                                                                        'Số QĐ thành lập hội đồng',
+                                                                    'council_decision_date' =>
+                                                                        'Ngày QĐ thành lập hội đồng',
+                                                                    'graduation_decision_number' =>
+                                                                        'Số QĐ công nhận tốt nghiệp',
+                                                                    'graduation_decision_date' =>
+                                                                        'Ngày QĐ công nhận tốt nghiệp',
+                                                                    'defense_date' => 'Ngày bảo vệ',
+                                                                    'training_start_date' => 'Ngày bắt đầu đào tạo',
+                                                                    'training_end_date' => 'Ngày kết thúc đào tạo',
+                                                                ];
+                                                            @endphp
+                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                <i class="fas fa-tag mr-1"></i>
+                                                                {{ $fieldLabels[$adjustment->adjusted_field] ?? $adjustment->adjusted_field }}
+                                                            </p>
+                                                        @endif
+                                                        @if ($adjustment->old_value && $adjustment->new_value)
+                                                            <p class="mb-2 text-sm">
+                                                                <span
+                                                                    class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $adjustment->old_value }}</span>
+                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                <span
+                                                                    class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $adjustment->new_value }}</span>
+                                                            </p>
+                                                        @endif
+                                                        <p class="font-medium text-gray-900">
+                                                            {{ $adjustment->adjustment_content }}</p>
+                                                        <div class="mt-1 flex flex-wrap gap-x-4 text-xs text-gray-600">
+                                                            @if ($adjustment->decision_number)
+                                                                <span>
+                                                                    <i class="fas fa-file-contract mr-1"></i>
+                                                                    QĐ: {{ $adjustment->decision_number }}
+                                                                </span>
+                                                            @endif
+                                                            @if ($adjustment->decision_date)
+                                                                <span>
+                                                                    <i class="fas fa-calendar mr-1"></i>
+                                                                    {{ $adjustment->decision_date->format('d/m/Y') }}
+                                                                </span>
+                                                            @endif
+                                                            @if ($adjustment->adjustedBy)
+                                                                <span>
+                                                                    <i class="fas fa-user mr-1"></i>
+                                                                    {{ $adjustment->adjustedBy->full_name }}
+                                                                </span>
+                                                            @endif
+                                                            <span>
+                                                                <i class="fas fa-clock mr-1"></i>
+                                                                {{ $adjustment->created_at->diffForHumans() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                            @if ($degree->adjustments->count() > 3)
+                                                <button type="button"
+                                                    onclick="viewAllAdjustments({{ $degree->degree_id }})"
+                                                    class="w-full text-center text-sm text-purple-600 hover:text-purple-800">
+                                                    Xem tất cả {{ $degree->adjustments->count() }} lượt điều chỉnh
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
@@ -834,6 +963,32 @@
                         <input type="text" name="decision_number" id="decision_number" class="field-input"
                             placeholder="Nhập số quyết định" value="{{ old('decision_number') }}">
                     </div>
+
+                    <div class="field-group">
+                        <label for="council_decision_number" class="field-label">Số QĐ thành lập hội đồng</label>
+                        <input type="text" name="council_decision_number" id="council_decision_number"
+                            class="field-input" placeholder="Nhập số QĐ thành lập hội đồng"
+                            value="{{ old('council_decision_number') }}">
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="council_decision_date" name="council_decision_date"
+                            label="Ngày QĐ thành lập hội đồng" :required="false"
+                            value="{{ old('council_decision_date') }}" inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <label for="graduation_decision_number" class="field-label">Số QĐ công nhận tốt nghiệp</label>
+                        <input type="text" name="graduation_decision_number" id="graduation_decision_number"
+                            class="field-input" placeholder="Nhập số QĐ công nhận tốt nghiệp"
+                            value="{{ old('graduation_decision_number') }}">
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="graduation_decision_date" name="graduation_decision_date"
+                            label="Ngày QĐ công nhận tốt nghiệp" :required="false"
+                            value="{{ old('graduation_decision_date') }}" inputClass="field-input" />
+                    </div>
                 </div>
 
                 <div class="field-group">
@@ -947,6 +1102,31 @@
                         <input type="text" name="decision_number" id="edit_decision_number" class="field-input"
                             placeholder="Nhập số quyết định">
                     </div>
+
+                    <div class="field-group">
+                        <label for="edit_council_decision_number" class="field-label">Số QĐ thành lập hội đồng</label>
+                        <input type="text" name="council_decision_number" id="edit_council_decision_number"
+                            class="field-input" placeholder="Nhập số QĐ thành lập hội đồng">
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="edit_council_decision_date" name="council_decision_date"
+                            label="Ngày QĐ thành lập hội đồng" :required="false" value=""
+                            inputClass="field-input" />
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_graduation_decision_number" class="field-label">Số QĐ công nhận tốt
+                            nghiệp</label>
+                        <input type="text" name="graduation_decision_number" id="edit_graduation_decision_number"
+                            class="field-input" placeholder="Nhập số QĐ công nhận tốt nghiệp">
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="edit_graduation_decision_date" name="graduation_decision_date"
+                            label="Ngày QĐ công nhận tốt nghiệp" :required="false" value=""
+                            inputClass="field-input" />
+                    </div>
                 </div>
 
                 <div class="field-group">
@@ -1042,7 +1222,396 @@
         </div>
     </div>
 
+    <!-- Add Adjustment Modal -->
+    <div id="addAdjustmentModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-edit mr-2 text-purple-600"></i>
+                    Thêm điều chỉnh thông tin văn bằng
+                </h3>
+                <button type="button" onclick="closeAdjustmentModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="addAdjustmentForm" method="POST" action="" class="space-y-4">
+                @csrf
+
+                <div class="field-group">
+                    <label for="adjusted_field" class="field-label required">Trường thông tin cần điều chỉnh</label>
+                    <select name="adjusted_field" id="adjusted_field" class="field-input" required
+                        onchange="loadCurrentValue(this.value)">
+                        <option value="">-- Chọn trường cần điều chỉnh --</option>
+                        <option value="registration_number">Số đăng ký</option>
+                        <option value="degree_type">Loại văn bằng</option>
+                        <option value="major_name">Ngành/Chuyên ngành</option>
+                        <option value="ranking">Xếp loại</option>
+                        <option value="granting_date">Ngày cấp</option>
+                        <option value="graduation_year">Năm tốt nghiệp</option>
+                        <option value="decision_number">Số quyết định</option>
+                        <option value="council_decision_number">Số QĐ thành lập hội đồng</option>
+                        <option value="council_decision_date">Ngày QĐ thành lập hội đồng</option>
+                        <option value="graduation_decision_number">Số QĐ công nhận tốt nghiệp</option>
+                        <option value="graduation_decision_date">Ngày QĐ công nhận tốt nghiệp</option>
+                        <option value="defense_date">Ngày bảo vệ</option>
+                        <option value="training_start_date">Ngày bắt đầu đào tạo</option>
+                        <option value="training_end_date">Ngày kết thúc đào tạo</option>
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Chọn trường thông tin văn bằng cần điều chỉnh</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="field-group">
+                        <label for="old_value" class="field-label">Giá trị hiện tại</label>
+                        <input type="text" name="old_value" id="old_value" class="field-input bg-gray-50"
+                            placeholder="Giá trị hiện tại" readonly>
+                        <p class="mt-1 text-xs text-gray-500">Giá trị hiện tại (tự động lấy từ hệ thống)</p>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="new_value" class="field-label required">Giá trị mới</label>
+
+                        <!-- Text input for most fields -->
+                        <input type="text" name="new_value" id="new_value" class="field-input"
+                            placeholder="Nhập giá trị mới" required>
+
+                        <!-- Dropdown for degree_type -->
+                        <select name="new_value" id="new_value_degree_type" class="field-input hidden" required>
+                            <option value="">-- Chọn loại văn bằng --</option>
+                            <option value="bachelor">Cử nhân</option>
+                            <option value="master">Thạc sĩ</option>
+                            <option value="doctor">Tiến sĩ</option>
+                            <option value="certificate">Chứng chỉ</option>
+                        </select>
+
+                        <!-- Dropdown for major_name -->
+                        <select name="new_value" id="new_value_major_name" class="field-input hidden" required>
+                            <option value="">-- Chọn ngành --</option>
+                            @foreach ($majors as $major)
+                                <option value="{{ $major->major_name }}">{{ $major->major_name }}</option>
+                            @endforeach
+                        </select>
+
+                        <p class="mt-1 text-xs text-gray-500">Giá trị sau khi điều chỉnh</p>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="adjustment_content" class="field-label required">Nội dung điều chỉnh</label>
+                    <textarea name="adjustment_content" id="adjustment_content" rows="4" class="field-input"
+                        placeholder="Nhập nội dung điều chỉnh chi tiết..." required></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết nội dung điều chỉnh văn bằng</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="field-group">
+                        <label for="adjustment_decision_number" class="field-label">Số quyết định điều chỉnh</label>
+                        <input type="text" name="decision_number" id="adjustment_decision_number" class="field-input"
+                            placeholder="Nhập số QĐ">
+                    </div>
+
+                    <div class="field-group">
+                        <x-vietnamese-date-input id="adjustment_decision_date" name="decision_date"
+                            label="Ngày quyết định" :required="false" value="" inputClass="field-input" />
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle mr-3 mt-0.5 text-amber-600"></i>
+                        <div class="text-sm text-amber-800">
+                            <p class="font-medium">Lưu ý quan trọng:</p>
+                            <ul class="mt-2 list-inside list-disc space-y-1">
+                                <li>Mọi điều chỉnh sẽ được lưu vào lịch sử và không thể xóa</li>
+                                <li>Thông tin người thực hiện sẽ tự động được ghi nhận</li>
+                                <li>Vui lòng kiểm tra kỹ thông tin trước khi lưu</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <button type="button" onclick="closeAdjustmentModal()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button type="submit" class="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">
+                        <i class="fas fa-save mr-2"></i>Lưu điều chỉnh
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View All Adjustments Modal -->
+    <div id="viewAdjustmentsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-history mr-2 text-purple-600"></i>
+                    Lịch sử điều chỉnh văn bằng
+                </h3>
+                <button type="button" onclick="closeViewAdjustmentsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div id="adjustmentsTimeline" class="space-y-4">
+                <!-- Timeline will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Adjustment Modal Functions - Must be defined first for onclick handlers
+        let currentDegreeData = null;
+
+        window.openAdjustmentModal = function(degreeId) {
+            try {
+                const modal = document.getElementById('addAdjustmentModal');
+                const form = document.getElementById('addAdjustmentForm');
+
+                if (!modal || !form) {
+                    alert('Không tìm thấy modal hoặc form');
+                    return;
+                }
+
+                // Set form action
+                form.action = `/degrees/${degreeId}/adjustments`;
+
+                // Store degree data with all fields properly serialized
+                const degreesData = @json($degrees);
+                currentDegreeData = {
+                    id: degreeId,
+                    data: degreesData.find(d => d.degree_id === degreeId)
+                };
+
+                // Reset form
+                form.reset();
+                const oldValueInput = document.getElementById('old_value');
+                const newValueInput = document.getElementById('new_value');
+                if (oldValueInput) oldValueInput.value = '';
+                if (newValueInput) newValueInput.value = '';
+
+                // Show modal
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error opening adjustment modal:', error);
+                alert('Có lỗi khi mở modal điều chỉnh: ' + error.message);
+            }
+        };
+
+        window.loadCurrentValue = function(fieldName) {
+            try {
+                if (!fieldName || !currentDegreeData || !currentDegreeData.data) {
+                    return;
+                }
+
+                const degree = currentDegreeData.data;
+                const oldValueInput = document.getElementById('old_value');
+                const textInput = document.getElementById('new_value');
+                const degreeTypeSelect = document.getElementById('new_value_degree_type');
+                const majorNameSelect = document.getElementById('new_value_major_name');
+
+                if (!degree || !oldValueInput) return;
+
+                // Hide all inputs and remove name attribute
+                textInput.classList.add('hidden');
+                textInput.removeAttribute('name');
+                textInput.removeAttribute('required');
+                degreeTypeSelect.classList.add('hidden');
+                degreeTypeSelect.removeAttribute('name');
+                degreeTypeSelect.removeAttribute('required');
+                majorNameSelect.classList.add('hidden');
+                majorNameSelect.removeAttribute('name');
+                majorNameSelect.removeAttribute('required');
+
+                // Show appropriate input based on field type
+                if (fieldName === 'degree_type') {
+                    degreeTypeSelect.classList.remove('hidden');
+                    degreeTypeSelect.setAttribute('name', 'new_value');
+                    degreeTypeSelect.setAttribute('required', 'required');
+                    degreeTypeSelect.value = degree[fieldName] || ''; // Pre-select current value
+                } else if (fieldName === 'major_name') {
+                    majorNameSelect.classList.remove('hidden');
+                    majorNameSelect.setAttribute('name', 'new_value');
+                    majorNameSelect.setAttribute('required', 'required');
+                    majorNameSelect.value = degree[fieldName] || ''; // Pre-select current value
+                } else {
+                    textInput.classList.remove('hidden');
+                    textInput.setAttribute('name', 'new_value');
+                    textInput.setAttribute('required', 'required');
+                    textInput.value = '';
+                }
+
+                let currentValue = degree[fieldName];
+
+                // Map degree_type enum to Vietnamese for display
+                if (fieldName === 'degree_type' && currentValue) {
+                    const degreeTypeMap = {
+                        'bachelor': 'Cử nhân',
+                        'master': 'Thạc sĩ',
+                        'doctor': 'Tiến sĩ',
+                        'certificate': 'Chứng chỉ'
+                    };
+                    currentValue = degreeTypeMap[currentValue] || currentValue;
+                }
+
+                // Handle enum values (ranking, etc)
+                if (typeof currentValue === 'object' && currentValue !== null) {
+                    if (currentValue.name) {
+                        currentValue = currentValue.name;
+                    } else if (currentValue.value !== undefined) {
+                        currentValue = currentValue.value;
+                    }
+                }
+
+                // Format dates if needed
+                if (fieldName.includes('_date') && currentValue) {
+                    try {
+                        const date = new Date(currentValue);
+                        if (!isNaN(date.getTime())) {
+                            currentValue = date.toLocaleDateString('vi-VN');
+                        }
+                    } catch (e) {
+                        // Keep original value if date parsing fails
+                    }
+                }
+
+                oldValueInput.value = currentValue || '(Chưa có giá trị)';
+            } catch (error) {
+                console.error('Error loading current value:', error);
+            }
+        };
+
+        window.closeAdjustmentModal = function() {
+            const modal = document.getElementById('addAdjustmentModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        };
+
+        window.viewAllAdjustments = function(degreeId) {
+            const modal = document.getElementById('viewAdjustmentsModal');
+            const timeline = document.getElementById('adjustmentsTimeline');
+
+            if (modal && timeline) {
+                // Show loading state
+                timeline.innerHTML = `
+                    <div class="flex items-center justify-center py-8">
+                        <i class="fas fa-spinner fa-spin text-3xl text-purple-600"></i>
+                    </div>
+                `;
+
+                // Show modal
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+
+                // Fetch adjustments
+                fetch(`/degrees/${degreeId}/adjustments`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.adjustments.length > 0) {
+                            const fieldLabels = {
+                                'registration_number': 'Số đăng ký',
+                                'degree_type': 'Loại văn bằng',
+                                'major_name': 'Ngành/Chuyên ngành',
+                                'ranking': 'Xếp loại',
+                                'granting_date': 'Ngày cấp',
+                                'graduation_year': 'Năm tốt nghiệp',
+                                'decision_number': 'Số quyết định',
+                                'council_decision_number': 'Số QĐ thành lập hội đồng',
+                                'council_decision_date': 'Ngày QĐ thành lập hội đồng',
+                                'graduation_decision_number': 'Số QĐ công nhận tốt nghiệp',
+                                'graduation_decision_date': 'Ngày QĐ công nhận tốt nghiệp',
+                                'defense_date': 'Ngày bảo vệ',
+                                'training_start_date': 'Ngày bắt đầu đào tạo',
+                                'training_end_date': 'Ngày kết thúc đào tạo'
+                            };
+
+                            timeline.innerHTML = data.adjustments.map((adj, index) => `
+                                <div class="relative flex gap-4 pb-8 ${index === data.adjustments.length - 1 ? '' : 'border-l-2 border-purple-200'} pl-6">
+                                    <div class="absolute left-0 top-0 -translate-x-1/2 rounded-full bg-purple-600 p-2 text-white">
+                                        <i class="fas fa-edit text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 rounded-lg bg-white p-4 shadow">
+                                        <div class="mb-2 flex items-start justify-between">
+                                            <div class="flex-1">
+                                                ${adj.adjusted_field ? `
+                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                            <i class="fas fa-tag mr-1"></i>
+                                                            ${fieldLabels[adj.adjusted_field] || adj.adjusted_field}
+                                                        </p>
+                                                    ` : ''}
+                                                ${adj.old_value && adj.new_value ? `
+                                                        <p class="mb-2 text-sm">
+                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${adj.old_value}</span>
+                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${adj.new_value}</span>
+                                                        </p>
+                                                    ` : ''}
+                                                <h4 class="font-semibold text-gray-900">${adj.adjustment_content}</h4>
+                                            </div>
+                                            <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
+                                        </div>
+                                        <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
+                                            ${adj.decision_number ? `
+                                                    <span class="flex items-center">
+                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                    </span>
+                                                ` : ''}
+                                            ${adj.decision_date ? `
+                                                    <span class="flex items-center">
+                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                    </span>
+                                                ` : ''}
+                                            ${adj.adjusted_by ? `
+                                                    <span class="flex items-center">
+                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                        ${adj.adjusted_by.full_name || 'N/A'}
+                                                    </span>
+                                                ` : ''}
+                                            <span class="flex items-center">
+                                                <i class="fas fa-clock mr-1 text-purple-600"></i>
+                                                ${new Date(adj.created_at).toLocaleString('vi-VN')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('');
+                        } else {
+                            timeline.innerHTML = `
+                                <div class="flex flex-col items-center justify-center py-8 text-gray-500">
+                                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                                    <p>Chưa có lịch sử điều chỉnh</p>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        timeline.innerHTML = `
+                            <div class="flex flex-col items-center justify-center py-8 text-red-500">
+                                <i class="fas fa-exclamation-triangle text-4xl mb-3"></i>
+                                <p>Có lỗi xảy ra khi tải lịch sử điều chỉnh</p>
+                            </div>
+                        `;
+                    });
+            }
+        };
+
+        window.closeViewAdjustmentsModal = function() {
+            const modal = document.getElementById('viewAdjustmentsModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        };
+
         // Auto-hide success/error messages after 5 seconds
         setTimeout(() => {
             const successMsg = document.getElementById('success-message');
@@ -1321,8 +1890,43 @@
 
             document.getElementById('edit_ranking').value = degree.ranking || '';
             document.getElementById('edit_decision_number').value = degree.decision_number || '';
+            document.getElementById('edit_council_decision_number').value = degree.council_decision_number || '';
+            document.getElementById('edit_graduation_decision_number').value = degree.graduation_decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';
             document.getElementById('edit_notes').value = degree.notes || '';
+
+            // Set council decision date
+            const councilDecisionDate = degree.council_decision_date ? degree.council_decision_date.split('T')[0] : '';
+            document.getElementById('edit_council_decision_date').value = councilDecisionDate;
+
+            // Format and set display input for council decision date
+            if (councilDecisionDate) {
+                const displayInput = document.getElementById('edit_council_decision_date_display');
+                if (displayInput) {
+                    const date = new Date(councilDecisionDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
+
+            // Set graduation decision date
+            const graduationDecisionDate = degree.graduation_decision_date ? degree.graduation_decision_date.split('T')[0] :
+                '';
+            document.getElementById('edit_graduation_decision_date').value = graduationDecisionDate;
+
+            // Format and set display input for graduation decision date
+            if (graduationDecisionDate) {
+                const displayInput = document.getElementById('edit_graduation_decision_date_display');
+                if (displayInput) {
+                    const date = new Date(graduationDecisionDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    displayInput.value = `${day}/${month}/${year}`;
+                }
+            }
 
             // Update diploma blank info
             if (degree.diploma_blank) {
@@ -1441,6 +2045,8 @@
             const addModal = document.getElementById('addDegreeModal');
             const editModal = document.getElementById('editDegreeModal');
             const exportModal = document.getElementById('exportVerificationModal');
+            const adjustmentModal = document.getElementById('addAdjustmentModal');
+            const viewAdjustmentsModal = document.getElementById('viewAdjustmentsModal');
 
             if (event.target === addModal) {
                 closeAddDegreeModal();
@@ -1452,6 +2058,14 @@
 
             if (event.target === exportModal) {
                 closeExportModal();
+            }
+
+            if (event.target === adjustmentModal) {
+                closeAdjustmentModal();
+            }
+
+            if (event.target === viewAdjustmentsModal) {
+                closeViewAdjustmentsModal();
             }
         });
     </script>

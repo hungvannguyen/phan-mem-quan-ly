@@ -22,6 +22,10 @@ return new class extends Migration {
             $table->integer('graduation_year');
             $table->string('ranking', 50)->nullable();
             $table->string('decision_number', 50)->nullable();
+            $table->string('council_decision_number', 50)->nullable()->comment('Số QĐ thành lập hội đồng đánh giá luận án');
+            $table->date('council_decision_date')->nullable()->comment('Ngày QĐ thành lập hội đồng đánh giá luận án');
+            $table->string('graduation_decision_number', 50)->nullable()->comment('Số QĐ công nhận tốt nghiệp');
+            $table->date('graduation_decision_date')->nullable()->comment('Ngày QĐ công nhận tốt nghiệp');
             $table->unsignedBigInteger('major_id')->nullable();
             $table->foreign('major_id')->references('major_id')->on('majors')->onDelete('set null');
             $table->string('major_name', 255)->nullable()->comment('Tên chuyên ngành');

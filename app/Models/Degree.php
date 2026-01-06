@@ -31,6 +31,10 @@ class Degree extends Model
         'graduation_year',
         'ranking',
         'decision_number',
+        'council_decision_number',
+        'council_decision_date',
+        'graduation_decision_number',
+        'graduation_decision_date',
         'major_id',
         'major_name',
         'defense_date',
@@ -53,9 +57,13 @@ class Degree extends Model
             'defense_date' => 'date',
             'training_start_date' => 'date',
             'training_end_date' => 'date',
+            'council_decision_date' => 'date',
+            'graduation_decision_date' => 'date',
             'graduation_year' => 'integer',
             'ranking' => 'string',
             'decision_number' => 'string',
+            'council_decision_number' => 'string',
+            'graduation_decision_number' => 'string',
             'major_name' => 'string',
             'notes' => 'string',
         ];
@@ -83,6 +91,14 @@ class Degree extends Model
     public function major()
     {
         return $this->belongsTo(Major::class, 'major_id', 'major_id');
+    }
+
+    /**
+     * Get all adjustments for this degree.
+     */
+    public function adjustments()
+    {
+        return $this->hasMany(DegreeAdjustment::class, 'degree_id', 'degree_id')->orderBy('created_at', 'desc');
     }
 
     /**

@@ -283,6 +283,30 @@
                             <span class="error-message">{{ $message }}</span>
                         @enderror
                     </div>
+
+                    <div class="form-field">
+                        <label for="hometown" class="field-label">Quê quán</label>
+                        <input type="text" id="hometown" name="hometown" class="field-input"
+                            value="{{ old('hometown') }}" placeholder="Nhập quê quán">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Hà Nội, Nghệ An, Thanh Hóa</small>
+                        </div>
+                        @error('hometown')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-field">
+                        <label for="place_of_origin" class="field-label">Nguyên quán</label>
+                        <input type="text" id="place_of_origin" name="place_of_origin" class="field-input"
+                            value="{{ old('place_of_origin') }}" placeholder="Nhập nguyên quán">
+                        <div class="field-description">
+                            <small class="text-gray-600">Ví dụ: Hà Nội, Hải Phòng, Huế</small>
+                        </div>
+                        @error('place_of_origin')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Status Information -->
