@@ -222,6 +222,54 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
+
+        /* Adjustment History Collapse Styles */
+        .adjustment-history-toggle {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .adjustment-history-toggle:hover {
+            background-color: #f3f4f6;
+        }
+
+        .adjustment-history-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .adjustment-history-content.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* Custom scrollbar for adjustment history */
+        .adjustment-history-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .adjustment-history-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .adjustment-history-content::-webkit-scrollbar-thumb {
+            background: #a78bfa;
+            border-radius: 4px;
+        }
+
+        .adjustment-history-content::-webkit-scrollbar-thumb:hover {
+            background: #8b5cf6;
+        }
     </style>
     <div class="student-edit-page">
         <!-- Page Header -->
@@ -500,6 +548,17 @@
                                 class="text-sm">{{ $student->updated_at?->format('d/m/Y H:i') ?? 'Chưa cập nhật' }}</span>
                         </div>
                     </div>
+
+                    <div class="status-card">
+                        <div class="status-header">
+                            <i class="fas fa-history"></i>
+                            <span>Lịch sử thay đổi</span>
+                        </div>
+                        <div class="status-value">
+                            <span class="text-2xl font-bold text-purple-600">{{ $student->changeLogs()->count() }}</span>
+                            <small class="text-gray-500">lần thay đổi</small>
+                        </div>
+                    </div>
                 </div>
 
                 @if ($student->status && $student->status->value === 2)
@@ -518,6 +577,96 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Student Change History Section -->
+            @php
+                $studentChangeLogs = $student->changeLogs()->with('changedBy')->latest()->get();
+            @endphp
+            @if ($studentChangeLogs->count() > 0)
+                <div class="section-card">
+                    <div class="mb-4">
+                        <div class="adjustment-history-toggle mb-2 flex items-center justify-between rounded-lg p-2"
+                            onclick="toggleStudentHistory()">
+                            <h2 class="section-title mb-0">
+                                <i class="fas fa-history text-purple-600"></i>
+                                Lịch sử thay đổi thông tin sinh viên
+                                <span class="ml-2 text-sm font-normal text-gray-500">
+                                    ({{ $studentChangeLogs->count() }} lần thay đổi)
+                                </span>
+                            </h2>
+                            <i class="fas fa-chevron-down toggle-icon text-gray-500" id="toggle-icon-student"></i>
+                        </div>
+                        <div class="adjustment-history-content space-y-2" id="student-change-history">
+                            @foreach ($studentChangeLogs as $log)
+                                <div class="flex gap-3 rounded-lg bg-blue-50 p-3 text-sm">
+                                    <div class="flex-shrink-0">
+                                        @if ($log->action_type === 'create')
+                                            <i class="fas fa-plus-circle text-green-600"></i>
+                                        @elseif($log->action_type === 'update')
+                                            <i class="fas fa-edit text-blue-600"></i>
+                                        @elseif($log->action_type === 'delete')
+                                            <i class="fas fa-trash text-red-600"></i>
+                                        @else
+                                            <i class="fas fa-undo text-purple-600"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1">
+                                        @php
+                                            $actionLabels = [
+                                                'create' => ['label' => 'Tạo mới', 'color' => 'green'],
+                                                'update' => ['label' => 'Cập nhật', 'color' => 'blue'],
+                                                'delete' => ['label' => 'Xóa', 'color' => 'red'],
+                                                'restore' => ['label' => 'Khôi phục', 'color' => 'purple'],
+                                            ];
+                                            $action = $actionLabels[$log->action_type] ?? [
+                                                'label' => 'Khác',
+                                                'color' => 'gray',
+                                            ];
+                                        @endphp
+                                        <div class="mb-2 flex items-center gap-2">
+                                            <span
+                                                class="bg-{{ $action['color'] }}-100 text-{{ $action['color'] }}-700 rounded px-2 py-0.5 text-xs font-semibold">
+                                                {{ $action['label'] }}
+                                            </span>
+                                            @if ($log->changed_field)
+                                                <span class="text-xs font-semibold text-blue-700">
+                                                    <i class="fas fa-tag mr-1"></i>
+                                                    {{ ucfirst($log->changed_field) }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        @if ($log->old_value && $log->new_value)
+                                            <p class="mb-2 text-sm">
+                                                <span
+                                                    class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $log->old_value }}</span>
+                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                <span
+                                                    class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $log->new_value }}</span>
+                                            </p>
+                                        @endif
+                                        <p class="font-medium text-gray-900">{{ $log->change_description }}</p>
+                                        <div class="mt-1 flex flex-wrap gap-x-4 text-xs text-gray-600">
+                                            @if ($log->changedBy)
+                                                <span>
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $log->changedBy->full_name }}
+                                                </span>
+                                            @endif
+                                            <span>
+                                                <i class="fas fa-clock mr-1"></i>
+                                                {{ $log->created_at->diffForHumans() }}
+                                            </span>
+                                            <span class="text-xs text-gray-500">
+                                                {{ $log->created_at->format('d/m/Y H:i') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Degrees Information Section -->
             <div class="section-card">
@@ -679,60 +828,121 @@
                                 </div>
 
                                 {{-- Adjustment History Section --}}
-                                @if ($degree->adjustments && $degree->adjustments->count() > 0)
+                                @if ($degree->changeLogs && $degree->changeLogs->count() > 0)
                                     <div class="mt-4 border-t pt-4">
-                                        <div class="mb-2 flex items-center justify-between">
+                                        <div class="adjustment-history-toggle mb-2 flex items-center justify-between rounded-lg p-2"
+                                            onclick="toggleAdjustmentHistory({{ $degree->degree_id }})">
                                             <h4 class="text-sm font-semibold text-gray-700">
                                                 <i class="fas fa-history mr-1 text-purple-600"></i>
-                                                Lịch sử điều chỉnh ({{ $degree->adjustments->count() }})
+                                                Lịch sử điều chỉnh ({{ $degree->changeLogs->count() }})
                                             </h4>
+                                            <i class="fas fa-chevron-down toggle-icon text-gray-500"
+                                                id="toggle-icon-{{ $degree->degree_id }}"></i>
                                         </div>
-                                        <div class="space-y-2">
-                                            @foreach ($degree->adjustments->take(3) as $adjustment)
+                                        <div class="adjustment-history-content space-y-2"
+                                            id="adjustment-history-{{ $degree->degree_id }}">
+                                            @foreach ($degree->changeLogs->take(3) as $adjustment)
                                                 <div class="flex gap-3 rounded-lg bg-purple-50 p-3 text-sm">
                                                     <div class="flex-shrink-0">
-                                                        <i class="fas fa-edit text-purple-600"></i>
+                                                        @if ($adjustment->action_type === 'create')
+                                                            <i class="fas fa-plus-circle text-green-600"></i>
+                                                        @elseif($adjustment->action_type === 'update')
+                                                            <i class="fas fa-edit text-purple-600"></i>
+                                                        @elseif($adjustment->action_type === 'delete')
+                                                            <i class="fas fa-trash text-red-600"></i>
+                                                        @else
+                                                            <i class="fas fa-undo text-blue-600"></i>
+                                                        @endif
                                                     </div>
                                                     <div class="flex-1">
-                                                        @if ($adjustment->adjusted_field)
-                                                            @php
-                                                                $fieldLabels = [
-                                                                    'registration_number' => 'Số đăng ký',
-                                                                    'degree_type' => 'Loại văn bằng',
-                                                                    'major_name' => 'Ngành/Chuyên ngành',
-                                                                    'ranking' => 'Xếp loại',
-                                                                    'granting_date' => 'Ngày cấp',
-                                                                    'graduation_year' => 'Năm tốt nghiệp',
-                                                                    'decision_number' => 'Số quyết định',
-                                                                    'council_decision_number' =>
-                                                                        'Số QĐ thành lập hội đồng',
-                                                                    'council_decision_date' =>
-                                                                        'Ngày QĐ thành lập hội đồng',
-                                                                    'graduation_decision_number' =>
-                                                                        'Số QĐ công nhận tốt nghiệp',
-                                                                    'graduation_decision_date' =>
-                                                                        'Ngày QĐ công nhận tốt nghiệp',
-                                                                    'defense_date' => 'Ngày bảo vệ',
-                                                                    'training_start_date' => 'Ngày bắt đầu đào tạo',
-                                                                    'training_end_date' => 'Ngày kết thúc đào tạo',
-                                                                ];
-                                                            @endphp
-                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                <i class="fas fa-tag mr-1"></i>
-                                                                {{ $fieldLabels[$adjustment->adjusted_field] ?? $adjustment->adjusted_field }}
-                                                            </p>
-                                                        @endif
+                                                        @php
+                                                            $actionLabels = [
+                                                                'create' => ['label' => 'Tạo mới', 'color' => 'green'],
+                                                                'update' => [
+                                                                    'label' => 'Cập nhật',
+                                                                    'color' => 'purple',
+                                                                ],
+                                                                'delete' => ['label' => 'Xóa', 'color' => 'red'],
+                                                                'restore' => [
+                                                                    'label' => 'Khôi phục',
+                                                                    'color' => 'blue',
+                                                                ],
+                                                            ];
+                                                            $action = $actionLabels[$adjustment->action_type] ?? [
+                                                                'label' => 'Khác',
+                                                                'color' => 'gray',
+                                                            ];
+                                                        @endphp
+                                                        <div class="mb-2 flex items-center gap-2">
+                                                            <span
+                                                                class="bg-{{ $action['color'] }}-100 text-{{ $action['color'] }}-700 rounded px-2 py-0.5 text-xs font-semibold">
+                                                                {{ $action['label'] }}
+                                                            </span>
+                                                            @if ($adjustment->changed_field)
+                                                                @php
+                                                                    $fieldLabels = [
+                                                                        'registration_number' => 'Số đăng ký',
+                                                                        'degree_type' => 'Loại văn bằng',
+                                                                        'major_name' => 'Ngành/Chuyên ngành',
+                                                                        'ranking' => 'Xếp loại',
+                                                                        'granting_date' => 'Ngày cấp',
+                                                                        'graduation_year' => 'Năm tốt nghiệp',
+                                                                        'decision_number' => 'Số quyết định',
+                                                                        'council_decision_number' =>
+                                                                            'Số QĐ thành lập hội đồng',
+                                                                        'council_decision_date' =>
+                                                                            'Ngày QĐ thành lập hội đồng',
+                                                                        'graduation_decision_number' =>
+                                                                            'Số QĐ công nhận tốt nghiệp',
+                                                                        'graduation_decision_date' =>
+                                                                            'Ngày QĐ công nhận tốt nghiệp',
+                                                                        'defense_date' => 'Ngày bảo vệ',
+                                                                        'training_start_date' => 'Ngày bắt đầu đào tạo',
+                                                                        'training_end_date' => 'Ngày kết thúc đào tạo',
+                                                                    ];
+                                                                @endphp
+                                                                <span class="text-xs font-semibold text-purple-700">
+                                                                    <i class="fas fa-tag mr-1"></i>
+                                                                    {{ $fieldLabels[$adjustment->changed_field] ?? $adjustment->changed_field }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
                                                         @if ($adjustment->old_value && $adjustment->new_value)
+                                                            @php
+                                                                // Map giá trị tiếng Anh sang tiếng Việt
+                                                                $valueMapping = [
+                                                                    // Degree types
+                                                                    'certificate' => 'Chứng chỉ',
+                                                                    'bachelor' => 'Cử nhân',
+                                                                    'engineer' => 'Kỹ sư',
+                                                                    'master' => 'Thạc sĩ',
+                                                                    'doctor' => 'Tiến sĩ',
+                                                                    // Rankings
+                                                                    'excellent' => 'Xuất sắc',
+                                                                    'very_good' => 'Giỏi',
+                                                                    'good' => 'Khá',
+                                                                    'average' => 'Trung bình',
+                                                                    'below_average' => 'Trung bình khá',
+                                                                ];
+                                                                $oldValueDisplay =
+                                                                    $valueMapping[strtolower($adjustment->old_value)] ??
+                                                                    $adjustment->old_value;
+                                                                $newValueDisplay =
+                                                                    $valueMapping[strtolower($adjustment->new_value)] ??
+                                                                    $adjustment->new_value;
+                                                            @endphp
                                                             <p class="mb-2 text-sm">
                                                                 <span
-                                                                    class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $adjustment->old_value }}</span>
+                                                                    class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $oldValueDisplay }}</span>
                                                                 <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
                                                                 <span
-                                                                    class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $adjustment->new_value }}</span>
+                                                                    class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $newValueDisplay }}</span>
                                                             </p>
                                                         @endif
-                                                        <p class="font-medium text-gray-900">
-                                                            {{ $adjustment->adjustment_content }}</p>
+                                                        @if ($adjustment->change_description)
+                                                            <p class="font-medium text-gray-900">
+                                                                {{ $adjustment->change_description }}</p>
+                                                        @endif
                                                         <div class="mt-1 flex flex-wrap gap-x-4 text-xs text-gray-600">
                                                             @if ($adjustment->decision_number)
                                                                 <span>
@@ -746,10 +956,10 @@
                                                                     {{ $adjustment->decision_date->format('d/m/Y') }}
                                                                 </span>
                                                             @endif
-                                                            @if ($adjustment->adjustedBy)
+                                                            @if ($adjustment->changedBy)
                                                                 <span>
                                                                     <i class="fas fa-user mr-1"></i>
-                                                                    {{ $adjustment->adjustedBy->full_name }}
+                                                                    {{ $adjustment->changedBy->full_name }}
                                                                 </span>
                                                             @endif
                                                             <span>
@@ -760,11 +970,11 @@
                                                     </div>
                                                 </div>
                                             @endforeach
-                                            @if ($degree->adjustments->count() > 3)
+                                            @if ($degree->changeLogs->count() > 3)
                                                 <button type="button"
                                                     onclick="viewAllAdjustments({{ $degree->degree_id }})"
                                                     class="w-full text-center text-sm text-purple-600 hover:text-purple-800">
-                                                    Xem tất cả {{ $degree->adjustments->count() }} lượt điều chỉnh
+                                                    Xem tất cả {{ $degree->changeLogs->count() }} lượt điều chỉnh
                                                 </button>
                                             @endif
                                         </div>
@@ -876,8 +1086,10 @@
                             <option value="">Chọn loại văn bằng</option>
                             <option value="bachelor" {{ old('degree_type') == 'bachelor' ? 'selected' : '' }}>Cử nhân
                             </option>
-                            <option value="master" {{ old('degree_type') == 'master' ? 'selected' : '' }}>Thạc sĩ</option>
-                            <option value="doctor" {{ old('degree_type') == 'doctor' ? 'selected' : '' }}>Tiến sĩ</option>
+                            <option value="master" {{ old('degree_type') == 'master' ? 'selected' : '' }}>Thạc sĩ
+                            </option>
+                            <option value="doctor" {{ old('degree_type') == 'doctor' ? 'selected' : '' }}>Tiến sĩ
+                            </option>
                             <option value="certificate" {{ old('degree_type') == 'certificate' ? 'selected' : '' }}>Chứng
                                 chỉ</option>
                         </select>
@@ -1283,6 +1495,7 @@
                             <option value="master">Thạc sĩ</option>
                             <option value="doctor">Tiến sĩ</option>
                             <option value="certificate">Chứng chỉ</option>
+                            <option value="engineer">Kỹ sư</option>
                         </select>
 
                         <!-- Dropdown for major_name -->
@@ -1298,10 +1511,11 @@
                 </div>
 
                 <div class="field-group">
-                    <label for="adjustment_content" class="field-label required">Nội dung điều chỉnh</label>
+                    <label for="adjustment_content" class="field-label">Nội dung điều chỉnh</label>
                     <textarea name="adjustment_content" id="adjustment_content" rows="4" class="field-input"
-                        placeholder="Nhập nội dung điều chỉnh chi tiết..." required></textarea>
-                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết nội dung điều chỉnh văn bằng</p>
+                        placeholder="Nhập nội dung điều chỉnh chi tiết (tùy chọn)..."></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết nội dung điều chỉnh. Nếu để trống, hệ thống sẽ tự
+                        động tạo mô tả.</p>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -1532,6 +1746,28 @@
                                 'training_end_date': 'Ngày kết thúc đào tạo'
                             };
 
+                            // Map giá trị tiếng Anh sang tiếng Việt
+                            const valueMapping = {
+                                // Degree types
+                                'certificate': 'Chứng chỉ',
+                                'bachelor': 'Cử nhân',
+                                'engineer': 'Kỹ sư',
+                                'master': 'Thạc sĩ',
+                                'doctor': 'Tiến sĩ',
+                                // Rankings
+                                'excellent': 'Xuất sắc',
+                                'very_good': 'Giỏi',
+                                'good': 'Khá',
+                                'average': 'Trung bình',
+                                'below_average': 'Trung bình khá'
+                            };
+
+                            // Helper function để convert giá trị
+                            const convertValue = (value) => {
+                                if (!value) return value;
+                                return valueMapping[value.toLowerCase()] || value;
+                            };
+
                             timeline.innerHTML = data.adjustments.map((adj, index) => `
                                 <div class="relative flex gap-4 pb-8 ${index === data.adjustments.length - 1 ? '' : 'border-l-2 border-purple-200'} pl-6">
                                     <div class="absolute left-0 top-0 -translate-x-1/2 rounded-full bg-purple-600 p-2 text-white">
@@ -1540,42 +1776,42 @@
                                     <div class="flex-1 rounded-lg bg-white p-4 shadow">
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
-                                                ${adj.adjusted_field ? `
-                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                            <i class="fas fa-tag mr-1"></i>
-                                                            ${fieldLabels[adj.adjusted_field] || adj.adjusted_field}
-                                                        </p>
-                                                    ` : ''}
+                                                ${adj.changed_field ? `
+                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                    <i class="fas fa-tag mr-1"></i>
+                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                </p>
+                                                            ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                        <p class="mb-2 text-sm">
-                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${adj.old_value}</span>
-                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${adj.new_value}</span>
-                                                        </p>
-                                                    ` : ''}
-                                                <h4 class="font-semibold text-gray-900">${adj.adjustment_content}</h4>
+                                                                <p class="mb-2 text-sm">
+                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                </p>
+                                                            ` : ''}
+                                                <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                    <span class="flex items-center">
-                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                    </span>
-                                                ` : ''}
+                                                            <span class="flex items-center">
+                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                            </span>
+                                                        ` : ''}
                                             ${adj.decision_date ? `
-                                                    <span class="flex items-center">
-                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                    </span>
-                                                ` : ''}
-                                            ${adj.adjusted_by ? `
-                                                    <span class="flex items-center">
-                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                        ${adj.adjusted_by.full_name || 'N/A'}
-                                                    </span>
-                                                ` : ''}
+                                                            <span class="flex items-center">
+                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                            </span>
+                                                        ` : ''}
+                                            ${adj.changed_by ? `
+                                                            <span class="flex items-center">
+                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                ${adj.changed_by.full_name || 'N/A'}
+                                                            </span>
+                                                        ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2039,6 +2275,28 @@
                 // ignore
             }
         });
+
+        // Toggle Adjustment History
+        function toggleAdjustmentHistory(degreeId) {
+            const content = document.getElementById(`adjustment-history-${degreeId}`);
+            const icon = document.getElementById(`toggle-icon-${degreeId}`);
+
+            if (content && icon) {
+                content.classList.toggle('expanded');
+                icon.classList.toggle('rotated');
+            }
+        }
+
+        // Toggle Student Change History
+        function toggleStudentHistory() {
+            const content = document.getElementById('student-change-history');
+            const icon = document.getElementById('toggle-icon-student');
+
+            if (content && icon) {
+                content.classList.toggle('expanded');
+                icon.classList.toggle('rotated');
+            }
+        }
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {

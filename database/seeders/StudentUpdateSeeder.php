@@ -1,0 +1,214 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Student;
+use App\Models\User;
+use App\Models\ChangeLog;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Auth;
+
+class StudentUpdateSeeder extends Seeder
+{
+    /**
+     * Seed student updates để test change logs
+     */
+    public function run(): void
+    {
+        // Lấy user đầu tiên để làm người thực hiện
+        $user = User::first();
+
+        if (!$user) {
+            $this->command->warn('Không tìm thấy user. Vui lòng chạy UserSeeder trước.');
+            return;
+        }
+
+        // Lấy 5 sinh viên đầu tiên
+        $students = Student::take(5)->get();
+
+        if ($students->isEmpty()) {
+            $this->command->warn('Không tìm thấy sinh viên. Vui lòng chạy StudentSeeder trước.');
+            return;
+        }
+
+        $this->command->info('Bắt đầu seed student updates...');
+
+        foreach ($students as $index => $student) {
+            $studentNumber = $index + 1;
+            $this->command->info("Cập nhật sinh viên #" . $studentNumber . ": {$student->full_name}");
+
+            // Update 1: Thay đổi lớp học
+            if ($index % 2 === 0) {
+                $oldClass = $student->class_name;
+                $newClass = $oldClass . ' (Chuyển lớp)';
+
+                // Cập nhật student
+                $student->class_name = $newClass;
+                $student->save();
+
+                // Tạo log thủ công
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'class_name',
+                    'old_value' => $oldClass,
+                    'new_value' => $newClass,
+                    'change_description' => 'Chuyển lớp học',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                $this->command->info("  ✓ Đổi lớp: {$oldClass} → {$newClass}");
+            }
+
+            // Update 2: Thay đổi trạng thái
+            if ($index === 0) {
+                $oldStatus = $student->status->label();
+                $student->status = \App\Enums\StudentStatus::Graduate;
+                $student->save();
+
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'status',
+                    'old_value' => $oldStatus,
+                    'new_value' => 'Đã tốt nghiệp',
+                    'change_description' => 'Thay đổi trạng thái học tập',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                $this->command->info("  ✓ Đổi trạng thái: {$oldStatus} → Đã tốt nghiệp");
+            }
+
+            // Update 3: Thay đổi nhiều trường cùng lúc
+            if ($index === 1) {
+                $oldBirth = $student->place_of_birth;
+                $oldHometown = $student->hometown;
+                $oldOrigin = $student->place_of_origin;
+
+                $student->update([
+                    'place_of_birth' => 'Hà Nội',
+                    'hometown' => 'Nam Định',
+                    'place_of_origin' => 'Thanh Hóa',
+                ]);
+
+                // Tạo log cho từng trường
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'place_of_birth',
+                    'old_value' => $oldBirth,
+                    'new_value' => 'Hà Nội',
+                    'change_description' => 'Cập nhật nơi sinh',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'hometown',
+                    'old_value' => $oldHometown,
+                    'new_value' => 'Nam Định',
+                    'change_description' => 'Cập nhật quê quán',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'place_of_origin',
+                    'old_value' => $oldOrigin,
+                    'new_value' => 'Thanh Hóa',
+                    'change_description' => 'Cập nhật nguyên quán',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                $this->command->info("  ✓ Cập nhật thông tin địa chỉ");
+            }
+
+            // Update 4: Thay đổi niên khóa
+            if ($index === 2) {
+                $oldYear = $student->academic_year;
+                $student->academic_year = '2020-2024';
+                $student->save();
+
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'academic_year',
+                    'old_value' => $oldYear,
+                    'new_value' => '2020-2024',
+                    'change_description' => 'Thay đổi niên khóa',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                $this->command->info("  ✓ Đổi niên khóa: {$oldYear} → 2020-2024");
+            }
+
+            // Update 5: Thay đổi số sổ gốc
+            if ($index === 3) {
+                $oldNumber = $student->number_in_the_book;
+                $newNumber = str_pad($index + 100, 4, '0', STR_PAD_LEFT);
+                $student->number_in_the_book = $newNumber;
+                $student->save();
+
+                ChangeLog::create([
+                    'entity_type' => 'Student',
+                    'entity_id' => $student->student_id,
+                    'changed_field' => 'number_in_the_book',
+                    'old_value' => $oldNumber,
+                    'new_value' => $newNumber,
+                    'change_description' => 'Thay đổi số sổ gốc',
+                    'changed_by' => $user->user_id,
+                    'action_type' => 'update',
+                ]);
+
+                $this->command->info("  ✓ Đổi số sổ gốc: {$oldNumber} → {$newNumber}");
+            }
+
+            // Delay nhỏ để các timestamp khác nhau
+            usleep(100000); // 0.1 second
+        }
+
+        // Test soft delete và restore
+        if ($students->count() > 0) {
+            $testStudent = $students->last();
+            $this->command->info("\nTest soft delete và restore:");
+
+            $studentName = $testStudent->full_name;
+            $testStudent->delete();
+
+            ChangeLog::create([
+                'entity_type' => 'Student',
+                'entity_id' => $testStudent->student_id,
+                'change_description' => "Xóa sinh viên: {$studentName}",
+                'changed_by' => $user->user_id,
+                'action_type' => 'delete',
+            ]);
+
+            $this->command->info("  ✓ Xóa mềm sinh viên: {$studentName}");
+
+            sleep(1);
+
+            $testStudent->restore();
+
+            ChangeLog::create([
+                'entity_type' => 'Student',
+                'entity_id' => $testStudent->student_id,
+                'change_description' => "Khôi phục sinh viên: {$studentName}",
+                'changed_by' => $user->user_id,
+                'action_type' => 'restore',
+            ]);
+
+            $this->command->info("  ✓ Khôi phục sinh viên: {$studentName}");
+        }
+
+        $this->command->info("\n✅ Hoàn thành seed student updates!");
+        $this->command->info("Kiểm tra change logs trong database hoặc trên giao diện edit student.");
+    }
+}

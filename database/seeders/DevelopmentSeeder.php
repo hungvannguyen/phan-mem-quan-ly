@@ -11,7 +11,7 @@ use App\Models\DiplomaBlankImport;
 use App\Models\DiplomaBlank;
 use App\Models\Student;
 use App\Models\Degree;
-use App\Models\DegreeAdjustment;
+use App\Models\ChangeLog;
 use App\Models\SystemSetting;
 use App\Models\DamageReason;
 use App\Enums\StudentGender;
@@ -29,6 +29,9 @@ class DevelopmentSeeder extends Seeder
     private const STUDENTS_DROPPED_OUT = 20;
     private const DEGREES_TO_ISSUE = 70;
     private const CERTIFICATES_TO_ISSUE = 75;
+
+    // Array to store degrees that need adjustments
+    private array $degreesForAdjustment = [];
 
     /**
      * Seed the database for development/local environment.
@@ -64,6 +67,12 @@ class DevelopmentSeeder extends Seeder
             // 9. Damage Reasons
             $this->seedDamageReasons();
         });
+
+        // 10. Create degree adjustments - Outside transaction
+        $this->createDegreeAdjustments();
+
+        // 11. Student Updates (to create change logs) - Outside transaction
+        $this->call(StudentUpdateSeeder::class);
     }
 
     /**
@@ -338,10 +347,11 @@ class DevelopmentSeeder extends Seeder
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
 
-                // Create adjustments for 30% of degrees
-                if (rand(1, 100) <= 30) {
-                    $this->createAdjustmentsForDegree($degree);
-                }
+                // Store degree ID for later adjustment creation
+                $this->degreesForAdjustment[] = [
+                    'degree_id' => $degree->degree_id,
+                    'chance' => 30
+                ];
             }
 
             $studentOffset += $config['count'];
@@ -399,10 +409,11 @@ class DevelopmentSeeder extends Seeder
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
 
-                // Create adjustments for 20% of certificates
-                if (rand(1, 100) <= 20) {
-                    $this->createAdjustmentsForDegree($degree);
-                }
+                // Store degree ID for later adjustment creation
+                $this->degreesForAdjustment[] = [
+                    'degree_id' => $degree->degree_id,
+                    'chance' => 20
+                ];
             }
 
             $studentOffset += $config['count'];
@@ -428,20 +439,57 @@ class DevelopmentSeeder extends Seeder
             'Thay đổi ngày tốt nghiệp theo hồ sơ đào tạo',
         ];
 
+        $fields = [
+            'registration_number' => 'Số đăng ký',
+            'ranking' => 'Xếp loại',
+            'granting_date' => 'Ngày cấp',
+            'major_name' => 'Ngành đào tạo',
+        ];
+
         for ($i = 0; $i < $adjustmentCount; $i++) {
             $adjustmentDate = now()->subDays(rand(10, 365));
+            $field = array_rand($fields);
 
-            DegreeAdjustment::factory()
-                ->forDegree($degree)
-                ->byUser($adminUser)
-                ->create([
-                    'adjustment_content' => collect($adjustmentContents)->random(),
-                    'decision_number' => 'QĐ-DC-' . now()->year . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
-                    'decision_date' => $adjustmentDate,
-                    'created_at' => $adjustmentDate,
-                    'updated_at' => $adjustmentDate,
-                ]);
+            ChangeLog::create([
+                'entity_type' => 'Degree',
+                'entity_id' => $degree->degree_id,
+                'changed_field' => $field,
+                'old_value' => 'Giá trị cũ',
+                'new_value' => 'Giá trị mới',
+                'change_description' => collect($adjustmentContents)->random(),
+                'decision_number' => 'QĐ-DC-' . now()->year . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
+                'decision_date' => $adjustmentDate,
+                'changed_by' => $adminUser->user_id,
+                'action_type' => 'update',
+                'created_at' => $adjustmentDate,
+                'updated_at' => $adjustmentDate,
+            ]);
         }
+    }
+
+    /**
+     * Create adjustments for stored degrees (called outside transaction)
+     */
+    private function createDegreeAdjustments(): void
+    {
+        if (empty($this->degreesForAdjustment)) {
+            return;
+        }
+
+        $this->command->info("\nTạo degree adjustments...");
+
+        $created = 0;
+        foreach ($this->degreesForAdjustment as $item) {
+            if (rand(1, 100) <= $item['chance']) {
+                $degree = Degree::find($item['degree_id']);
+                if ($degree) {
+                    $this->createAdjustmentsForDegree($degree);
+                    $created++;
+                }
+            }
+        }
+
+        $this->command->info("✓ Đã tạo adjustments cho {$created} degrees");
     }
 
     private function seedSystemSettings(): void

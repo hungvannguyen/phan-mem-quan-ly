@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\LogsChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Degree extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsChanges;
 
     /**
      * The primary key associated with the table.
@@ -70,6 +71,31 @@ class Degree extends Model
     }
 
     /**
+     * Field labels for logging (tiếng Việt)
+     *
+     * @var array
+     */
+    protected $fieldLabels = [
+        'registration_number' => 'số đăng ký',
+        'degree_type' => 'loại văn bằng',
+        'major_name' => 'ngành/chuyên ngành',
+        'ranking' => 'xếp loại',
+        'granting_date' => 'ngày cấp',
+        'graduation_year' => 'năm tốt nghiệp',
+        'decision_number' => 'số quyết định',
+        'council_decision_number' => 'số QĐ thành lập hội đồng',
+        'council_decision_date' => 'ngày QĐ thành lập hội đồng',
+        'graduation_decision_number' => 'số QĐ công nhận tốt nghiệp',
+        'graduation_decision_date' => 'ngày QĐ công nhận tốt nghiệp',
+        'defense_date' => 'ngày bảo vệ',
+        'training_start_date' => 'ngày bắt đầu đào tạo',
+        'training_end_date' => 'ngày kết thúc đào tạo',
+        'diploma_blank_id' => 'số hiệu văn bằng',
+        'major_id' => 'mã ngành',
+        'notes' => 'ghi chú',
+    ];
+
+    /**
      * Get the student who received this degree.
      */
     public function student()
@@ -95,10 +121,13 @@ class Degree extends Model
 
     /**
      * Get all adjustments for this degree.
+     * Sử dụng ChangeLog với hasMany vì entity_type lưu class basename
      */
     public function adjustments()
     {
-        return $this->hasMany(DegreeAdjustment::class, 'degree_id', 'degree_id')->orderBy('created_at', 'desc');
+        return $this->hasMany(ChangeLog::class, 'entity_id', 'degree_id')
+            ->where('entity_type', 'Degree')
+            ->orderBy('created_at', 'desc');
     }
 
     /**

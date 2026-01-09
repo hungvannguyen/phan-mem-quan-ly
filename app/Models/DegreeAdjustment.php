@@ -5,9 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model wrapper cho degree_adjustments view
+ * View này lọc dữ liệu từ bảng change_logs cho entity_type = 'Degree'
+ *
+ * @deprecated Sử dụng ChangeLog::forEntity('Degree', $degreeId) để lấy logs của degree
+ */
 class DegreeAdjustment extends Model
 {
     use HasFactory;
+
+    /**
+     * The table associated with the model.
+     * Đây là một view, không phải bảng thực
+     */
+    protected $table = 'degree_adjustments';
 
     /**
      * The primary key associated with the table.
@@ -61,4 +73,20 @@ class DegreeAdjustment extends Model
     {
         return $this->belongsTo(User::class, 'adjusted_by', 'user_id');
     }
+
+    /**
+     * NOTE: Model này chỉ dùng để đọc dữ liệu (read-only)
+     * Để tạo log mới cho degree, sử dụng:
+     *
+     * ChangeLog::logChange(
+     *     entityType: 'Degree',
+     *     entityId: $degreeId,
+     *     changeDescription: 'Mô tả thay đổi',
+     *     changedField: 'field_name',
+     *     oldValue: 'giá trị cũ',
+     *     newValue: 'giá trị mới',
+     *     decisionNumber: 'số quyết định',
+     *     decisionDate: 'ngày quyết định'
+     * );
+     */
 }

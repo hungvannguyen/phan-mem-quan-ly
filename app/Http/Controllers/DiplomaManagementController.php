@@ -6,7 +6,7 @@ use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
-use App\Models\DegreeAdjustment;
+use App\Models\ChangeLog;
 use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -143,8 +143,8 @@ class DiplomaManagementController extends Controller
         // Get all diploma blank types for dropdown
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
-        // Get degrees issued to this student with all relationships including adjustments
-        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type', 'adjustments.adjustedBy'])->get();
+        // Get degrees issued to this student with all relationships including change logs
+        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type', 'changeLogs.changedBy'])->get();
 
         return view('components.students.edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
     }
@@ -442,27 +442,64 @@ class DiplomaManagementController extends Controller
             'adjusted_field' => 'required|string',
             'old_value' => 'nullable|string|max:500',
             'new_value' => 'required|string|max:500',
-            'adjustment_content' => 'required|string|max:1000',
+            'adjustment_content' => 'nullable|string|max:1000', // Không bắt buộc
             'decision_number' => 'nullable|string|max:100',
             'decision_date' => 'nullable|date',
         ]);
 
         try {
-            $validated['degree_id'] = $degree->degree_id;
-            $validated['adjusted_by'] = auth()->user()->user_id;
-
-            // Create adjustment record
-            DegreeAdjustment::create($validated);
-
-            // Update the actual field value in degrees table
             $fieldName = $validated['adjusted_field'];
+            $oldValue = $validated['old_value'];
             $newValue = $validated['new_value'];
 
+            // Kiểm tra unique constraint cho registration_number
+            if ($fieldName === 'registration_number') {
+                $existingDegree = Degree::where('registration_number', $newValue)
+                    ->where('degree_id', '!=', $degree->degree_id)
+                    ->first();
+
+                if ($existingDegree) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', "Số đăng ký '{$newValue}' đã tồn tại. Vui lòng sử dụng số đăng ký khác.");
+                }
+            }
+
+            // Kiểm tra có nội dung điều chỉnh tùy chỉnh không
+            $hasCustomContent = !empty($validated['adjustment_content']) &&
+                trim($validated['adjustment_content']) !== '';
+
+            if ($hasCustomContent) {
+                // Nếu có nội dung điều chỉnh từ form, tạo log thủ công với thông tin đầy đủ
+                ChangeLog::logChange(
+                    entityType: 'Degree',
+                    entityId: $degree->degree_id,
+                    changeDescription: $validated['adjustment_content'],
+                    changedField: $fieldName,
+                    oldValue: $oldValue,
+                    newValue: $newValue,
+                    decisionNumber: $validated['decision_number'] ?? null,
+                    decisionDate: $validated['decision_date'] ?? null,
+                    changedBy: auth()->user()->user_id,
+                    actionType: 'update'
+                );
+
+                // Tắt auto-logging để tránh tạo log trùng
+                $degree->disableLogging();
+            }
+            // Nếu không có nội dung tùy chỉnh, để trait tự động log với description mặc định
+
+            // Update the actual field value in degrees table
             // Check if the field exists in the fillable array to prevent mass assignment issues
             if (in_array($fieldName, $degree->getFillable())) {
                 $degree->update([
                     $fieldName => $newValue
                 ]);
+            }
+
+            if ($hasCustomContent) {
+                // Bật lại logging
+                $degree->enableLogging();
             }
 
             return redirect()->route('student.show', ['student' => $degree->student_id])
@@ -479,7 +516,8 @@ class DiplomaManagementController extends Controller
     public function getAdjustments(Degree $degree)
     {
         try {
-            $adjustments = $degree->adjustments()->with('adjustedBy')->get();
+            // Use changeLogs relationship which returns hasMany filtered by entity_type
+            $adjustments = $degree->changeLogs()->with('changedBy')->get();
 
             return response()->json([
                 'success' => true,

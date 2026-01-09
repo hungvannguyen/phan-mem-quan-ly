@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\StudentGender;
 use App\Enums\StudentStatus;
+use App\Models\Traits\LogsChanges;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory, HasUlids, SoftDeletes, LogsChanges;
 
     /**
      * The primary key associated with the table.
