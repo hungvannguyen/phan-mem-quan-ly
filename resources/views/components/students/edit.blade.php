@@ -125,22 +125,26 @@
 
         /* Modal Styles */
         #addDegreeModal,
-        #editDegreeModal {
+        #editDegreeModal,
+        #addReissueModal {
             z-index: 9999;
         }
 
         #addDegreeModal.hidden,
-        #editDegreeModal.hidden {
+        #editDegreeModal.hidden,
+        #addReissueModal.hidden {
             display: none !important;
         }
 
         #addDegreeModal:not(.hidden),
-        #editDegreeModal:not(.hidden) {
+        #editDegreeModal:not(.hidden),
+        #addReissueModal:not(.hidden) {
             display: flex !important;
         }
 
         #addDegreeModal .bg-white,
-        #editDegreeModal .bg-white {
+        #editDegreeModal .bg-white,
+        #addReissueModal .bg-white {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
@@ -980,6 +984,119 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                {{-- Reissue History Section --}}
+                                @php
+                                    $reissues = $degree->reissues ?? collect();
+                                @endphp
+                                <div class="mt-4 border-t pt-4">
+                                    <div class="mb-3 flex items-center justify-between">
+                                        <h4 class="text-sm font-semibold text-gray-700">
+                                            <i class="fas fa-sync-alt mr-1 text-blue-600"></i>
+                                            Lịch sử cấp lại văn bằng ({{ $reissues->count() }})
+                                        </h4>
+                                        <button type="button"
+                                            onclick="openReissueModal({{ $degree->degree_id }}, {{ $degree->diplomaBlank?->type_id ?? 'null' }}, '{{ $degree->diplomaBlank?->serial_number ?? 'N/A' }}')"
+                                            class="inline-flex items-center rounded border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                            <i class="fas fa-plus mr-1"></i>
+                                            Cấp lại
+                                        </button>
+                                    </div>
+                                    @if ($reissues->count() > 0)
+                                        <div class="space-y-2">
+                                            @foreach ($reissues as $reissue)
+                                                <div class="flex gap-3 rounded-lg bg-blue-50 p-3 text-sm">
+                                                    <div class="flex-shrink-0">
+                                                        <i class="fas fa-file-import text-blue-600"></i>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <div class="mb-2 flex items-center justify-between">
+                                                            <div class="flex items-center gap-2">
+                                                                <span
+                                                                    class="rounded bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
+                                                                    Cấp lại
+                                                                </span>
+                                                                <span class="text-xs text-gray-600">
+                                                                    <i class="fas fa-calendar mr-1"></i>
+                                                                    {{ $reissue->decision_date->format('d/m/Y') }}
+                                                                </span>
+                                                                @if ($reissue->is_recalled)
+                                                                    <span
+                                                                        class="rounded bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-700">
+                                                                        <i class="fas fa-undo mr-1"></i>Thu hồi
+                                                                    </span>
+                                                                @endif
+                                                                @if ($reissue->is_destroyed)
+                                                                    <span
+                                                                        class="rounded bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+                                                                        <i class="fas fa-ban mr-1"></i>Hủy
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                            <button type="button"
+                                                                onclick="deleteReissue({{ $reissue->reissue_id }})"
+                                                                class="text-red-600 hover:text-red-800"
+                                                                title="Xóa lịch sử cấp lại">
+                                                                <i class="fas fa-trash text-xs"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <p class="mb-1 text-xs text-gray-600">
+                                                                <span class="font-semibold">Phôi cũ:</span>
+                                                                @if ($reissue->oldDiplomaBlank)
+                                                                    <code
+                                                                        class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $reissue->oldDiplomaBlank->serial_number }}</code>
+                                                                    @if ($reissue->oldDiplomaBlank->type)
+                                                                        <span
+                                                                            class="text-xs text-gray-500">({{ $reissue->oldDiplomaBlank->type->type_name }})</span>
+                                                                    @endif
+                                                                @else
+                                                                    <span class="text-gray-500">N/A</span>
+                                                                @endif
+                                                            </p>
+                                                            <p class="mb-1 text-xs text-gray-600">
+                                                                <span class="font-semibold">Phôi mới:</span>
+                                                                @if ($reissue->newDiplomaBlank)
+                                                                    <code
+                                                                        class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $reissue->newDiplomaBlank->serial_number }}</code>
+                                                                    @if ($reissue->newDiplomaBlank->type)
+                                                                        <span
+                                                                            class="text-xs text-gray-500">({{ $reissue->newDiplomaBlank->type->type_name }})</span>
+                                                                    @endif
+                                                                @else
+                                                                    <span class="text-gray-500">N/A</span>
+                                                                @endif
+                                                            </p>
+                                                        </div>
+                                                        <p class="mb-1 text-xs">
+                                                            <span class="font-semibold text-gray-700">Nội dung chỉnh
+                                                                sửa:</span>
+                                                            <span
+                                                                class="text-gray-900">{{ $reissue->edit_content }}</span>
+                                                        </p>
+                                                        <p class="mb-1 text-xs">
+                                                            <span class="font-semibold text-gray-700">QĐ thu hồi & cấp
+                                                                lại:</span>
+                                                            <span
+                                                                class="text-gray-900">{{ $reissue->recall_decision }}</span>
+                                                        </p>
+                                                        @if ($reissue->notes)
+                                                            <p class="text-xs text-gray-600">
+                                                                <i class="fas fa-sticky-note mr-1"></i>
+                                                                {{ $reissue->notes }}
+                                                            </p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Chưa có lịch sử cấp lại văn bằng
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -1577,6 +1694,130 @@
         </div>
     </div>
 
+    <!-- Add Reissue Modal -->
+    <div id="addReissueModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-sync-alt mr-2 text-blue-600"></i>
+                    Thêm lịch sử cấp lại văn bằng
+                </h3>
+                <button type="button" onclick="closeReissueModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form id="addReissueForm" method="POST" action="" class="space-y-4">
+                @csrf
+
+                {{-- Display validation errors for reissue --}}
+                <div id="reissueErrors" class="hidden rounded-md border border-red-200 bg-red-50 p-3">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Có lỗi xảy ra:</h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul id="reissueErrorList" class="list-inside list-disc space-y-1"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="reissue_old_blank" class="field-label">Phôi văn bằng hiện tại</label>
+                    <input type="text" id="reissue_old_blank" class="field-input bg-gray-100" readonly>
+                    <p class="mt-1 text-xs text-gray-500">Phôi văn bằng đang sử dụng</p>
+                </div>
+
+                <div class="field-group">
+                    <label for="new_diploma_blank_id" class="field-label required">Chọn phôi văn bằng mới</label>
+                    <select name="new_diploma_blank_id" id="new_diploma_blank_id" class="field-input" required>
+                        <option value="">-- Chọn phôi từ kho --</option>
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Chọn phôi văn bằng mới từ kho (cùng loại)</p>
+                </div>
+
+                <div class="field-group">
+                    <label for="reissue_edit_content" class="field-label required">Nội dung chỉnh sửa</label>
+                    <textarea name="edit_content" id="reissue_edit_content" rows="3" class="field-input"
+                        placeholder="Mô tả nội dung chỉnh sửa, lý do cấp lại..." required></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết lý do và nội dung chỉnh sửa</p>
+                </div>
+
+                <div class="field-group">
+                    <label for="reissue_recall_decision" class="field-label required">Quyết định thu hồi, hủy bỏ và cấp
+                        lại</label>
+                    <input type="text" name="recall_decision" id="reissue_recall_decision" class="field-input"
+                        placeholder="Số quyết định thu hồi và cấp lại" required>
+                    <p class="mt-1 text-xs text-gray-500">Số và tên quyết định thu hồi, hủy bỏ văn bằng cũ và cấp lại</p>
+                </div>
+
+                <div class="field-group">
+                    <label for="reissue_decision_date" class="field-label required">Ngày quyết định</label>
+                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input" required>
+                    <p class="mt-1 text-xs text-gray-500">Ngày ban hành quyết định cấp lại</p>
+                </div>
+
+                <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
+                    <h4 class="mb-3 text-sm font-semibold text-gray-700">
+                        <i class="fas fa-clipboard-check mr-1"></i>
+                        Xử lý phôi cũ <span class="text-red-500">*</span>
+                    </h4>
+                    <div class="space-y-2">
+                        <div class="flex items-start">
+                            <input type="radio" name="old_blank_status" id="status_recalled" value="recalled"
+                                class="mt-1 h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="status_recalled" class="ml-2 text-sm">
+                                <span class="font-medium text-gray-700">Đã thu hồi phôi cũ</span>
+                                <p class="text-xs text-gray-500">Phôi cũ đã được thu hồi về trường (cập nhật trạng thái:
+                                    Đã thu hồi)</p>
+                            </label>
+                        </div>
+                        <div class="flex items-start">
+                            <input type="radio" name="old_blank_status" id="status_destroyed" value="destroyed"
+                                class="mt-1 h-4 w-4 border-gray-300 text-red-600 focus:ring-red-500">
+                            <label for="status_destroyed" class="ml-2 text-sm">
+                                <span class="font-medium text-gray-700">Đã hủy phôi cũ</span>
+                                <p class="text-xs text-gray-500">Phôi cũ đã được hủy (cập nhật trạng thái: Đã hủy)</p>
+                            </label>
+                        </div>
+                        <div class="flex items-start">
+                            <input type="radio" name="old_blank_status" id="status_not_recalled"
+                                value="not_recalled" checked
+                                class="mt-1 h-4 w-4 border-gray-300 text-gray-600 focus:ring-gray-500">
+                            <label for="status_not_recalled" class="ml-2 text-sm">
+                                <span class="font-medium text-gray-700">Chưa thu hồi</span>
+                                <p class="text-xs text-gray-500">Phôi cũ chưa được thu hồi (giữ nguyên trạng thái)</p>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-blue-600">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Lưu ý: Chọn một trong ba tùy chọn xử lý phôi cũ
+                    </p>
+                </div>
+
+                <div class="field-group">
+                    <label for="reissue_notes" class="field-label">Ghi chú</label>
+                    <textarea name="notes" id="reissue_notes" rows="2" class="field-input"
+                        placeholder="Ghi chú bổ sung (nếu có)"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 border-t pt-4">
+                    <button type="button" onclick="closeReissueModal()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>Lưu lịch sử cấp lại
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Adjustment Modal Functions - Must be defined first for onclick handlers
         let currentDegreeData = null;
@@ -1777,41 +2018,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                    <i class="fas fa-tag mr-1"></i>
-                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                </p>
-                                                            ` : ''}
+                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                        <i class="fas fa-tag mr-1"></i>
+                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                    </p>
+                                                                ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                <p class="mb-2 text-sm">
-                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                </p>
-                                                            ` : ''}
+                                                                    <p class="mb-2 text-sm">
+                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                    </p>
+                                                                ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                            <span class="flex items-center">
-                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                            </span>
-                                                        ` : ''}
+                                                                <span class="flex items-center">
+                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                </span>
+                                                            ` : ''}
                                             ${adj.decision_date ? `
-                                                            <span class="flex items-center">
-                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                            </span>
-                                                        ` : ''}
+                                                                <span class="flex items-center">
+                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                </span>
+                                                            ` : ''}
                                             ${adj.changed_by ? `
-                                                            <span class="flex items-center">
-                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                ${adj.changed_by.full_name || 'N/A'}
-                                                            </span>
-                                                        ` : ''}
+                                                                <span class="flex items-center">
+                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                    ${adj.changed_by.full_name || 'N/A'}
+                                                                </span>
+                                                            ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2305,6 +2546,7 @@
             const exportModal = document.getElementById('exportVerificationModal');
             const adjustmentModal = document.getElementById('addAdjustmentModal');
             const viewAdjustmentsModal = document.getElementById('viewAdjustmentsModal');
+            const reissueModal = document.getElementById('addReissueModal');
 
             if (event.target === addModal) {
                 closeAddDegreeModal();
@@ -2325,6 +2567,123 @@
             if (event.target === viewAdjustmentsModal) {
                 closeViewAdjustmentsModal();
             }
+
+            if (event.target === reissueModal) {
+                closeReissueModal();
+            }
         });
+
+        // Reissue Modal Functions
+        window.openReissueModal = function(degreeId, typeId, currentBlankSerial) {
+            const modal = document.getElementById('addReissueModal');
+            const form = document.getElementById('addReissueForm');
+            const oldBlankInput = document.getElementById('reissue_old_blank');
+            const newBlankSelect = document.getElementById('new_diploma_blank_id');
+
+            if (!modal || !form || !oldBlankInput || !newBlankSelect) {
+                alert('Không tìm thấy modal hoặc form');
+                return;
+            }
+
+            // Set form action
+            form.action = `/degrees/${degreeId}/reissues`;
+
+            // Set old blank serial number
+            oldBlankInput.value = currentBlankSerial || 'N/A';
+
+            // Reset other fields
+            newBlankSelect.innerHTML = '<option value="">-- Chọn phôi từ kho --</option>';
+            document.getElementById('reissue_edit_content').value = '';
+            document.getElementById('reissue_recall_decision').value = '';
+            document.getElementById('reissue_decision_date').value = '';
+            document.getElementById('reissue_notes').value = '';
+            // Reset radio buttons to default (not_recalled)
+            document.getElementById('status_not_recalled').checked = true;
+
+            // Load available blanks
+            if (typeId) {
+                fetch(`/api/diploma-blanks/available?type_id=${typeId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.blanks) {
+                            data.blanks.forEach(blank => {
+                                const option = document.createElement('option');
+                                option.value = blank.diploma_blank_id;
+                                option.textContent = `${blank.serial_number} - ${blank.type_name || ''}`;
+                                newBlankSelect.appendChild(option);
+                            });
+
+                            if (data.blanks.length === 0) {
+                                newBlankSelect.innerHTML = '<option value="">Không có phôi nào trong kho</option>';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading blanks:', error);
+                        alert('Không thể tải danh sách phôi từ kho');
+                    });
+            }
+
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+
+            console.log('Modal opened, form action:', form.action);
+        };
+
+        // Add form submit listener for debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            const reissueForm = document.getElementById('addReissueForm');
+            if (reissueForm) {
+                reissueForm.addEventListener('submit', function(e) {
+                    console.log('Form submitting...');
+                    console.log('Form action:', this.action);
+                    console.log('Form data:', new FormData(this));
+
+                    // Log all form fields
+                    const formData = new FormData(this);
+                    for (let pair of formData.entries()) {
+                        console.log(pair[0] + ': ' + pair[1]);
+                    }
+                });
+            }
+        });
+
+        window.closeReissueModal = function() {
+            const modal = document.getElementById('addReissueModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        };
+
+        window.deleteReissue = function(reissueId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa lịch sử cấp lại này?')) {
+                return;
+            }
+
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/degrees/reissues/${reissueId}`;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_token';
+                csrfInput.value = csrfToken.content;
+                form.appendChild(csrfInput);
+            }
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        };
     </script>
 @endsection

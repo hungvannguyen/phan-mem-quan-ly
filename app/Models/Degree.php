@@ -131,6 +131,15 @@ class Degree extends Model
     }
 
     /**
+     * Get all reissues for this degree.
+     */
+    public function reissues()
+    {
+        return $this->hasMany(DegreeReissue::class, 'degree_id', 'degree_id')
+            ->orderBy('decision_date', 'desc');
+    }
+
+    /**
      * Get the full degree information with related data.
      */
     public function getFullDegreeInfo()

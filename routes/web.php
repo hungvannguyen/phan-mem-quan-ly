@@ -146,6 +146,20 @@ Route::middleware('auth')->group(function () {
                 ->name('adjustments.store');
             Route::get('/{degree}/adjustments', [DiplomaManagementController::class, 'getAdjustments'])
                 ->name('adjustments.index');
+
+            // Degree Reissues
+            Route::post('/{degree}/reissues', [DiplomaManagementController::class, 'storeReissue'])
+                ->middleware('permission:diplomas.edit')
+                ->name('reissues.store');
+            Route::delete('/reissues/{reissue}', [DiplomaManagementController::class, 'deleteReissue'])
+                ->middleware('permission:diplomas.delete')
+                ->name('reissues.delete');
+        });
+
+        // API Routes for AJAX
+        Route::prefix('api')->name('api.')->group(function () {
+            Route::get('/diploma-blanks/available', [DiplomaManagementController::class, 'getAvailableBlanks'])
+                ->name('diploma-blanks.available');
         });
     });
 

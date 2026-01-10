@@ -73,6 +73,9 @@ class DevelopmentSeeder extends Seeder
 
         // 11. Student Updates (to create change logs) - Outside transaction
         $this->call(StudentUpdateSeeder::class);
+
+        // 12. Degree Reissues (lịch sử cấp lại văn bằng) - Outside transaction
+        $this->call(DegreeReissueSeeder::class);
     }
 
     /**

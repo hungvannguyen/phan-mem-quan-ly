@@ -6,6 +6,7 @@ use App\Http\Requests\StudentRequest;
 use App\Models\Student;
 use App\Models\Major;
 use App\Models\Degree;
+use App\Models\DegreeReissue;
 use App\Models\ChangeLog;
 use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
@@ -144,7 +145,13 @@ class DiplomaManagementController extends Controller
         $diplomaBlankTypes = DiplomaBlankType::orderBy('type_name')->get();
 
         // Get degrees issued to this student with all relationships including change logs
-        $degrees = $student->degrees()->with(['major', 'diplomaBlank.type', 'changeLogs.changedBy'])->get();
+        $degrees = $student->degrees()->with([
+            'major', 
+            'diplomaBlank.type', 
+            'changeLogs.changedBy', 
+            'reissues.oldDiplomaBlank.type',
+            'reissues.newDiplomaBlank.type'
+        ])->get();
 
         return view('components.students.edit', compact('student', 'majors', 'diplomaBlankTypes', 'degrees'));
     }
@@ -191,7 +198,7 @@ class DiplomaManagementController extends Controller
 
                 // Check diploma blank availability and lock it
                 $diplomaBlank = DiplomaBlank::where('diploma_blank_id', $validated['diploma_blank_id'])
-                    ->where('status', DiplomaBlankStatus::IN_STOCK)
+                    ->where('status', DiplomaBlankStatus::IN_STOCK->value)
                     ->whereDoesntHave('degree') // Not already assigned
                     ->lockForUpdate() // Lock for atomic update
                     ->first();
@@ -234,7 +241,7 @@ class DiplomaManagementController extends Controller
         try {
             // Get the oldest available diploma blank for the specified type
             $oldestBlank = DiplomaBlank::where('type_id', $typeId)
-                ->where('status', DiplomaBlankStatus::IN_STOCK)
+                ->where('status', DiplomaBlankStatus::IN_STOCK->value)
                 ->whereDoesntHave('degree') // Not assigned to any degree
                 ->orderBy('import_date', 'asc') // Oldest first by import date
                 ->orderBy('serial_number', 'asc') // Then by serial number
@@ -527,6 +534,169 @@ class DiplomaManagementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Có lỗi xảy ra khi tải lịch sử điều chỉnh'
+            ], 500);
+        }
+    }
+
+    /**
+     * Store a new degree reissue
+     */
+    public function storeReissue(Request $request, Degree $degree)
+    {
+        try {
+            \Log::info('Reissue request received', [
+                'all_data' => $request->all(),
+                'degree_id' => $degree->degree_id
+            ]);
+
+            $validated = $request->validate([
+                'new_diploma_blank_id' => 'required|exists:diploma_blanks,diploma_blank_id',
+                'edit_content' => 'required|string',
+                'recall_decision' => 'required|string|max:100',
+                'decision_date' => 'required|date',
+                'old_blank_status' => 'required|in:recalled,destroyed,not_recalled',
+                'notes' => 'nullable|string',
+            ]);
+
+            \Log::info('Validation passed', ['validated' => $validated]);
+
+            DB::beginTransaction();
+
+            // Get old and new diploma blanks
+            $oldBlank = $degree->diplomaBlank;
+            
+            \Log::info('Looking for blank', ['blank_id' => $validated['new_diploma_blank_id']]);
+            
+            $newBlank = DiplomaBlank::findOrFail($validated['new_diploma_blank_id']);
+
+            \Log::info('Found new blank', [
+                'blank_id' => $newBlank->diploma_blank_id,
+                'status' => $newBlank->status,
+                'expected_status' => DiplomaBlankStatus::IN_STOCK
+            ]);
+
+            // Validate new blank is in stock
+            if ($newBlank->status !== DiplomaBlankStatus::IN_STOCK) {
+                DB::rollBack();
+                \Log::warning('Blank not in stock', ['status' => $newBlank->status]);
+                return redirect()->back()
+                    ->with('error', 'Phôi văn bằng đã chọn không còn trong kho')
+                    ->withInput();
+            }
+
+            // Create reissue record
+            $validated['degree_id'] = $degree->degree_id;
+            $validated['old_diploma_blank_id'] = $oldBlank?->diploma_blank_id;
+            
+            // Handle old blank status based on radio button value
+            $oldBlankStatus = $request->input('old_blank_status', 'not_recalled');
+            $validated['is_recalled'] = ($oldBlankStatus === 'recalled');
+            $validated['is_destroyed'] = ($oldBlankStatus === 'destroyed');
+
+            \Log::info('About to create reissue', ['validated_data' => $validated]);
+
+            $reissue = DegreeReissue::create($validated);
+
+            \Log::info('Reissue created', ['reissue_id' => $reissue->reissue_id]);
+
+            // Update old blank status based on selection
+            if ($oldBlank) {
+                if ($oldBlankStatus === 'destroyed') {
+                    $oldBlank->update(['status' => DiplomaBlankStatus::DESTROYED]);
+                } elseif ($oldBlankStatus === 'recalled') {
+                    $oldBlank->update(['status' => DiplomaBlankStatus::RECALLED]);
+                }
+                // If 'not_recalled', keep the old blank status unchanged
+            }
+
+            // Update new blank status to issued
+            $newBlank->update(['status' => DiplomaBlankStatus::ISSUED]);
+
+            // Update degree's diploma blank to new one
+            $degree->update([
+                'diploma_blank_id' => $newBlank->diploma_blank_id
+            ]);
+
+            DB::commit();
+
+            \Log::info('Reissue created successfully');
+
+            return redirect()->back()
+                ->with('success', 'Đã lưu lịch sử cấp lại văn bằng thành công');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error in storeReissue', [
+                'errors' => $e->errors(),
+                'input' => $request->all()
+            ]);
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error storing degree reissue: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi lưu lịch sử cấp lại: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Delete a degree reissue
+     */
+    public function deleteReissue($reissueId)
+    {
+        try {
+            $reissue = \App\Models\DegreeReissue::findOrFail($reissueId);
+            $reissue->delete();
+
+            return redirect()->back()
+                ->with('success', 'Đã xóa lịch sử cấp lại thành công');
+        } catch (\Exception $e) {
+            \Log::error('Error deleting degree reissue: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi xóa lịch sử cấp lại');
+        }
+    }
+
+    /**
+     * Get available diploma blanks by type
+     */
+    public function getAvailableBlanks(Request $request)
+    {
+        try {
+            $typeId = $request->input('type_id');
+            
+            if (!$typeId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Type ID is required'
+                ], 400);
+            }
+
+            $blanks = DiplomaBlank::with('type')
+                ->where('type_id', $typeId)
+                ->where('status', DiplomaBlankStatus::IN_STOCK)
+                ->orderBy('serial_number')
+                ->get()
+                ->map(function ($blank) {
+                    return [
+                        'diploma_blank_id' => $blank->diploma_blank_id,
+                        'serial_number' => $blank->serial_number,
+                        'type_name' => $blank->type?->type_name,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'blanks' => $blanks
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting available blanks: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi lấy danh sách phôi'
             ], 500);
         }
     }

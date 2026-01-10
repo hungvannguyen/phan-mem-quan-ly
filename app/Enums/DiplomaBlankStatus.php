@@ -8,6 +8,7 @@ enum DiplomaBlankStatus: string
     case ISSUED = 'Issued';
     case RECALLED = 'Recalled';
     case DAMAGED = 'Damaged';
+    case DESTROYED = 'Destroyed';
 
     /**
      * Lấy danh sách tất cả status với label tiếng Việt
@@ -18,7 +19,8 @@ enum DiplomaBlankStatus: string
             self::IN_STOCK->value => 'Trong kho',
             self::ISSUED->value => 'Đã cấp',
             self::RECALLED->value => 'Đã thu hồi',
-            self::DAMAGED->value => 'Hư hỏng'
+            self::DAMAGED->value => 'Hư hỏng',
+            self::DESTROYED->value => 'Đã hủy'
         ];
     }
 
@@ -31,7 +33,8 @@ enum DiplomaBlankStatus: string
             self::IN_STOCK => 'Trong kho',
             self::ISSUED => 'Đã cấp',
             self::RECALLED => 'Đã thu hồi',
-            self::DAMAGED => 'Hư hỏng'
+            self::DAMAGED => 'Hư hỏng',
+            self::DESTROYED => 'Đã hủy'
         };
     }
 
@@ -44,7 +47,8 @@ enum DiplomaBlankStatus: string
             self::IN_STOCK => 'status-pending',
             self::ISSUED => 'status-completed',
             self::RECALLED => 'status-processing',
-            self::DAMAGED => 'status-failed'
+            self::DAMAGED => 'status-failed',
+            self::DESTROYED => 'status-canceled'
         };
     }
 
