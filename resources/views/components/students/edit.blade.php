@@ -990,20 +990,26 @@
                                     $reissues = $degree->reissues ?? collect();
                                 @endphp
                                 <div class="mt-4 border-t pt-4">
-                                    <div class="mb-3 flex items-center justify-between">
-                                        <h4 class="text-sm font-semibold text-gray-700">
-                                            <i class="fas fa-sync-alt mr-1 text-blue-600"></i>
-                                            Lịch sử cấp lại văn bằng ({{ $reissues->count() }})
-                                        </h4>
-                                        <button type="button"
-                                            onclick="openReissueModal({{ $degree->degree_id }}, {{ $degree->diplomaBlank?->type_id ?? 'null' }}, '{{ $degree->diplomaBlank?->serial_number ?? 'N/A' }}')"
-                                            class="inline-flex items-center rounded border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            <i class="fas fa-plus mr-1"></i>
-                                            Cấp lại
-                                        </button>
+                                    <div class="adjustment-history-toggle mb-2 flex items-center justify-between rounded-lg p-2"
+                                        onclick="toggleReissueHistory({{ $degree->degree_id }})">
+                                        <div class="flex items-center gap-3">
+                                            <h4 class="text-sm font-semibold text-gray-700">
+                                                <i class="fas fa-sync-alt mr-1 text-blue-600"></i>
+                                                Lịch sử cấp lại văn bằng ({{ $reissues->count() }})
+                                            </h4>
+                                            <button type="button"
+                                                onclick="event.stopPropagation(); openReissueModal({{ $degree->degree_id }}, {{ $degree->diplomaBlank?->type_id ?? 'null' }}, '{{ $degree->diplomaBlank?->serial_number ?? 'N/A' }}')"
+                                                class="inline-flex items-center rounded border border-blue-300 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                                <i class="fas fa-plus mr-1"></i>
+                                                Cấp lại
+                                            </button>
+                                        </div>
+                                        <i class="fas fa-chevron-down toggle-icon text-gray-500"
+                                            id="toggle-icon-reissue-{{ $degree->degree_id }}"></i>
                                     </div>
-                                    @if ($reissues->count() > 0)
-                                        <div class="space-y-2">
+                                    <div class="adjustment-history-content space-y-2"
+                                        id="reissue-history-{{ $degree->degree_id }}">
+                                        @if ($reissues->count() > 0)
                                             @foreach ($reissues as $reissue)
                                                 <div class="flex gap-3 rounded-lg bg-blue-50 p-3 text-sm">
                                                     <div class="flex-shrink-0">
@@ -1032,13 +1038,13 @@
                                                                         <i class="fas fa-ban mr-1"></i>Hủy
                                                                     </span>
                                                                 @endif
+                                                                @if (!$reissue->is_recalled && !$reissue->is_destroyed)
+                                                                    <span
+                                                                        class="rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">
+                                                                        <i class="fas fa-clock mr-1"></i>Chưa thu hồi
+                                                                    </span>
+                                                                @endif
                                                             </div>
-                                                            <button type="button"
-                                                                onclick="deleteReissue({{ $reissue->reissue_id }})"
-                                                                class="text-red-600 hover:text-red-800"
-                                                                title="Xóa lịch sử cấp lại">
-                                                                <i class="fas fa-trash text-xs"></i>
-                                                            </button>
                                                         </div>
                                                         <div class="mb-2">
                                                             <p class="mb-1 text-xs text-gray-600">
@@ -1089,13 +1095,13 @@
                                                     </div>
                                                 </div>
                                             @endforeach
-                                        </div>
-                                    @else
-                                        <div class="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            Chưa có lịch sử cấp lại văn bằng
-                                        </div>
-                                    @endif
+                                        @else
+                                            <div class="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Chưa có lịch sử cấp lại văn bằng
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -1756,7 +1762,8 @@
 
                 <div class="field-group">
                     <label for="reissue_decision_date" class="field-label required">Ngày quyết định</label>
-                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input" required>
+                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input"
+                        required>
                     <p class="mt-1 text-xs text-gray-500">Ngày ban hành quyết định cấp lại</p>
                 </div>
 
@@ -2018,41 +2025,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                        <i class="fas fa-tag mr-1"></i>
-                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                    </p>
-                                                                ` : ''}
+                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                            <i class="fas fa-tag mr-1"></i>
+                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                        </p>
+                                                                    ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                    <p class="mb-2 text-sm">
-                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                    </p>
-                                                                ` : ''}
+                                                                        <p class="mb-2 text-sm">
+                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                        </p>
+                                                                    ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                <span class="flex items-center">
-                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                </span>
-                                                            ` : ''}
+                                                                    <span class="flex items-center">
+                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                    </span>
+                                                                ` : ''}
                                             ${adj.decision_date ? `
-                                                                <span class="flex items-center">
-                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                </span>
-                                                            ` : ''}
+                                                                    <span class="flex items-center">
+                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                    </span>
+                                                                ` : ''}
                                             ${adj.changed_by ? `
-                                                                <span class="flex items-center">
-                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                    ${adj.changed_by.full_name || 'N/A'}
-                                                                </span>
-                                                            ` : ''}
+                                                                    <span class="flex items-center">
+                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                        ${adj.changed_by.full_name || 'N/A'}
+                                                                    </span>
+                                                                ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2532,6 +2539,17 @@
         function toggleStudentHistory() {
             const content = document.getElementById('student-change-history');
             const icon = document.getElementById('toggle-icon-student');
+
+            if (content && icon) {
+                content.classList.toggle('expanded');
+                icon.classList.toggle('rotated');
+            }
+        }
+
+        // Toggle Reissue History
+        function toggleReissueHistory(degreeId) {
+            const content = document.getElementById(`reissue-history-${degreeId}`);
+            const icon = document.getElementById(`toggle-icon-reissue-${degreeId}`);
 
             if (content && icon) {
                 content.classList.toggle('expanded');
