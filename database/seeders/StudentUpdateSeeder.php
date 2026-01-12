@@ -42,11 +42,13 @@ class StudentUpdateSeeder extends Seeder
                 $oldClass = $student->class_name;
                 $newClass = $oldClass . ' (Chuyển lớp)';
 
-                // Cập nhật student
+                // Cập nhật student (disable auto-logging)
+                $student->disableLogging();
                 $student->class_name = $newClass;
                 $student->save();
+                $student->enableLogging();
 
-                // Tạo log thủ công
+                // Tạo log thủ công với đầy đủ thông tin quyết định
                 ChangeLog::create([
                     'entity_type' => 'Student',
                     'entity_id' => $student->student_id,
@@ -54,6 +56,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldClass,
                     'new_value' => $newClass,
                     'change_description' => 'Chuyển lớp học',
+                    'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                    'decision_date' => now()->subDays(rand(30, 180)),
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -64,8 +68,10 @@ class StudentUpdateSeeder extends Seeder
             // Update 2: Thay đổi trạng thái
             if ($index === 0) {
                 $oldStatus = $student->status->label();
+                $student->disableLogging();
                 $student->status = \App\Enums\StudentStatus::Graduate;
                 $student->save();
+                $student->enableLogging();
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -74,6 +80,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldStatus,
                     'new_value' => 'Đã tốt nghiệp',
                     'change_description' => 'Thay đổi trạng thái học tập',
+                    'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(100 + $index, 4, '0', STR_PAD_LEFT),
+                    'decision_date' => now()->subDays(rand(30, 180)),
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -87,13 +95,18 @@ class StudentUpdateSeeder extends Seeder
                 $oldHometown = $student->hometown;
                 $oldOrigin = $student->place_of_origin;
 
+                $student->disableLogging();
                 $student->update([
                     'place_of_birth' => 'Hà Nội',
                     'hometown' => 'Nam Định',
                     'place_of_origin' => 'Thanh Hóa',
                 ]);
+                $student->enableLogging();
 
                 // Tạo log cho từng trường
+                $decisionDate = now()->subDays(rand(30, 180));
+                $decisionNumber = 'QĐ-HVANND-' . now()->year . '-' . str_pad(200 + $index, 4, '0', STR_PAD_LEFT);
+
                 ChangeLog::create([
                     'entity_type' => 'Student',
                     'entity_id' => $student->student_id,
@@ -101,6 +114,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldBirth,
                     'new_value' => 'Hà Nội',
                     'change_description' => 'Cập nhật nơi sinh',
+                    'decision_number' => $decisionNumber,
+                    'decision_date' => $decisionDate,
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -112,6 +127,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldHometown,
                     'new_value' => 'Nam Định',
                     'change_description' => 'Cập nhật quê quán',
+                    'decision_number' => $decisionNumber,
+                    'decision_date' => $decisionDate,
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -123,6 +140,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldOrigin,
                     'new_value' => 'Thanh Hóa',
                     'change_description' => 'Cập nhật nguyên quán',
+                    'decision_number' => $decisionNumber,
+                    'decision_date' => $decisionDate,
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -133,8 +152,10 @@ class StudentUpdateSeeder extends Seeder
             // Update 4: Thay đổi niên khóa
             if ($index === 2) {
                 $oldYear = $student->academic_year;
+                $student->disableLogging();
                 $student->academic_year = '2020-2024';
                 $student->save();
+                $student->enableLogging();
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -143,6 +164,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldYear,
                     'new_value' => '2020-2024',
                     'change_description' => 'Thay đổi niên khóa',
+                    'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(300 + $index, 4, '0', STR_PAD_LEFT),
+                    'decision_date' => now()->subDays(rand(30, 180)),
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -154,8 +177,10 @@ class StudentUpdateSeeder extends Seeder
             if ($index === 3) {
                 $oldNumber = $student->number_in_the_book;
                 $newNumber = str_pad($index + 100, 4, '0', STR_PAD_LEFT);
+                $student->disableLogging();
                 $student->number_in_the_book = $newNumber;
                 $student->save();
+                $student->enableLogging();
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -164,6 +189,8 @@ class StudentUpdateSeeder extends Seeder
                     'old_value' => $oldNumber,
                     'new_value' => $newNumber,
                     'change_description' => 'Thay đổi số sổ gốc',
+                    'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(400 + $index, 4, '0', STR_PAD_LEFT),
+                    'decision_date' => now()->subDays(rand(30, 180)),
                     'changed_by' => $user->user_id,
                     'action_type' => 'update',
                 ]);
@@ -181,12 +208,16 @@ class StudentUpdateSeeder extends Seeder
             $this->command->info("\nTest soft delete và restore:");
 
             $studentName = $testStudent->full_name;
+            $testStudent->disableLogging();
             $testStudent->delete();
+            $testStudent->enableLogging();
 
             ChangeLog::create([
                 'entity_type' => 'Student',
                 'entity_id' => $testStudent->student_id,
                 'change_description' => "Xóa sinh viên: {$studentName}",
+                'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(500, 4, '0', STR_PAD_LEFT),
+                'decision_date' => now()->subDays(rand(10, 60)),
                 'changed_by' => $user->user_id,
                 'action_type' => 'delete',
             ]);
@@ -195,12 +226,16 @@ class StudentUpdateSeeder extends Seeder
 
             sleep(1);
 
+            $testStudent->disableLogging();
             $testStudent->restore();
+            $testStudent->enableLogging();
 
             ChangeLog::create([
                 'entity_type' => 'Student',
                 'entity_id' => $testStudent->student_id,
                 'change_description' => "Khôi phục sinh viên: {$studentName}",
+                'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(501, 4, '0', STR_PAD_LEFT),
+                'decision_date' => now()->subDays(rand(1, 30)),
                 'changed_by' => $user->user_id,
                 'action_type' => 'restore',
             ]);

@@ -163,7 +163,13 @@ class AllCertificatesInfoExport
                 $trainingProgram = $degree->major->major_name;
             }
 
-            // Ghi data vào các cột A-P theo mapping
+            // Get latest change log for this degree (from eager loaded collection)
+            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+
+            // Get latest reissue for this degree (from eager loaded collection)
+            $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
+
+            // Ghi data vào các cột A-X theo mapping
             $sheet->setCellValue('A' . $currentRow, $stt); // TT (STT)
             $sheet->setCellValue('B' . $currentRow, $student->full_name ?? ''); // Họ và tên
             $sheet->setCellValue('C' . $currentRow, $student->date_of_birth ? $student->date_of_birth->format('d/m/Y') : ''); // Ngày sinh
@@ -180,6 +186,22 @@ class AllCertificatesInfoExport
             $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng công nhận tốt nghiệp
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng
+
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu và có changed_field
+            if ($latestChangeLog && $latestChangeLog->changed_field) {
+                $sheet->setCellValue('Q' . $currentRow, $latestChangeLog->change_description ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('R' . $currentRow, $latestChangeLog->decision_number ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('S' . $currentRow, $latestChangeLog->decision_date ? $latestChangeLog->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+            }
+
+            // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
+            if ($latestReissue) {
+                $sheet->setCellValue('T' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
+                $sheet->setCellValue('U' . $currentRow, $latestReissue->edit_content ?? ''); // Nội dung chỉnh sửa
+                $sheet->setCellValue('V' . $currentRow, $latestReissue->recall_decision ?? ''); // QĐ thu hồi, hủy bỏ và cấp lại
+                $sheet->setCellValue('W' . $currentRow, $latestReissue->decision_date ? $latestReissue->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+                $sheet->setCellValue('X' . $currentRow, $latestReissue->notes ?? ''); // Ghi chú
+            }
 
             $stt++;
             $currentRow++;
@@ -207,6 +229,14 @@ class AllCertificatesInfoExport
             'N' => 13,  // Ngày công nhận
             'O' => 13,  // Ngày cấp
             'P' => 13,  // Tình trạng
+            'Q' => 30,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'R' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'S' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
+            'T' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
+            'U' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'V' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'W' => 13,  // Ngày QĐ (Cấp lại văn bằng)
+            'X' => 30,  // Ghi chú
         ];
 
         foreach ($columnWidths as $col => $width) {

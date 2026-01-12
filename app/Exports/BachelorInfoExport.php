@@ -25,16 +25,6 @@ class BachelorInfoExport
         // Increase execution time for large exports
         set_time_limit(300); // 5 minutes
 
-        // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT01] Thong tin cap bang cu nhan.xlsx');
-
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
-        }
-
-        $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
-
         // Query students with bachelor degrees
         $query = Student::with([
                 'major',
@@ -91,29 +81,33 @@ class BachelorInfoExport
         // Execute query
         $students = $query->get();
 
-        \Log::info('BachelorInfoExport: Query returned ' . $students->count() . ' students with bachelor degrees');
-
-        // Check if there's any data to export
-        if ($students->count() === 0) {
-            \Log::warning('BachelorInfoExport: No data found - throwing exception');
-            throw new \Exception('Không có dữ liệu bằng cử nhân để xuất');
-        }
-
         // Filter out students without degrees
         $students = $students->filter(function ($student) {
             return $student->degrees->isNotEmpty() &&
                 $student->degrees->first()->registration_number !== null;
         });
 
-        \Log::info('BachelorInfoExport: Found ' . $students->count() . ' students');
+        \Log::info('BachelorInfoExport: Query returned ' . $students->count() . ' students with bachelor degrees');
+
+        // Check if there's any data to export BEFORE loading template
+        if ($students->count() === 0) {
+            \Log::warning('BachelorInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu bằng cử nhân để xuất');
+        }
+
+        // Step 1: Load file mẫu (only after confirming there's data)
+        $templatePath = resource_path('templates/[Mau TT01] Thong tin cap bang cu nhan.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
-
-        if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu sinh viên để xuất');
-        }
 
         // Step 3: Insert rows và copy style (tối ưu tốc độ)
         // Disable automatic calculation for better performance
@@ -143,6 +137,12 @@ class BachelorInfoExport
                 $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
             }
 
+            // Get latest change log for this degree (from eager loaded collection)
+            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+
+            // Get latest reissue for this degree (from eager loaded collection)
+            $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
+
             // Ghi data vào các cột A-T theo mapping
             $sheet->setCellValue('A' . $currentRow, $stt); // STT
             $sheet->setCellValue('B' . $currentRow, $student->full_name ?? ''); // Họ tên
@@ -164,6 +164,22 @@ class BachelorInfoExport
             $sheet->setCellValue('R' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày quyết định
             $sheet->setCellValue('S' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('T' . $currentRow, 'Đã cấp'); // Tình trạng
+
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu và có changed_field
+            if ($latestChangeLog && $latestChangeLog->changed_field) {
+                $sheet->setCellValue('U' . $currentRow, $latestChangeLog->change_description ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('V' . $currentRow, $latestChangeLog->decision_number ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('W' . $currentRow, $latestChangeLog->decision_date ? $latestChangeLog->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+            }
+
+            // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
+            if ($latestReissue) {
+                $sheet->setCellValue('X' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
+                $sheet->setCellValue('Y' . $currentRow, $latestReissue->edit_content ?? ''); // Nội dung chỉnh sửa
+                $sheet->setCellValue('Z' . $currentRow, $latestReissue->recall_decision ?? ''); // QĐ thu hồi, hủy bỏ và cấp lại
+                $sheet->setCellValue('AA' . $currentRow, $latestReissue->decision_date ? $latestReissue->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+                $sheet->setCellValue('AB' . $currentRow, $latestReissue->notes ?? ''); // Ghi chú
+            }
 
             $stt++;
             $currentRow++;
@@ -191,10 +207,18 @@ class BachelorInfoExport
             'N' => 16,  // Lớp
             'O' => 13,  // Niên khoá
             'P' => 20,  // Hình thức
-            'Q' => 18,  // Số QĐ
-            'R' => 13,  // Ngày QĐ
+            'Q' => 30,  // Số quyết định (QĐ công nhận tốt nghiệp)
+            'R' => 18,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'S' => 13,  // Ngày cấp
-            'T' => 13,  // Tình trạng
+            'T' => 25,  // Tình trạng
+            'U' => 18,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'V' => 30,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'W' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
+            'X' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
+            'Y' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'Z' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'AA' => 13,  // Ngày QĐ (Cấp lại văn bằng)
+            'AB' => 30,  // Ghi chú
         ];
 
         foreach ($columnWidths as $col => $width) {

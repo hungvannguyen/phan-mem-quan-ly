@@ -146,9 +146,9 @@ class DiplomaManagementController extends Controller
 
         // Get degrees issued to this student with all relationships including change logs
         $degrees = $student->degrees()->with([
-            'major', 
-            'diplomaBlank.type', 
-            'changeLogs.changedBy', 
+            'major',
+            'diplomaBlank.type',
+            'changeLogs.changedBy',
             'reissues.oldDiplomaBlank.type',
             'reissues.newDiplomaBlank.type'
         ])->get();
@@ -449,9 +449,9 @@ class DiplomaManagementController extends Controller
             'adjusted_field' => 'required|string',
             'old_value' => 'nullable|string|max:500',
             'new_value' => 'required|string|max:500',
-            'adjustment_content' => 'nullable|string|max:1000', // Không bắt buộc
-            'decision_number' => 'nullable|string|max:100',
-            'decision_date' => 'nullable|date',
+            'adjustment_content' => 'required|string|max:1000', // BẮT BUỘC - Nội dung điều chỉnh
+            'decision_number' => 'required|string|max:100', // BẮT BUỘC - Số quyết định
+            'decision_date' => 'required|date', // BẮT BUỘC - Ngày quyết định
         ]);
 
         try {
@@ -472,29 +472,22 @@ class DiplomaManagementController extends Controller
                 }
             }
 
-            // Kiểm tra có nội dung điều chỉnh tùy chỉnh không
-            $hasCustomContent = !empty($validated['adjustment_content']) &&
-                trim($validated['adjustment_content']) !== '';
+            // Tạo log điều chỉnh với thông tin đầy đủ (các trường đã bắt buộc)
+            ChangeLog::logChange(
+                entityType: 'Degree',
+                entityId: $degree->degree_id,
+                changeDescription: $validated['adjustment_content'],
+                changedField: $fieldName,
+                oldValue: $oldValue,
+                newValue: $newValue,
+                decisionNumber: $validated['decision_number'],
+                decisionDate: $validated['decision_date'],
+                changedBy: auth()->user()->user_id,
+                actionType: 'update'
+            );
 
-            if ($hasCustomContent) {
-                // Nếu có nội dung điều chỉnh từ form, tạo log thủ công với thông tin đầy đủ
-                ChangeLog::logChange(
-                    entityType: 'Degree',
-                    entityId: $degree->degree_id,
-                    changeDescription: $validated['adjustment_content'],
-                    changedField: $fieldName,
-                    oldValue: $oldValue,
-                    newValue: $newValue,
-                    decisionNumber: $validated['decision_number'] ?? null,
-                    decisionDate: $validated['decision_date'] ?? null,
-                    changedBy: auth()->user()->user_id,
-                    actionType: 'update'
-                );
-
-                // Tắt auto-logging để tránh tạo log trùng
-                $degree->disableLogging();
-            }
-            // Nếu không có nội dung tùy chỉnh, để trait tự động log với description mặc định
+            // Tắt auto-logging để tránh tạo log trùng
+            $degree->disableLogging();
 
             // Update the actual field value in degrees table
             // Check if the field exists in the fillable array to prevent mass assignment issues
@@ -504,10 +497,8 @@ class DiplomaManagementController extends Controller
                 ]);
             }
 
-            if ($hasCustomContent) {
-                // Bật lại logging
-                $degree->enableLogging();
-            }
+            // Bật lại logging
+            $degree->enableLogging();
 
             return redirect()->route('student.show', ['student' => $degree->student_id])
                 ->with('success', 'Đã điều chỉnh thông tin văn bằng thành công!');
@@ -564,9 +555,9 @@ class DiplomaManagementController extends Controller
 
             // Get old and new diploma blanks
             $oldBlank = $degree->diplomaBlank;
-            
+
             \Log::info('Looking for blank', ['blank_id' => $validated['new_diploma_blank_id']]);
-            
+
             $newBlank = DiplomaBlank::findOrFail($validated['new_diploma_blank_id']);
 
             \Log::info('Found new blank', [
@@ -587,7 +578,7 @@ class DiplomaManagementController extends Controller
             // Create reissue record
             $validated['degree_id'] = $degree->degree_id;
             $validated['old_diploma_blank_id'] = $oldBlank?->diploma_blank_id;
-            
+
             // Handle old blank status based on radio button value
             $oldBlankStatus = $request->input('old_blank_status', 'not_recalled');
             $validated['is_recalled'] = ($oldBlankStatus === 'recalled');
@@ -667,7 +658,7 @@ class DiplomaManagementController extends Controller
     {
         try {
             $typeId = $request->input('type_id');
-            
+
             if (!$typeId) {
                 return response()->json([
                     'success' => false,

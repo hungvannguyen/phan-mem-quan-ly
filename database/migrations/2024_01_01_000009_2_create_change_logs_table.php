@@ -11,8 +11,6 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Drop bảng degree_adjustments cũ nếu tồn tại (trước khi tạo view)
-        Schema::dropIfExists('degree_adjustments');
 
         // Tạo bảng change_logs mới
         Schema::create('change_logs', function (Blueprint $table) {
@@ -57,6 +55,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        Schema::table('change_logs', function (Blueprint $table) {
+            $table->dropForeign(['changed_by']);
+        });
+        
         Schema::dropIfExists('change_logs');
     }
 };

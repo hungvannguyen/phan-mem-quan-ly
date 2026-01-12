@@ -27,8 +27,8 @@ class AdvancedPoliticalTheoryInfoExport
 
         // Query students with certificate degrees (Cao cấp lý luận chính trị)
         $query = Student::with([
-                'major', 
-                'degrees.major', 
+                'major',
+                'degrees.major',
                 'degrees.diplomaBlank.type',
                 'degrees.changeLogs',
                 'degrees.reissues.newDiplomaBlank'
@@ -163,7 +163,7 @@ class AdvancedPoliticalTheoryInfoExport
 
             // Get latest change log for this degree (from eager loaded collection)
             $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
-            
+
             // Get latest reissue for this degree (from eager loaded collection)
             $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
 
@@ -184,14 +184,14 @@ class AdvancedPoliticalTheoryInfoExport
             $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng
-            
-            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu
-            if ($latestChangeLog) {
-                $sheet->setCellValue('Q' . $currentRow, $latestChangeLog->changes ?? ''); // Nội dung điều chỉnh
-                $sheet->setCellValue('R' . $currentRow, $latestChangeLog->adjustment_decision ?? ''); // QĐ điều chỉnh thông tin
-                $sheet->setCellValue('S' . $currentRow, $latestChangeLog->created_at ? $latestChangeLog->created_at->format('d/m/Y') : ''); // Ngày QĐ
+
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu và có changed_field
+            if ($latestChangeLog && $latestChangeLog->changed_field) {
+                $sheet->setCellValue('Q' . $currentRow, $latestChangeLog->change_description ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('R' . $currentRow, $latestChangeLog->decision_number ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('S' . $currentRow, $latestChangeLog->decision_date ? $latestChangeLog->decision_date->format('d/m/Y') : ''); // Ngày QĐ
             }
-            
+
             // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
             if ($latestReissue) {
                 $sheet->setCellValue('T' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
@@ -227,7 +227,7 @@ class AdvancedPoliticalTheoryInfoExport
             'N' => 13,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'O' => 13,  // Ngày cấp
             'P' => 13,  // Tình trạng
-            'Q' => 20,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'Q' => 30,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
             'R' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
             'S' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
             'T' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)

@@ -25,16 +25,6 @@ class MasterInfoExport
         // Increase execution time for large exports
         set_time_limit(300); // 5 minutes
 
-        // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT02] Thong tin cap bang thac si.xlsx');
-
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
-        }
-
-        $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
-
         // Query students with master degrees
         $query = Student::with([
                 'major',
@@ -96,29 +86,33 @@ class MasterInfoExport
         // Execute query
         $students = $query->get();
 
-        \Log::info('MasterInfoExport: Query returned ' . $students->count() . ' students with master degrees');
-
-        // Check if there's any data to export
-        if ($students->count() === 0) {
-            \Log::warning('MasterInfoExport: No data found - throwing exception');
-            throw new \Exception('Không có dữ liệu bằng thạc sĩ để xuất');
-        }
-
         // Filter out students without master degrees
         $students = $students->filter(function ($student) {
             $masterDegree = $student->degrees->where('degree_type', 'master')->first();
             return $masterDegree && $masterDegree->registration_number !== null;
         });
 
-        \Log::info('MasterInfoExport: Found ' . $students->count() . ' students with master degrees');
+        \Log::info('MasterInfoExport: Query returned ' . $students->count() . ' students with master degrees');
+
+        // Check if there's any data to export BEFORE loading template
+        if ($students->count() === 0) {
+            \Log::warning('MasterInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu bằng thạc sĩ để xuất');
+        }
+
+        // Step 1: Load file mẫu (only after confirming there's data)
+        $templatePath = resource_path('templates/[Mau TT02] Thong tin cap bang thac si.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
-
-        if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu sinh viên thạc sĩ để xuất');
-        }
 
         // Step 3: Insert rows và copy style (tối ưu tốc độ)
         // Disable automatic calculation for better performance
@@ -149,6 +143,12 @@ class MasterInfoExport
                 $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
             }
 
+            // Get latest change log for this degree (from eager loaded collection)
+            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+
+            // Get latest reissue for this degree (from eager loaded collection)
+            $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
+
             // Ghi data vào các cột A-S theo mapping
             $sheet->setCellValue('A' . $currentRow, $stt); // STT
             $sheet->setCellValue('B' . $currentRow, $student->full_name ?? ''); // Họ và tên
@@ -158,8 +158,8 @@ class MasterInfoExport
             $sheet->setCellValue('F' . $currentRow, $student->nation ?? ''); // Dân tộc
             $sheet->setCellValue('G' . $currentRow, $student->nationality ?? ''); // Quốc tịch
             $sheet->setCellValue('H' . $currentRow, $degree->major->major_name ?? $student->major->major_name ?? ''); // Ngành đào tạo
-            $sheet->setCellValue('I' . $currentRow, ''); // Số quyết định đánh giá luận văn (trống)
-            $sheet->setCellValue('J' . $currentRow, ''); // Ngày Tháng quyết định (trống)
+            $sheet->setCellValue('I' . $currentRow, $degree->council_decision_number ?? ''); // Số quyết định đánh giá luận văn
+            $sheet->setCellValue('J' . $currentRow, $degree->council_decision_date ? $degree->council_decision_date->format('d/m/Y') : ''); // Ngày Tháng quyết định
             $sheet->setCellValue('K' . $currentRow, $degree->defense_date ? $degree->defense_date->format('d/m/Y') : ''); // Ngày bảo vệ
             $sheet->setCellValue('L' . $currentRow, $degree->registration_number ?? ''); // Số hiệu văn bằng
             $sheet->setCellValue('M' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
@@ -169,6 +169,22 @@ class MasterInfoExport
             $sheet->setCellValue('Q' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng (quyết định)
             $sheet->setCellValue('R' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('S' . $currentRow, 'Đã cấp'); // Tình trạng
+
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu và có changed_field
+            if ($latestChangeLog && $latestChangeLog->changed_field) {
+                $sheet->setCellValue('T' . $currentRow, $latestChangeLog->change_description ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('U' . $currentRow, $latestChangeLog->decision_number ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('V' . $currentRow, $latestChangeLog->decision_date ? $latestChangeLog->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+            }
+
+            // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
+            if ($latestReissue) {
+                $sheet->setCellValue('W' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
+                $sheet->setCellValue('X' . $currentRow, $latestReissue->edit_content ?? ''); // Nội dung chỉnh sửa
+                $sheet->setCellValue('Y' . $currentRow, $latestReissue->recall_decision ?? ''); // QĐ thu hồi, hủy bỏ và cấp lại
+                $sheet->setCellValue('Z' . $currentRow, $latestReissue->decision_date ? $latestReissue->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+                $sheet->setCellValue('AA' . $currentRow, $latestReissue->notes ?? ''); // Ghi chú
+            }
 
             $stt++;
             $currentRow++;
@@ -188,17 +204,25 @@ class MasterInfoExport
             'F' => 13,  // Dân tộc
             'G' => 13,  // Quốc tịch
             'H' => 40,  // Ngành đào tạo
-            'I' => 18,  // Số QĐ đánh giá luận văn
-            'J' => 13,  // Ngày QĐ
+            'I' => 18,  // Số QĐ (QĐ thành lập hội đồng đánh giá luận văn)
+            'J' => 13,  // Ngày QĐ (QĐ thành lập hội đồng đánh giá luận văn)
             'K' => 13,  // Ngày bảo vệ
             'L' => 18,  // Số hiệu văn bằng
             'M' => 13,  // Số vào sổ
             'N' => 9,   // Khoá
             'O' => 20,  // Hình thức
-            'P' => 18,  // Số quyết định
-            'Q' => 13,  // Ngày tháng
+            'P' => 18,  // Số quyết định (QĐ công nhận tốt nghiệp)
+            'Q' => 13,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'R' => 13,  // Ngày cấp
             'S' => 13,  // Tình trạng
+            'T' => 30,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'U' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'V' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
+            'W' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
+            'X' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'Y' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'Z' => 13,  // Ngày QĐ (Cấp lại văn bằng)
+            'AA' => 30,  // Ghi chú
         ];
 
         foreach ($columnWidths as $col => $width) {

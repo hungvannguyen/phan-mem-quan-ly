@@ -1634,23 +1634,24 @@
                 </div>
 
                 <div class="field-group">
-                    <label for="adjustment_content" class="field-label">Nội dung điều chỉnh</label>
-                    <textarea name="adjustment_content" id="adjustment_content" rows="4" class="field-input"
-                        placeholder="Nhập nội dung điều chỉnh chi tiết (tùy chọn)..."></textarea>
-                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết nội dung điều chỉnh. Nếu để trống, hệ thống sẽ tự
-                        động tạo mô tả.</p>
+                    <label for="adjustment_content" class="field-label">Nội dung điều chỉnh <span
+                            class="text-red-500">*</span></label>
+                    <textarea name="adjustment_content" id="adjustment_content" rows="4" class="field-input" required
+                        placeholder="Nhập nội dung điều chỉnh chi tiết..."></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Mô tả chi tiết nội dung điều chỉnh (bắt buộc).</p>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="field-group">
-                        <label for="adjustment_decision_number" class="field-label">Số quyết định điều chỉnh</label>
+                        <label for="adjustment_decision_number" class="field-label">Số quyết định điều chỉnh <span
+                                class="text-red-500">*</span></label>
                         <input type="text" name="decision_number" id="adjustment_decision_number" class="field-input"
-                            placeholder="Nhập số QĐ">
+                            required placeholder="Nhập số QĐ">
                     </div>
 
                     <div class="field-group">
                         <x-vietnamese-date-input id="adjustment_decision_date" name="decision_date"
-                            label="Ngày quyết định" :required="false" value="" inputClass="field-input" />
+                            label="Ngày quyết định" :required="true" value="" inputClass="field-input" />
                     </div>
                 </div>
 
@@ -2025,41 +2026,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                            <i class="fas fa-tag mr-1"></i>
-                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                        </p>
-                                                                    ` : ''}
+                                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                <i class="fas fa-tag mr-1"></i>
+                                                                                ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                            </p>
+                                                                        ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                        <p class="mb-2 text-sm">
-                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                        </p>
-                                                                    ` : ''}
+                                                                            <p class="mb-2 text-sm">
+                                                                                <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                            </p>
+                                                                        ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                    <span class="flex items-center">
-                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                    </span>
-                                                                ` : ''}
+                                                                        <span class="flex items-center">
+                                                                            <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                            <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                        </span>
+                                                                    ` : ''}
                                             ${adj.decision_date ? `
-                                                                    <span class="flex items-center">
-                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                    </span>
-                                                                ` : ''}
+                                                                        <span class="flex items-center">
+                                                                            <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                            <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                        </span>
+                                                                    ` : ''}
                                             ${adj.changed_by ? `
-                                                                    <span class="flex items-center">
-                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                        ${adj.changed_by.full_name || 'N/A'}
-                                                                    </span>
-                                                                ` : ''}
+                                                                        <span class="flex items-center">
+                                                                            <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                            ${adj.changed_by.full_name || 'N/A'}
+                                                                        </span>
+                                                                    ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}

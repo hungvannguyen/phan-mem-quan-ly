@@ -39,33 +39,38 @@ class DevelopmentSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::transaction(function () {
-            // 1. Roles and Permissions
-            $this->seedRolesAndPermissions();
+        // Disable model event logging during seeding to avoid creating incomplete ChangeLogs
+        Student::withoutEvents(function () {
+            Degree::withoutEvents(function () {
+                DB::transaction(function () {
+                    // 1. Roles and Permissions
+                    $this->seedRolesAndPermissions();
 
-            // 2. Users
-            $this->seedUsers();
+                    // 2. Users
+                    $this->seedUsers();
 
-            // 3. Majors
-            $this->seedMajors();
+                    // 3. Majors
+                    $this->seedMajors();
 
-            // 4. Diploma Blank Types
-            $this->seedDiplomaBlankTypes();
+                    // 4. Diploma Blank Types
+                    $this->seedDiplomaBlankTypes();
 
-            // 5. Diploma Blank Imports (MUST come before blanks)
-            $this->seedDiplomaBlankImports();
+                    // 5. Diploma Blank Imports (MUST come before blanks)
+                    $this->seedDiplomaBlankImports();
 
-            // 6. Students
-            $this->seedStudents();
+                    // 6. Students
+                    $this->seedStudents();
 
-            // 7. Degrees (using blanks from imports)
-            $this->seedDegrees();
+                    // 7. Degrees (using blanks from imports)
+                    $this->seedDegrees();
 
-            // 8. System Settings
-            $this->seedSystemSettings();
+                    // 8. System Settings
+                    $this->seedSystemSettings();
 
-            // 9. Damage Reasons
-            $this->seedDamageReasons();
+                    // 9. Damage Reasons
+                    $this->seedDamageReasons();
+                });
+            });
         });
 
         // 10. Create degree adjustments - Outside transaction
@@ -341,6 +346,9 @@ class DevelopmentSeeder extends Seeder
 
                 if (isset($config['has_defense']) && $config['has_defense']) {
                     $degreeData['defense_date'] = $grantingDate->copy()->subMonths(rand(1, 6));
+                    // Add council decision data for master and doctorate degrees
+                    $degreeData['council_decision_number'] = 'QĐ-HĐ-' . $config['prefix'] . '-' . now()->year . '-' . str_pad($index + 1, 4, '0', STR_PAD_LEFT);
+                    $degreeData['council_decision_date'] = $degreeData['defense_date']->copy()->subMonths(rand(1, 3));
                 }
 
                 $degree = Degree::factory()

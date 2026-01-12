@@ -72,7 +72,7 @@ class DegreeReissueSeeder extends Seeder
 
                     // Tạo số quyết định
                     $decisionPrefix = collect($decisionPrefixes)->random();
-                    $decisionNumber = $decisionPrefix . '-' . $decisionDate->format('Y') . '-' 
+                    $decisionNumber = $decisionPrefix . '-' . $decisionDate->format('Y') . '-'
                         . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
 
                     // Lý do cấp lại
@@ -82,7 +82,7 @@ class DegreeReissueSeeder extends Seeder
                     $statusRandom = rand(1, 100);
                     $isRecalled = false;
                     $isDestroyed = false;
-                    
+
                     if ($statusRandom <= 40) {
                         // 40% đã thu hồi
                         $isRecalled = true;
@@ -131,12 +131,14 @@ class DegreeReissueSeeder extends Seeder
 
                     // Cập nhật degree's diploma_blank_id
                     $currentBlankId = $newBlank->diploma_blank_id;
-                    
+
                     $totalReissues++;
                 }
 
-                // Cập nhật diploma_blank_id cuối cùng cho degree
+                // Cập nhật diploma_blank_id cuối cùng cho degree (disable auto-logging)
+                $degree->disableLogging();
                 $degree->update(['diploma_blank_id' => $currentBlankId]);
+                $degree->enableLogging();
             }
 
             $this->command->info('✓ Đã tạo ' . $totalReissues . ' lịch sử cấp lại văn bằng mẫu');

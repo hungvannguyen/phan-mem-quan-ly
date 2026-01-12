@@ -25,16 +25,6 @@ class IntermediatePoliticalTheoryInfoExport
         // Increase execution time for large exports
         set_time_limit(300); // 5 minutes
 
-        // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT05] Thong tin cap bang trung cap LLCT.xlsx');
-
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
-        }
-
-        $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
-
         // Query students with certificate degrees (Trung cấp lý luận chính trị)
         $query = Student::with([
                 'major',
@@ -47,7 +37,7 @@ class IntermediatePoliticalTheoryInfoExport
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
                     ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Trung cấp lý luận chính trị%');
+                        $typeQuery->where('type_name', 'LIKE', '%TC lý luận chính trị%');
                     });
             });
 
@@ -58,7 +48,7 @@ class IntermediatePoliticalTheoryInfoExport
                     ->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
                     ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Trung cấp lý luận chính trị%');
+                        $typeQuery->where('type_name', 'LIKE', '%TC lý luận chính trị%');
                     });
             });
         }
@@ -69,7 +59,7 @@ class IntermediatePoliticalTheoryInfoExport
                     ->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
                     ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Trung cấp lý luận chính trị%');
+                        $typeQuery->where('type_name', 'LIKE', '%TC lý luận chính trị%');
                     });
             });
         }
@@ -80,7 +70,7 @@ class IntermediatePoliticalTheoryInfoExport
                     ->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
                     ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Trung cấp lý luận chính trị%');
+                        $typeQuery->where('type_name', 'LIKE', '%TC lý luận chính trị%');
                     });
             });
         }
@@ -95,7 +85,7 @@ class IntermediatePoliticalTheoryInfoExport
                     ->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
                     ->whereHas('diplomaBlank.type', function ($typeQuery) {
-                        $typeQuery->where('type_name', 'LIKE', '%Trung cấp lý luận chính trị%');
+                        $typeQuery->where('type_name', 'LIKE', '%TC lý luận chính trị%');
                     });
             });
         }
@@ -115,7 +105,7 @@ class IntermediatePoliticalTheoryInfoExport
                     && $degree->registration_number !== null
                     && $degree->diplomaBlank
                     && $degree->diplomaBlank->type
-                    && stripos($degree->diplomaBlank->type->type_name, 'Trung cấp lý luận chính trị') !== false
+                    && stripos($degree->diplomaBlank->type->type_name, 'TC lý luận chính trị') !== false
                 ) {
                     return true;
                 }
@@ -125,11 +115,21 @@ class IntermediatePoliticalTheoryInfoExport
 
         \Log::info('IntermediatePoliticalTheoryInfoExport: Query returned ' . $students->count() . ' students with intermediate political theory certificates');
 
-        // Check if there's any data to export
+        // Check if there's any data to export BEFORE loading template
         if ($students->count() === 0) {
             \Log::warning('IntermediatePoliticalTheoryInfoExport: No data found - throwing exception');
             throw new \Exception('Không có dữ liệu chứng chỉ trung cấp lý luận chính trị để xuất');
         }
+
+        // Step 1: Load file mẫu (only after confirming there's data)
+        $templatePath = resource_path('templates/[Mau TT05] Thong tin cap bang trung cap LLCT.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
@@ -159,7 +159,7 @@ class IntermediatePoliticalTheoryInfoExport
                     $d->degree_type === 'certificate'
                     && $d->diplomaBlank
                     && $d->diplomaBlank->type
-                    && stripos($d->diplomaBlank->type->type_name, 'Trung cấp lý luận chính trị') !== false
+                    && stripos($d->diplomaBlank->type->type_name, 'TC lý luận chính trị') !== false
                 ) {
                     $degree = $d;
                     break;
@@ -174,6 +174,12 @@ class IntermediatePoliticalTheoryInfoExport
             if ($rowHeight) {
                 $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
             }
+
+            // Get latest change log for this degree (from eager loaded collection)
+            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+
+            // Get latest reissue for this degree (from eager loaded collection)
+            $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
 
             // Ghi data vào các cột A-Q theo mapping
             $sheet->setCellValue('A' . $currentRow, $stt); // TT (STT)
@@ -193,6 +199,22 @@ class IntermediatePoliticalTheoryInfoExport
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng công nhận tốt nghiệp
             $sheet->setCellValue('P' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('Q' . $currentRow, 'Đã cấp'); // Tình trạng
+
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu và có changed_field
+            if ($latestChangeLog && $latestChangeLog->changed_field) {
+                $sheet->setCellValue('R' . $currentRow, $latestChangeLog->change_description ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('S' . $currentRow, $latestChangeLog->decision_number ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('T' . $currentRow, $latestChangeLog->decision_date ? $latestChangeLog->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+            }
+
+            // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
+            if ($latestReissue) {
+                $sheet->setCellValue('U' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
+                $sheet->setCellValue('V' . $currentRow, $latestReissue->edit_content ?? ''); // Nội dung chỉnh sửa
+                $sheet->setCellValue('W' . $currentRow, $latestReissue->recall_decision ?? ''); // QĐ thu hồi, hủy bỏ và cấp lại
+                $sheet->setCellValue('X' . $currentRow, $latestReissue->decision_date ? $latestReissue->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+                $sheet->setCellValue('Y' . $currentRow, $latestReissue->notes ?? ''); // Ghi chú
+            }
 
             $stt++;
             $currentRow++;
@@ -221,6 +243,14 @@ class IntermediatePoliticalTheoryInfoExport
             'O' => 13,  // Ngày công nhận
             'P' => 13,  // Ngày cấp
             'Q' => 13,  // Tình trạng
+            'R' => 30,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'S' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'T' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
+            'U' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
+            'V' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'W' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'X' => 13,  // Ngày QĐ (Cấp lại văn bằng)
+            'Y' => 30,  // Ghi chú
         ];
 
         foreach ($columnWidths as $col => $width) {
