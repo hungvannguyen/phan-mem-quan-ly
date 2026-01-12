@@ -36,7 +36,13 @@ class DoctorateInfoExport
         $sheet = $spreadsheet->getActiveSheet();
 
         // Query students with doctorate degrees
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major',
+                'degrees.major',
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'doctor'); // Filter only doctorate degrees
@@ -89,6 +95,14 @@ class DoctorateInfoExport
 
         // Execute query
         $students = $query->get();
+
+        \Log::info('DoctorateInfoExport: Query returned ' . $students->count() . ' students with doctorate degrees');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('DoctorateInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu bằng tiến sĩ để xuất');
+        }
 
         // Filter out students without doctorate degrees
         $students = $students->filter(function ($student) {

@@ -36,7 +36,13 @@ class MasterInfoExport
         $sheet = $spreadsheet->getActiveSheet();
 
         // Query students with master degrees
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major',
+                'degrees.major',
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'master'); // Filter only master degrees
@@ -89,6 +95,14 @@ class MasterInfoExport
 
         // Execute query
         $students = $query->get();
+
+        \Log::info('MasterInfoExport: Query returned ' . $students->count() . ' students with master degrees');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('MasterInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu bằng thạc sĩ để xuất');
+        }
 
         // Filter out students without master degrees
         $students = $students->filter(function ($student) {

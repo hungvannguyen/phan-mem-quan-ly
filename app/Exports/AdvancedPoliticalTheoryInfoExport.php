@@ -25,18 +25,14 @@ class AdvancedPoliticalTheoryInfoExport
         // Increase execution time for large exports
         set_time_limit(300); // 5 minutes
 
-        // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT04] Thong tin cap bang cao cap LLCT.xlsx');
-
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
-        }
-
-        $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
-
         // Query students with certificate degrees (Cao cấp lý luận chính trị)
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major', 
+                'degrees.major', 
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
@@ -107,19 +103,27 @@ class AdvancedPoliticalTheoryInfoExport
             return $certificateDegree && $certificateDegree->registration_number !== null;
         });
 
-        \Log::info('AdvancedPoliticalTheoryInfoExport: Found ' . $students->count() . ' students with certificates');
+        \Log::info('AdvancedPoliticalTheoryInfoExport: Query returned ' . $students->count() . ' students with advanced political theory certificates');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('AdvancedPoliticalTheoryInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu chứng chỉ cao cấp lý luận chính trị để xuất');
+        }
+
+        // Step 1: Load file mẫu
+        $templatePath = resource_path('templates/[Mau TT04] Thong tin cap bang cao cap LLCT.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
-
-        if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu chứng chỉ cao cấp lý luận chính trị để xuất');
-        }
-
-        // Step 3: Insert rows và copy style (tối ưu tốc độ)
-        // Disable automatic calculation for better performance
-        $spreadsheet->getActiveSheet()->setSelectedCell('A1');
 
         // Insert rows at once (for students 2, 3, 4, ...)
         if ($totalStudents > 1) {
@@ -157,7 +161,13 @@ class AdvancedPoliticalTheoryInfoExport
                 $sheet->getRowDimension($currentRow)->setRowHeight($rowHeight);
             }
 
-            // Ghi data vào các cột A-P theo mapping
+            // Get latest change log for this degree (from eager loaded collection)
+            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+            
+            // Get latest reissue for this degree (from eager loaded collection)
+            $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();
+
+            // Ghi data vào các cột A-X theo mapping
             $sheet->setCellValue('A' . $currentRow, $stt); // STT
             $sheet->setCellValue('B' . $currentRow, $student->full_name ?? ''); // Họ và tên
             $sheet->setCellValue('C' . $currentRow, $student->date_of_birth ? $student->date_of_birth->format('d/m/Y') : ''); // Ngày sinh
@@ -167,13 +177,29 @@ class AdvancedPoliticalTheoryInfoExport
             $sheet->setCellValue('G' . $currentRow, $student->training_type ?? 'Chính quy'); // Loại hình đào tạo
             $sheet->setCellValue('H' . $currentRow, $student->course ?? ''); // Khóa
             $sheet->setCellValue('I' . $currentRow, $degree->ranking ?? ''); // Xếp loại tốt nghiệp
-            $sheet->setCellValue('J' . $currentRow, $degree->registration_number ?? ''); // Số hiệu văn bằng
+            $sheet->setCellValue('J' . $currentRow, $degree->diplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng (serial number)
             $sheet->setCellValue('K' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
             $sheet->setCellValue('L' . $currentRow, $student->academic_year ?? ''); // Khóa học
             $sheet->setCellValue('M' . $currentRow, $degree->decision_number ?? ''); // Số Quyết định
             $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng
+            
+            // Điều chỉnh thông tin (Change Logs) - chỉ ghi nếu có dữ liệu
+            if ($latestChangeLog) {
+                $sheet->setCellValue('Q' . $currentRow, $latestChangeLog->changes ?? ''); // Nội dung điều chỉnh
+                $sheet->setCellValue('R' . $currentRow, $latestChangeLog->adjustment_decision ?? ''); // QĐ điều chỉnh thông tin
+                $sheet->setCellValue('S' . $currentRow, $latestChangeLog->created_at ? $latestChangeLog->created_at->format('d/m/Y') : ''); // Ngày QĐ
+            }
+            
+            // Cấp lại văn bằng (Reissues) - chỉ ghi nếu có dữ liệu
+            if ($latestReissue) {
+                $sheet->setCellValue('T' . $currentRow, $latestReissue->newDiplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng mới
+                $sheet->setCellValue('U' . $currentRow, $latestReissue->edit_content ?? ''); // Nội dung chỉnh sửa
+                $sheet->setCellValue('V' . $currentRow, $latestReissue->recall_decision ?? ''); // QĐ thu hồi, hủy bỏ và cấp lại
+                $sheet->setCellValue('W' . $currentRow, $latestReissue->decision_date ? $latestReissue->decision_date->format('d/m/Y') : ''); // Ngày QĐ
+                $sheet->setCellValue('X' . $currentRow, $latestReissue->notes ?? ''); // Ghi chú
+            }
 
             $stt++;
             $currentRow++;
@@ -197,10 +223,18 @@ class AdvancedPoliticalTheoryInfoExport
             'J' => 18,  // Số hiệu văn bằng
             'K' => 13,  // Số vào sổ
             'L' => 13,  // Khóa học
-            'M' => 18,  // Số quyết định
-            'N' => 13,  // Ngày tháng
+            'M' => 18,  // Số quyết định (QĐ công nhận tốt nghiệp)
+            'N' => 13,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'O' => 13,  // Ngày cấp
             'P' => 13,  // Tình trạng
+            'Q' => 20,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
+            'R' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'S' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
+            'T' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
+            'U' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'V' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'W' => 13,  // Ngày QĐ (Cấp lại văn bằng)
+            'X' => 30,  // Ghi chú
         ];
 
         foreach ($columnWidths as $col => $width) {

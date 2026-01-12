@@ -36,7 +36,13 @@ class BachelorInfoExport
         $sheet = $spreadsheet->getActiveSheet();
 
         // Query students with bachelor degrees
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major',
+                'degrees.major',
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number');
             });
@@ -84,6 +90,14 @@ class BachelorInfoExport
 
         // Execute query
         $students = $query->get();
+
+        \Log::info('BachelorInfoExport: Query returned ' . $students->count() . ' students with bachelor degrees');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('BachelorInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu bằng cử nhân để xuất');
+        }
 
         // Filter out students without degrees
         $students = $students->filter(function ($student) {

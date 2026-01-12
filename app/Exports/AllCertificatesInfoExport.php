@@ -25,18 +25,14 @@ class AllCertificatesInfoExport
         // Increase execution time for large exports
         set_time_limit(300); // 5 minutes
 
-        // Step 1: Load file mẫu
-        $templatePath = resource_path('templates/[Mau TT06] Thong tin cap chung chi.xlsx');
-
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
-        }
-
-        $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
-
         // Query students with certificate degrees (all types)
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major',
+                'degrees.major',
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate');
@@ -99,15 +95,27 @@ class AllCertificatesInfoExport
             return false;
         });
 
-        \Log::info('AllCertificatesInfoExport: Found ' . $students->count() . ' students with certificates');
+        \Log::info('AllCertificatesInfoExport: Query returned ' . $students->count() . ' students with certificates');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('AllCertificatesInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu chứng chỉ để xuất');
+        }
+
+        // Step 1: Load file mẫu
+        $templatePath = resource_path('templates/[Mau TT06] Thong tin cap chung chi.xlsx');
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception('Template file not found: ' . $templatePath);
+        }
+
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
-
-        if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu chứng chỉ để xuất');
-        }
 
         // Step 3: Insert rows và copy style (tối ưu tốc độ)
         // Disable automatic calculation for better performance

@@ -814,7 +814,12 @@ class StatisticsController extends Controller
                 'filters' => $filters,
             ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Lỗi xuất file: ' . $e->getMessage());
+            // Always return JSON error response for export endpoints
+            // These are always called via JavaScript fetch
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], 422);
         }
     }
 }

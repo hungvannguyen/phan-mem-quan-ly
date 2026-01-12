@@ -36,7 +36,13 @@ class IntermediatePoliticalTheoryInfoExport
         $sheet = $spreadsheet->getActiveSheet();
 
         // Query students with certificate degrees (Trung cấp lý luận chính trị)
-        $query = Student::with(['major', 'degrees.major', 'degrees.diplomaBlank.type'])
+        $query = Student::with([
+                'major',
+                'degrees.major',
+                'degrees.diplomaBlank.type',
+                'degrees.changeLogs',
+                'degrees.reissues.newDiplomaBlank'
+            ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
@@ -117,15 +123,17 @@ class IntermediatePoliticalTheoryInfoExport
             return false;
         });
 
-        \Log::info('IntermediatePoliticalTheoryInfoExport: Found ' . $students->count() . ' students with certificates');
+        \Log::info('IntermediatePoliticalTheoryInfoExport: Query returned ' . $students->count() . ' students with intermediate political theory certificates');
+
+        // Check if there's any data to export
+        if ($students->count() === 0) {
+            \Log::warning('IntermediatePoliticalTheoryInfoExport: No data found - throwing exception');
+            throw new \Exception('Không có dữ liệu chứng chỉ trung cấp lý luận chính trị để xuất');
+        }
 
         // Step 2: Xác định dòng bắt đầu (hardcoded = 5)
         $startRow = 5;
         $totalStudents = $students->count();
-
-        if ($totalStudents === 0) {
-            throw new \Exception('Không có dữ liệu chứng chỉ trung cấp lý luận chính trị để xuất');
-        }
 
         // Step 3: Insert rows và copy style (tối ưu tốc độ)
         // Disable automatic calculation for better performance

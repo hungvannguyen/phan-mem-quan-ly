@@ -694,6 +694,12 @@ async function exportAdvancedPoliticalTheoryInfo() {
         });
 
         if (!response.ok) {
+            // Try to parse JSON error response
+            const contentType = response.headers.get('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Lỗi khi xuất file');
+            }
             throw new Error('Lỗi khi xuất file: ' + response.statusText);
         }
 
