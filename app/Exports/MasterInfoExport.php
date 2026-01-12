@@ -203,15 +203,15 @@ class MasterInfoExport
             'E' => 11,  // Giới tính
             'F' => 13,  // Dân tộc
             'G' => 13,  // Quốc tịch
-            'H' => 40,  // Ngành đào tạo
-            'I' => 18,  // Số QĐ (QĐ thành lập hội đồng đánh giá luận văn)
+            'H' => 28,  // Ngành đào tạo
+            'I' => 26,  // Số QĐ (QĐ thành lập hội đồng đánh giá luận văn)
             'J' => 13,  // Ngày QĐ (QĐ thành lập hội đồng đánh giá luận văn)
             'K' => 13,  // Ngày bảo vệ
             'L' => 18,  // Số hiệu văn bằng
             'M' => 13,  // Số vào sổ
             'N' => 9,   // Khoá
             'O' => 20,  // Hình thức
-            'P' => 18,  // Số quyết định (QĐ công nhận tốt nghiệp)
+            'P' => 26,  // Số quyết định (QĐ công nhận tốt nghiệp)
             'Q' => 13,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'R' => 13,  // Ngày cấp
             'S' => 13,  // Tình trạng
@@ -220,7 +220,7 @@ class MasterInfoExport
             'V' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
             'W' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
             'X' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
-            'Y' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'Y' => 26,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
             'Z' => 13,  // Ngày QĐ (Cấp lại văn bằng)
             'AA' => 30,  // Ghi chú
         ];

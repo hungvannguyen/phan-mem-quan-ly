@@ -207,16 +207,16 @@ class BachelorInfoExport
             'N' => 16,  // Lớp
             'O' => 13,  // Niên khoá
             'P' => 20,  // Hình thức
-            'Q' => 30,  // Số quyết định (QĐ công nhận tốt nghiệp)
+            'Q' => 26,  // Số quyết định (QĐ công nhận tốt nghiệp)
             'R' => 18,  // Ngày tháng (QĐ công nhận tốt nghiệp)
             'S' => 13,  // Ngày cấp
             'T' => 25,  // Tình trạng
             'U' => 18,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
-            'V' => 30,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'V' => 26,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
             'W' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
             'X' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
-            'Y' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
-            'Z' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'Y' => 26,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
+            'Z' => 26,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
             'AA' => 13,  // Ngày QĐ (Cấp lại văn bằng)
             'AB' => 30,  // Ghi chú
         ];

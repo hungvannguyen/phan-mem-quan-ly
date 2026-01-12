@@ -230,11 +230,11 @@ class AllCertificatesInfoExport
             'O' => 13,  // Ngày cấp
             'P' => 13,  // Tình trạng
             'Q' => 30,  // Nội dung điều chỉnh (Điều chỉnh thông tin)
-            'R' => 18,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
+            'R' => 26,  // QĐ điều chỉnh thông tin (Điều chỉnh thông tin)
             'S' => 13,  // Ngày QĐ (Điều chỉnh thông tin)
             'T' => 25,  // Số hiệu văn bằng (Cấp lại văn bằng)
             'U' => 30,  // Nội dung chỉnh sửa (Cấp lại văn bằng)
-            'V' => 18,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
+            'V' => 26,  // QĐ thu hồi, hủy bỏ và cấp lại (Cấp lại văn bằng)
             'W' => 13,  // Ngày QĐ (Cấp lại văn bằng)
             'X' => 30,  // Ghi chú
         ];
