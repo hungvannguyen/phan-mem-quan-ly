@@ -78,24 +78,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [StatisticsController::class, 'index'])->name('index');
         Route::get('/diplomas', [StatisticsController::class, 'getDiplomaStatistics'])->name('diplomas');
         Route::get('/certificates', [StatisticsController::class, 'getCertificateStatistics'])->name('certificates');
-        Route::get('/export-bachelor-info', [StatisticsController::class, 'exportBachelorInfo'])
+        // Generic export route with type parameter
+        Route::get('/export-{type}-info', [StatisticsController::class, 'exportInfo'])
             ->middleware('permission:diplomas.export')
-            ->name('export-bachelor-info');
-        Route::get('/export-master-info', [StatisticsController::class, 'exportMasterInfo'])
-            ->middleware('permission:diplomas.export')
-            ->name('export-master-info');
-        Route::get('/export-doctorate-info', [StatisticsController::class, 'exportDoctorateInfo'])
-            ->middleware('permission:diplomas.export')
-            ->name('export-doctorate-info');
-        Route::get('/export-advanced-political-theory-info', [StatisticsController::class, 'exportAdvancedPoliticalTheoryInfo'])
-            ->middleware('permission:diplomas.export')
-            ->name('export-advanced-political-theory-info');
-        Route::get('/export-intermediate-political-theory-info', [StatisticsController::class, 'exportIntermediatePoliticalTheoryInfo'])
-            ->middleware('permission:diplomas.export')
-            ->name('export-intermediate-political-theory-info');
-        Route::get('/export-all-certificates-info', [StatisticsController::class, 'exportAllCertificatesInfo'])
-            ->middleware('permission:diplomas.export')
-            ->name('export-all-certificates-info');
+            ->where('type', 'bachelor|master|doctorate|advanced-political-theory|intermediate-political-theory|all-certificates')
+            ->name('export-info');
     });
 
     /*
