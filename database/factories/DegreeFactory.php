@@ -58,7 +58,6 @@ class DegreeFactory extends Factory
             'training_start_date' => $trainingStartDate->format('Y-m-d'),
             'training_end_date' => $trainingEndDate->format('Y-m-d'),
             'ranking' => $this->faker->randomElement(['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình']),
-            'decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-[A-Z]{2}'),
             'council_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-HĐ-[0-9]{4}'),
             'council_decision_date' => $councilDecisionDate->format('Y-m-d'),
             'graduation_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-TN-[0-9]{4}'),

@@ -21,7 +21,6 @@ return new class extends Migration {
             $table->date('granting_date');
             $table->integer('graduation_year');
             $table->string('ranking', 50)->nullable();
-            $table->string('decision_number', 50)->nullable();
             $table->string('council_decision_number', 50)->nullable()->comment('Số QĐ thành lập hội đồng đánh giá luận án');
             $table->date('council_decision_date')->nullable()->comment('Ngày QĐ thành lập hội đồng đánh giá luận án');
             $table->string('graduation_decision_number', 50)->nullable()->comment('Số QĐ công nhận tốt nghiệp');

@@ -188,7 +188,12 @@
             <!-- Action Buttons -->
             <div class="page-actions">
                 <a href="{{ route('student.create') }}" class="action-btn action-btn-primary">
+                    <i class="fas fa-user-plus"></i>
                     Thêm sinh viên mới
+                </a>
+                <a href="{{ route('import.index') }}" class="action-btn action-btn-success">
+                    <i class="fas fa-file-import"></i>
+                    Import dữ liệu
                 </a>
                 {{-- <button type="button" class="action-btn action-btn-info">
                     In danh sách

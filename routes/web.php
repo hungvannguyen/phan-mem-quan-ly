@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DataImportController;
 use App\Http\Controllers\DiplomaBlankController;
 use App\Http\Controllers\DiplomaBlankExportController;
 use App\Http\Controllers\DiplomaBlankImportController;
@@ -328,6 +329,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/{permission:permission_id}/edit', [PermissionController::class, 'edit'])->name('edit');
         Route::put('/{permission:permission_id}', [PermissionController::class, 'update'])->name('update');
         Route::delete('/{permission:permission_id}', [PermissionController::class, 'destroy'])->name('destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Data Import Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('data-import')->name('import.')->middleware('permission:diplomas.create')->group(function () {
+        Route::get('/', [DataImportController::class, 'index'])->name('index');
+        Route::post('/handle', [DataImportController::class, 'handleImport'])->name('handle');
+        Route::get('/logs', [DataImportController::class, 'logs'])->name('logs');
+        Route::get('/logs/{id}', [DataImportController::class, 'showLog'])->name('logs.show');
+        Route::get('/download-template/{type}', [DataImportController::class, 'downloadTemplate'])
+            ->where('type', 'degree|political_theory|certificate')
+            ->name('download-template');
     });
 
     /*

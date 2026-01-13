@@ -31,7 +31,6 @@ class Degree extends Model
         'granting_date',
         'graduation_year',
         'ranking',
-        'decision_number',
         'council_decision_number',
         'council_decision_date',
         'graduation_decision_number',

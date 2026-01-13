@@ -778,7 +778,7 @@
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Số quyết định:</span>
-                                        <span class="value">{{ $degree->decision_number ?? 'N/A' }}</span>
+                                        <span class="value">{{ $degree->graduation_decision_number ?? 'N/A' }}</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Chuyên ngành:</span>
@@ -1294,12 +1294,6 @@
                     </div>
 
                     <div class="field-group">
-                        <label for="decision_number" class="field-label">Số quyết định</label>
-                        <input type="text" name="decision_number" id="decision_number" class="field-input"
-                            placeholder="Nhập số quyết định" value="{{ old('decision_number') }}">
-                    </div>
-
-                    <div class="field-group">
                         <label for="council_decision_number" class="field-label">Số QĐ thành lập hội đồng</label>
                         <input type="text" name="council_decision_number" id="council_decision_number"
                             class="field-input" placeholder="Nhập số QĐ thành lập hội đồng"
@@ -1430,12 +1424,6 @@
                             <option value="Khá">Khá</option>
                             <option value="Trung bình">Trung bình</option>
                         </select>
-                    </div>
-
-                    <div class="field-group">
-                        <label for="edit_decision_number" class="field-label">Số quyết định</label>
-                        <input type="text" name="decision_number" id="edit_decision_number" class="field-input"
-                            placeholder="Nhập số quyết định">
                     </div>
 
                     <div class="field-group">
@@ -1763,8 +1751,7 @@
 
                 <div class="field-group">
                     <label for="reissue_decision_date" class="field-label required">Ngày quyết định</label>
-                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input"
-                        required>
+                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input" required>
                     <p class="mt-1 text-xs text-gray-500">Ngày ban hành quyết định cấp lại</p>
                 </div>
 
@@ -2026,41 +2013,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                <i class="fas fa-tag mr-1"></i>
-                                                                                ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                            </p>
-                                                                        ` : ''}
+                                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                    <i class="fas fa-tag mr-1"></i>
+                                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                </p>
+                                                                            ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                            <p class="mb-2 text-sm">
-                                                                                <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                            </p>
-                                                                        ` : ''}
+                                                                                <p class="mb-2 text-sm">
+                                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                </p>
+                                                                            ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                        <span class="flex items-center">
-                                                                            <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                            <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                        </span>
-                                                                    ` : ''}
+                                                                            <span class="flex items-center">
+                                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                            </span>
+                                                                        ` : ''}
                                             ${adj.decision_date ? `
-                                                                        <span class="flex items-center">
-                                                                            <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                            <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                        </span>
-                                                                    ` : ''}
+                                                                            <span class="flex items-center">
+                                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                            </span>
+                                                                        ` : ''}
                                             ${adj.changed_by ? `
-                                                                        <span class="flex items-center">
-                                                                            <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                            ${adj.changed_by.full_name || 'N/A'}
-                                                                        </span>
-                                                                    ` : ''}
+                                                                            <span class="flex items-center">
+                                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                ${adj.changed_by.full_name || 'N/A'}
+                                                                            </span>
+                                                                        ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2374,7 +2361,6 @@
             }
 
             document.getElementById('edit_ranking').value = degree.ranking || '';
-            document.getElementById('edit_decision_number').value = degree.decision_number || '';
             document.getElementById('edit_council_decision_number').value = degree.council_decision_number || '';
             document.getElementById('edit_graduation_decision_number').value = degree.graduation_decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';
