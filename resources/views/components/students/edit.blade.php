@@ -57,6 +57,27 @@
             color: #475569;
         }
 
+        /* Degree Status Badges */
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-processing {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
         .alert-warning,
         .alert-info {
             display: flex;
@@ -126,25 +147,29 @@
         /* Modal Styles */
         #addDegreeModal,
         #editDegreeModal,
-        #addReissueModal {
+        #addReissueModal,
+        #deleteDegreeModal {
             z-index: 9999;
         }
 
         #addDegreeModal.hidden,
         #editDegreeModal.hidden,
-        #addReissueModal.hidden {
+        #addReissueModal.hidden,
+        #deleteDegreeModal.hidden {
             display: none !important;
         }
 
         #addDegreeModal:not(.hidden),
         #editDegreeModal:not(.hidden),
-        #addReissueModal:not(.hidden) {
+        #addReissueModal:not(.hidden),
+        #deleteDegreeModal:not(.hidden) {
             display: flex !important;
         }
 
         #addDegreeModal .bg-white,
         #editDegreeModal .bg-white,
-        #addReissueModal .bg-white {
+        #addReissueModal .bg-white,
+        #deleteDegreeModal .bg-white {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
@@ -777,6 +802,19 @@
                                         <span class="value">{{ $degree->ranking ?? 'Chưa xếp loại' }}</span>
                                     </div>
                                     <div class="detail-item">
+                                        <span class="label">Trạng thái:</span>
+                                        <span class="value">
+                                            @if ($degree->status)
+                                                <span class="status-badge {{ $degree->status->getBadgeClass() }}">
+                                                    <i class="fas fa-{{ $degree->status->getIcon() }} mr-1"></i>
+                                                    {{ $degree->status->getLabel() }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-500">N/A</span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="detail-item">
                                         <span class="label">Số quyết định:</span>
                                         <span class="value">{{ $degree->graduation_decision_number ?? 'N/A' }}</span>
                                     </div>
@@ -1322,6 +1360,22 @@
                     </div>
 
                     <div class="field-group">
+                        <label for="status" class="field-label">Trạng thái <span class="text-red-500">*</span></label>
+                        <select name="status" id="status" class="field-input" required>
+                            <option value="">Chọn trạng thái</option>
+                            <option value="NotIssued" {{ old('status') == 'NotIssued' ? 'selected' : '' }}>Chưa cấp
+                            </option>
+                            <option value="Issued" {{ old('status', 'Issued') == 'Issued' ? 'selected' : '' }}>Đã cấp
+                            </option>
+                            <option value="Recalled" {{ old('status') == 'Recalled' ? 'selected' : '' }}>Thu hồi</option>
+                        </select>
+                        <p class="field-description text-sm text-gray-600 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Mặc định là "Đã cấp" khi tạo mới văn bằng
+                        </p>
+                    </div>
+
+                    <div class="field-group">
                         <label for="council_decision_number" class="field-label">Số QĐ thành lập hội đồng</label>
                         <input type="text" name="council_decision_number" id="council_decision_number"
                             class="field-input" placeholder="Nhập số QĐ thành lập hội đồng"
@@ -1451,6 +1505,17 @@
                             <option value="Giỏi">Giỏi</option>
                             <option value="Khá">Khá</option>
                             <option value="Trung bình">Trung bình</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="edit_status" class="field-label">Trạng thái <span
+                                class="text-red-500">*</span></label>
+                        <select name="status" id="edit_status" class="field-input" required>
+                            <option value="">Chọn trạng thái</option>
+                            <option value="NotIssued">Chưa cấp</option>
+                            <option value="Issued">Đã cấp</option>
+                            <option value="Recalled">Thu hồi</option>
                         </select>
                     </div>
 
@@ -1779,7 +1844,8 @@
 
                 <div class="field-group">
                     <label for="reissue_decision_date" class="field-label required">Ngày quyết định</label>
-                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input" required>
+                    <input type="date" name="decision_date" id="reissue_decision_date" class="field-input"
+                        required>
                     <p class="mt-1 text-xs text-gray-500">Ngày ban hành quyết định cấp lại</p>
                 </div>
 
@@ -1835,6 +1901,71 @@
                     </button>
                     <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
                         <i class="fas fa-save mr-2"></i>Lưu lịch sử cấp lại
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Degree Confirmation Modal -->
+    <div id="deleteDegreeModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+        <div class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div class="mb-4 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">
+                    <i class="fas fa-exclamation-triangle mr-2 text-red-600"></i>
+                    Xác nhận xóa văn bằng
+                </h3>
+                <button type="button" onclick="closeDeleteDegreeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <p class="text-gray-700">Bạn có chắc muốn xóa văn bằng <strong id="deleteDegreeNumber"
+                        class="text-red-600"></strong>?</p>
+                <p class="mt-2 text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Văn bằng sẽ được xóa mềm và có thể khôi phục sau này.
+                </p>
+            </div>
+
+            <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h4 class="mb-3 text-sm font-semibold text-gray-700">
+                    <i class="fas fa-file-invoice mr-1"></i>
+                    Tình trạng phôi văn bằng
+                </h4>
+                <div class="space-y-2">
+                    <div class="flex items-start">
+                        <input type="radio" id="recalled_yes" name="recalled_blank" value="1" checked
+                            class="mt-1 h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="recalled_yes" class="ml-2 text-sm">
+                            <span class="font-medium text-gray-700">Đã thu hồi phôi</span>
+                            <p class="text-xs text-gray-600">Phôi đã được thu hồi và sẽ được trả về kho (Trong kho)</p>
+                        </label>
+                    </div>
+                    <div class="flex items-start">
+                        <input type="radio" id="recalled_no" name="recalled_blank" value="0"
+                            class="mt-1 h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="recalled_no" class="ml-2 text-sm">
+                            <span class="font-medium text-gray-700">Chưa thu hồi phôi</span>
+                            <p class="text-xs text-gray-600">Phôi chưa được thu hồi (giữ nguyên trạng thái)</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <form id="deleteDegreeForm" method="POST" action="">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="recalled_blank" id="recalled_blank_input" value="1">
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeDeleteDegreeModal()"
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+                        <i class="fas fa-trash mr-2"></i>Xóa văn bằng
                     </button>
                 </div>
             </form>
@@ -2041,41 +2172,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                            <i class="fas fa-tag mr-1"></i>
-                                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                        </p>
-                                                                                    ` : ''}
+                                                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                                <i class="fas fa-tag mr-1"></i>
+                                                                                                ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                            </p>
+                                                                                        ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                        <p class="mb-2 text-sm">
-                                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                        </p>
-                                                                                    ` : ''}
+                                                                                            <p class="mb-2 text-sm">
+                                                                                                <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                                <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                            </p>
+                                                                                        ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                    <span class="flex items-center">
-                                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                    </span>
-                                                                                ` : ''}
+                                                                                        <span class="flex items-center">
+                                                                                            <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                            <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                        </span>
+                                                                                    ` : ''}
                                             ${adj.decision_date ? `
-                                                                                    <span class="flex items-center">
-                                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                    </span>
-                                                                                ` : ''}
+                                                                                        <span class="flex items-center">
+                                                                                            <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                            <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                        </span>
+                                                                                    ` : ''}
                                             ${adj.changed_by ? `
-                                                                                    <span class="flex items-center">
-                                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                        ${adj.changed_by.full_name || 'N/A'}
-                                                                                    </span>
-                                                                                ` : ''}
+                                                                                        <span class="flex items-center">
+                                                                                            <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                            ${adj.changed_by.full_name || 'N/A'}
+                                                                                        </span>
+                                                                                    ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2389,6 +2520,11 @@
             }
 
             document.getElementById('edit_ranking').value = degree.ranking || '';
+
+            // Set status - handle both enum object and string
+            const statusValue = degree.status?.value || degree.status || 'Issued';
+            document.getElementById('edit_status').value = statusValue;
+
             document.getElementById('edit_council_decision_number').value = degree.council_decision_number || '';
             document.getElementById('edit_graduation_decision_number').value = degree.graduation_decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';
@@ -2453,36 +2589,36 @@
 
         // Delete Degree Functions
         function confirmDeleteDegree(degreeId, registrationNumber) {
-            if (confirm(
-                    `⚠️ Bạn có chắc muốn xóa văn bằng "${registrationNumber}"?\n\nLưu ý: Văn bằng sẽ được xóa mềm và có thể khôi phục sau này.`
-                )) {
-                deleteDegree(degreeId);
-            }
+            // Get degree data to check status
+            const degrees = @json($degrees);
+            const degree = degrees.find(d => d.degree_id == degreeId);
+
+            // Set degree info in modal
+            document.getElementById('deleteDegreeNumber').textContent = registrationNumber;
+            document.getElementById('deleteDegreeForm').action = `/degrees/${degreeId}/delete`;
+
+            // Show modal
+            const modal = document.getElementById('deleteDegreeModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+
+            // Update hidden input when radio changes
+            const radioButtons = document.querySelectorAll('input[name="recalled_blank"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('recalled_blank_input').value = this.value;
+                });
+            });
         }
 
-        function deleteDegree(degreeId) {
-            // Create form for DELETE request
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/degrees/${degreeId}/delete`;
-
-            // Add CSRF token
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-            form.appendChild(csrfToken);
-
-            // Add method spoofing for DELETE
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'DELETE';
-            form.appendChild(methodInput);
-
-            // Submit form
-            document.body.appendChild(form);
-            form.submit();
+        function closeDeleteDegreeModal() {
+            const modal = document.getElementById('deleteDegreeModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            // Reset form
+            document.getElementById('deleteDegreeForm').reset();
+            document.getElementById('recalled_yes').checked = true;
+            document.getElementById('recalled_blank_input').value = '1';
         }
 
         // Export Verification Modal Functions
@@ -2580,6 +2716,7 @@
             const adjustmentModal = document.getElementById('addAdjustmentModal');
             const viewAdjustmentsModal = document.getElementById('viewAdjustmentsModal');
             const reissueModal = document.getElementById('addReissueModal');
+            const deleteModal = document.getElementById('deleteDegreeModal');
 
             if (event.target === addModal) {
                 closeAddDegreeModal();
@@ -2603,6 +2740,10 @@
 
             if (event.target === reissueModal) {
                 closeReissueModal();
+            }
+
+            if (event.target === deleteModal) {
+                closeDeleteDegreeModal();
             }
         });
 

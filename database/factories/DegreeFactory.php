@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\DegreeStatus;
 use App\Models\Degree;
 use App\Models\Student;
 use App\Models\DiplomaBlank;
@@ -62,6 +63,7 @@ class DegreeFactory extends Factory
             'council_decision_date' => $councilDecisionDate->format('Y-m-d'),
             'graduation_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-TN-[0-9]{4}'),
             'graduation_decision_date' => $graduationDecisionDate->format('Y-m-d'),
+            'status' => $this->faker->randomElement([DegreeStatus::NOT_ISSUED, DegreeStatus::ISSUED, DegreeStatus::RECALLED]),
         ];
     }
 

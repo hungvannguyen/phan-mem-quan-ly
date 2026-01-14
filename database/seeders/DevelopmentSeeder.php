@@ -14,6 +14,7 @@ use App\Models\Degree;
 use App\Models\ChangeLog;
 use App\Models\SystemSetting;
 use App\Models\DamageReason;
+use App\Enums\DegreeStatus;
 use App\Enums\StudentGender;
 use App\Enums\StudentStatus;
 use App\Enums\DiplomaBlankStatus;
@@ -354,7 +355,9 @@ class DevelopmentSeeder extends Seeder
                 $degree = Degree::factory()
                     ->forStudent($student)
                     ->withDiplomaBlank($blank)
-                    ->create($degreeData);
+                    ->create(array_merge($degreeData, [
+                        'status' => DegreeStatus::ISSUED, // Đã cấp vì đã có diploma blank
+                    ]));
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);
 
@@ -416,6 +419,7 @@ class DevelopmentSeeder extends Seeder
                         'major_id' => $student->major_id,
                         'major_name' => $student->major->major_name,
                         'notes' => $notes,
+                        'status' => DegreeStatus::ISSUED, // Đã cấp
                     ]);
 
                 $blank->update(['status' => DiplomaBlankStatus::ISSUED]);

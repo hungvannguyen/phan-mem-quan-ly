@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\Student;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Enums\DegreeStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -99,6 +100,7 @@ class TestSeeder extends Seeder
                     Degree::factory()->create([
                         'student_id' => $testGraduatedStudents[$index]->student_id,
                         'diploma_blank_id' => $blank->diploma_blank_id,
+                        'status' => DegreeStatus::ISSUED, // Đã cấp
                     ]);
 
                     // Update blank status to issued

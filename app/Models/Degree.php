@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DegreeStatus;
 use App\Models\Traits\LogsChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,7 @@ class Degree extends Model
         'defense_date',
         'training_start_date',
         'training_end_date',
+        'status',
         'notes',
     ];
 
@@ -65,6 +67,7 @@ class Degree extends Model
             'council_decision_number' => 'string',
             'graduation_decision_number' => 'string',
             'major_name' => 'string',
+            'status' => DegreeStatus::class,
             'notes' => 'string',
         ];
     }
@@ -91,6 +94,7 @@ class Degree extends Model
         'training_end_date' => 'ngày kết thúc đào tạo',
         'diploma_blank_id' => 'số hiệu văn bằng',
         'major_id' => 'mã ngành',
+        'status' => 'trạng thái',
         'notes' => 'ghi chú',
     ];
 

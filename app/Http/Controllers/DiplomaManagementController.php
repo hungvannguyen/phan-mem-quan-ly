@@ -12,6 +12,7 @@ use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\DiplomaBlank;
+use App\Enums\DegreeStatus;
 use App\Enums\DiplomaBlankStatus;
 use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -184,6 +185,7 @@ class DiplomaManagementController extends Controller
             'graduation_decision_number' => 'nullable|string|max:255',
             'graduation_decision_date' => 'nullable|date',
             'major_id' => 'nullable|exists:majors,major_id',
+            'status' => 'nullable|string|in:NotIssued,Issued,Recalled',
             'notes' => 'nullable|string',
         ]);
 
@@ -213,6 +215,11 @@ class DiplomaManagementController extends Controller
                     if ($major) {
                         $validated['major_name'] = $major->major_name;
                     }
+                }
+
+                // Set default status to ISSUED if not provided
+                if (!isset($validated['status'])) {
+                    $validated['status'] = DegreeStatus::ISSUED;
                 }
 
                 // Create the degree
@@ -289,6 +296,7 @@ class DiplomaManagementController extends Controller
             'graduation_decision_number' => 'nullable|string|max:255',
             'graduation_decision_date' => 'nullable|date',
             'major_id' => 'nullable|exists:majors,major_id',
+            'status' => 'nullable|string|in:NotIssued,Issued,Recalled',
             'notes' => 'nullable|string',
         ]);
 
@@ -359,16 +367,19 @@ class DiplomaManagementController extends Controller
         }
     }
 
-    public function deleteDegree(Degree $degree)
+    public function deleteDegree(Request $request, Degree $degree)
     {
         try {
             $student = Student::findOrFail($degree->student_id);
 
+            // Get recalled_blank parameter (1 = đã thu hồi, 0 = chưa thu hồi)
+            $recalledBlank = $request->input('recalled_blank', 1);
+
             // Soft delete the degree
             $degree->delete();
 
-            // If degree had a diploma blank, revert its status to IN_STOCK
-            if ($degree->diploma_blank_id) {
+            // Only revert diploma blank status if user confirmed they recalled it
+            if ($recalledBlank == 1 && $degree->diploma_blank_id) {
                 $diplomaBlank = DiplomaBlank::find($degree->diploma_blank_id);
                 if ($diplomaBlank) {
                     $diplomaBlank->update([
@@ -377,11 +388,14 @@ class DiplomaManagementController extends Controller
                         'issue_reason' => null
                     ]);
                 }
+                $message = 'Xóa văn bằng thành công! Phôi văn bằng đã được trả về kho.';
+            } else {
+                $message = 'Xóa văn bằng thành công! Phôi văn bằng chưa được thu hồi.';
             }
 
             // Redirect back to student page with success message
             return redirect()->route('student.show', ['student' => $degree->student_id])
-                ->with('success', 'Xóa văn bằng thành công! Phôi văn bằng đã được trả về kho.');
+                ->with('success', $message);
         } catch (\Exception $e) {
             // Redirect back to student page with error message
             return redirect()->route('student.show', ['student' => $degree->student_id])

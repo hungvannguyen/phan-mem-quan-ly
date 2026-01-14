@@ -10,6 +10,7 @@ use App\Models\DiplomaBlank;
 use App\Models\ChangeLog;
 use App\Models\DegreeReissue;
 use App\Models\DiplomaBlankType;
+use App\Enums\DegreeStatus;
 use App\Enums\ImportStatus;
 use App\Enums\DiplomaBlankStatus;
 use App\Traits\ImportHelper;
@@ -34,6 +35,42 @@ class DegreeImport implements ToCollection, WithStartRow
     protected $documentReference;
     protected $diplomaBlankImportId;
     protected static $diplomaBlankTypes = null;
+    protected static $majorsByName = [];
+    protected static $majorsByCode = [];
+
+    // Column mapping constants
+    private const COL_DEGREE_TYPE = 1;
+    private const COL_FULL_NAME = 2;
+    private const COL_DATE_OF_BIRTH = 3;
+    private const COL_PLACE_OF_BIRTH = 4;
+    private const COL_HOMETOWN = 5;
+    private const COL_PLACE_OF_ORIGIN = 6;
+    private const COL_GENDER = 7;
+    private const COL_NATION = 8;
+    private const COL_NATIONALITY = 9;
+    private const COL_COURSE = 10;
+    private const COL_CLASS_NAME = 11;
+    private const COL_ACADEMIC_YEAR = 12;
+    private const COL_MAJOR_NAME = 13;
+    private const COL_TRAINING_TYPE = 14;
+    private const COL_COUNCIL_DECISION_NUMBER = 15;
+    private const COL_COUNCIL_DECISION_DATE = 16;
+    private const COL_DEFENSE_DATE = 17;
+    private const COL_GRADUATION_DECISION_NUMBER = 18;
+    private const COL_GRADUATION_DECISION_DATE = 19;
+    private const COL_GRADUATION_YEAR = 20;
+    private const COL_RANKING = 21;
+    private const COL_DIPLOMA_NUMBER = 22;
+    private const COL_REGISTRATION_NUMBER = 23;
+    private const COL_GRANTING_DATE = 24;
+    private const COL_ADJUSTMENT_CONTENT = 25;
+    private const COL_ADJUSTMENT_DECISION = 26;
+    private const COL_ADJUSTMENT_DATE = 27;
+    private const COL_REISSUE_NUMBER = 28;
+    private const COL_REISSUE_CONTENT = 29;
+    private const COL_REISSUE_DECISION = 30;
+    private const COL_REISSUE_DATE = 31;
+    private const COL_NOTES = 32;
 
     public function __construct(string $documentReference = null)
     {
@@ -60,8 +97,8 @@ class DegreeImport implements ToCollection, WithStartRow
         DB::beginTransaction();
 
         try {
-            // Load diploma blank types vào cache
-            $this->loadDiplomaBlankTypes();
+            // Load caches
+            $this->loadCaches();
 
             // Tạo DiplomaBlankImport record cho lần import này
             // Sử dụng type_id mặc định là Bachelor (BCN) - sẽ được update sau nếu cần
@@ -119,286 +156,297 @@ class DegreeImport implements ToCollection, WithStartRow
      */
     protected function processRow(Collection $row, int $index)
     {
-        // Convert Collection to array for index access
         $row = $row->values()->all();
-
-        // Map columns theo cấu trúc file Excel
-        // A - STT (index 0)
-        // B - Loại văn bằng (index 1)
-        // C - Họ và tên (index 2)
-        // D - Ngày sinh (index 3)
-        // E - Nơi sinh (index 4)
-        // F - Quê quán (index 5)
-        // G - Nguyên quán (index 6)
-        // H - Giới tính (index 7)
-        // I - Dân tộc (index 8)
-        // J - Quốc tịch (index 9)
-        // K - Khoá (index 10)
-        // L - Lớp (index 11)
-        // M - Niên khoá (index 12)
-        // N - Ngành đào tạo (index 13)
-        // O - Hình thức đào tạo (index 14)
-        // P - Số QĐ (index 15)
-        // Q - Ngày tháng QĐ (index 16)
-        // R - Ngày bảo vệ (index 17)
-        // S - Số QĐ công nhận (index 18)
-        // T - Ngày tháng QĐ công nhận (index 19)
-        // U - Năm tốt nghiệp (index 20)
-        // V - Xếp loại (index 21)
-        // W - Số hiệu văn bằng (index 22)
-        // X - Số vào sổ (index 23)
-        // Y - Ngày cấp (index 24)
-        // Z - Nội dung điều chỉnh (index 25)
-        // AA - QĐ điều chỉnh (index 26)
-        // AB - Ngày QĐ điều chỉnh (index 27)
-        // AC - Số hiệu văn bằng cấp lại (index 28)
-        // AD - Nội dung chỉnh sửa (index 29)
-        // AE - QĐ thu hồi (index 30)
-        // AF - Ngày QĐ cấp lại (index 31)
-        // AG - Ghi chú (index 32)
+        $rowData = $this->parseRowData($row);
 
         // Skip empty rows
-        $fullName = $this->cleanString($row[2] ?? '');
-        if (empty($fullName)) {
-            return; // Skip this row
+        if (empty($rowData['full_name'])) {
+            return;
         }
-
-        $dateOfBirth = $this->parseDate($row[3] ?? '');
-        $placeOfBirth = $this->cleanString($row[4] ?? '');
-        $hometown = $this->cleanString($row[5] ?? '');
-        $placeOfOrigin = $this->cleanString($row[6] ?? '');
-        $gender = $this->parseGender($row[7] ?? '');
-        $nation = $this->cleanString($row[8] ?? '');
-        $nationality = $this->cleanString($row[9] ?? 'Việt Nam');
-        $course = $this->cleanString($row[10] ?? '');
-        $className = $this->cleanString($row[11] ?? '');
-        $academicYear = $this->cleanString($row[12] ?? '');
-        $majorName = $this->cleanString($row[13] ?? '');
-        $trainingType = $this->cleanString($row[14] ?? '');
-        // Normalize training_type to match enum values
-        $trainingType = $this->normalizeTrainingType($trainingType);
-        $councilDecisionNumber = $this->cleanString($row[15] ?? '');
-        $councilDecisionDate = $this->parseDate($row[16] ?? '');
-        $defenseDate = $this->parseDate($row[17] ?? '');
-        $graduationDecisionNumber = $this->cleanString($row[18] ?? '');
-        $graduationDecisionDate = $this->parseDate($row[19] ?? '');
-        $graduationYear = $this->cleanString($row[20] ?? '');
-        $ranking = $this->cleanString($row[21] ?? '');
-        $diplomaNumber = $this->cleanString($row[22] ?? ''); // W - Số hiệu văn bằng
-        $registrationNumber = $this->cleanString($row[23] ?? '');
-        $grantingDate = $this->parseDate($row[24] ?? '');
-        $notes = $this->cleanString($row[32] ?? '');
-
-        // Parse degree type from column B
-        $degreeType = $this->parseDegreeType($row[1] ?? '');
-
 
         // Tìm hoặc tạo Major
-        $major = null;
-        if (!empty($majorName)) {
-            // Tìm major theo tên trước
-            $major = Major::where('major_name', $majorName)->first();
+        $major = $this->findOrCreateMajor($rowData['major_name']);
 
-            // Nếu chưa có, tạo mới (nhưng cần kiểm tra major_code không trùng)
-            if (!$major) {
-                $majorCode = $this->generateMajorCode($majorName);
-
-                // Kiểm tra major_code đã tồn tại chưa
-                $existingByCode = Major::where('major_code', $majorCode)->first();
-                if ($existingByCode) {
-                    // Nếu có major với code này rồi thì dùng luôn
-                    $major = $existingByCode;
-                } else {
-                    // Tạo mới
-                    $major = Major::create([
-                        'major_name' => $majorName,
-                        'major_code' => $majorCode
-                    ]);
-
-                    Log::info('Created new major', [
-                        'major_name' => $majorName,
-                        'major_code' => $major->major_code,
-                        'major_id' => $major->major_id
-                    ]);
-                }
-            }
-        }
-
-        // Tìm Student thông qua registration_number (nếu degree đã tồn tại)
-        // Đây là cách tốt nhất để tránh duplicate khi import lại cùng file
-        $existingDegree = Degree::where('registration_number', $registrationNumber)->first();
-        $student = $existingDegree?->student;
-
-        // Nếu không tìm thấy qua degree, tìm theo full_name + date_of_birth + place_of_birth
-        if (!$student) {
-            $student = Student::where('full_name', $fullName)
-                ->where('date_of_birth', $dateOfBirth)
-                ->where('place_of_birth', $placeOfBirth)
-                ->first();
-        }
-
-        if (!$student) {
-            // Tạo student_code dựa trên registration_number để đảm bảo unique và consistent
-            // Thay thế ký tự đặc biệt trong registration_number
-            $cleanRegNumber = preg_replace('/[^A-Z0-9]/', '', $registrationNumber);
-            $studentCode = 'IMP_' . $cleanRegNumber;
-
-            $student = Student::create([
-                'student_code' => $studentCode,
-                'full_name' => $fullName,
-                'date_of_birth' => $dateOfBirth,
-                'place_of_birth' => $placeOfBirth,
-                'hometown' => $hometown,
-                'place_of_origin' => $placeOfOrigin,
-                'gender' => $gender,
-                'nation' => $nation,
-                'nationality' => $nationality,
-                'course' => $course,
-                'class_name' => $className,
-                'academic_year' => $academicYear,
-                'major_id' => $major?->major_id,
-                'training_type' => $trainingType,
-                'number_in_the_book' => $registrationNumber, // Sử dụng số vào sổ
-                'status' => 1, // Graduate
-            ]);
-        }
-
-        // Tạo hoặc cập nhật DiplomaBlank nếu có số hiệu văn bằng
-        $diplomaBlank = null;
-        if (!empty($diplomaNumber)) {
-            $typeId = $this->getTypeIdForDegreeType($degreeType);
-            $diplomaBlank = DiplomaBlank::firstOrCreate(
-                ['serial_number' => $diplomaNumber],
-                [
-                    'import_id' => $this->diplomaBlankImportId,
-                    'type_id' => $typeId,
-                    'status' => DiplomaBlankStatus::ISSUED,
-                ]
-            );
-        }
-
-        // Kiểm tra Degree đã tồn tại chưa (theo registration_number)
-        $degree = Degree::where('registration_number', $registrationNumber)->first();
-
-        if ($degree) {
-            // Nếu degree đã tồn tại, skip row này
+        // Kiểm tra degree đã tồn tại (early return để tránh xử lý thừa)
+        $existingDegree = Degree::where('registration_number', $rowData['registration_number'])->first();
+        if ($existingDegree) {
             Log::info('Degree already exists, skipping', [
-                'registration_number' => $registrationNumber,
-                'existing_degree_id' => $degree->degree_id
+                'registration_number' => $rowData['registration_number'],
+                'existing_degree_id' => $existingDegree->degree_id
             ]);
             return;
         }
 
-        // Tạo Degree mới
-        $degree = Degree::create([
-            'student_id' => $student->student_id,
-            'degree_type' => $degreeType,
-            'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
-            'registration_number' => $registrationNumber,
-            'granting_date' => $grantingDate,
-            'graduation_year' => $graduationYear,
-            'ranking' => $ranking,
-            'council_decision_number' => $councilDecisionNumber,
-            'council_decision_date' => $councilDecisionDate,
-            'graduation_decision_number' => $graduationDecisionNumber,
-            'graduation_decision_date' => $graduationDecisionDate,
-            'major_id' => $major?->major_id,
-            'major_name' => $majorName,
-            'defense_date' => $defenseDate,
-            'notes' => $notes,
-        ]);
+        $student = $existingDegree?->student;
 
-        // ChangeLog creation được xử lý tự động bởi DegreeObserver
-
-        // Xử lý ChangeLog điều chỉnh (Z, AA, AB)
-        // Đây là dữ liệu lịch sử từ file import, không phải thay đổi thực tế
-        // nên cần tạo thủ công (Observer không detect được)
-        $adjustmentContent = $this->cleanString($row[25] ?? '');
-        $adjustmentDecision = $this->cleanString($row[26] ?? '');
-        $adjustmentDate = $this->parseDate($row[27] ?? '');
-
-        if (!empty($adjustmentContent) || !empty($adjustmentDecision)) {
-            ChangeLog::create([
-                'entity_type' => class_basename(Degree::class),
-                'entity_id' => $degree->degree_id,
-                'change_description' => $adjustmentContent ?: 'Điều chỉnh thông tin từ import',
-                'decision_number' => $adjustmentDecision,
-                'decision_date' => $adjustmentDate,
-                'action_type' => 'update',
-                'changed_by' => Auth::id(),
-                'additional_data' => [
-                    'source' => 'import',
-                    'document_reference' => $this->documentReference,
-                ]
-            ]);
+        // Tìm hoặc tạo Student
+        if (!$student) {
+            $student = $this->findOrCreateStudent($rowData, $major);
         }
 
-        // Xử lý DegreeReissue (AC, AD, AE, AF)
-        $reissueNumber = $this->cleanString($row[28] ?? ''); // AC - Số hiệu văn bằng cấp lại
-        $reissueContent = $this->cleanString($row[29] ?? ''); // AD - Nội dung chỉnh sửa
-        $reissueDecision = $this->cleanString($row[30] ?? ''); // AE - QĐ thu hồi
-        $reissueDate = $this->parseDate($row[31] ?? ''); // AF - Ngày QĐ cấp lại
+        // Tạo diploma blank và degree
+        $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
+        $degree = $this->createDegree($student, $diplomaBlank, $major, $rowData);
 
-        // Log để debug
-        Log::info('Reissue data check', [
-            'registration_number' => $registrationNumber,
-            'reissueNumber' => $reissueNumber,
-            'reissueContent' => $reissueContent,
-            'reissueDecision' => $reissueDecision,
-            'reissueDate' => $reissueDate,
-            'diplomaNumber' => $diplomaNumber,
-            'diplomaBlankId' => $diplomaBlank?->diploma_blank_id
+        // Xử lý adjustment và reissue
+        $this->processAdjustment($degree, $rowData);
+        $this->processReissue($degree, $diplomaBlank, $rowData);
+    }
+
+    /**
+     * Parse row data from Excel
+     */
+    protected function parseRowData(array $row): array
+    {
+        return [
+            'full_name' => $this->cleanString($row[self::COL_FULL_NAME] ?? ''),
+            'date_of_birth' => $this->parseDate($row[self::COL_DATE_OF_BIRTH] ?? ''),
+            'place_of_birth' => $this->cleanString($row[self::COL_PLACE_OF_BIRTH] ?? ''),
+            'hometown' => $this->cleanString($row[self::COL_HOMETOWN] ?? ''),
+            'place_of_origin' => $this->cleanString($row[self::COL_PLACE_OF_ORIGIN] ?? ''),
+            'gender' => $this->parseGender($row[self::COL_GENDER] ?? ''),
+            'nation' => $this->cleanString($row[self::COL_NATION] ?? ''),
+            'nationality' => $this->cleanString($row[self::COL_NATIONALITY] ?? 'Việt Nam'),
+            'course' => $this->cleanString($row[self::COL_COURSE] ?? ''),
+            'class_name' => $this->cleanString($row[self::COL_CLASS_NAME] ?? ''),
+            'academic_year' => $this->cleanString($row[self::COL_ACADEMIC_YEAR] ?? ''),
+            'major_name' => $this->cleanString($row[self::COL_MAJOR_NAME] ?? ''),
+            'training_type' => $this->normalizeTrainingType($this->cleanString($row[self::COL_TRAINING_TYPE] ?? '')),
+            'council_decision_number' => $this->cleanString($row[self::COL_COUNCIL_DECISION_NUMBER] ?? ''),
+            'council_decision_date' => $this->parseDate($row[self::COL_COUNCIL_DECISION_DATE] ?? ''),
+            'defense_date' => $this->parseDate($row[self::COL_DEFENSE_DATE] ?? ''),
+            'graduation_decision_number' => $this->cleanString($row[self::COL_GRADUATION_DECISION_NUMBER] ?? ''),
+            'graduation_decision_date' => $this->parseDate($row[self::COL_GRADUATION_DECISION_DATE] ?? ''),
+            'graduation_year' => $this->cleanString($row[self::COL_GRADUATION_YEAR] ?? ''),
+            'ranking' => $this->cleanString($row[self::COL_RANKING] ?? ''),
+            'diploma_number' => $this->cleanString($row[self::COL_DIPLOMA_NUMBER] ?? ''),
+            'registration_number' => $this->cleanString($row[self::COL_REGISTRATION_NUMBER] ?? ''),
+            'granting_date' => $this->parseDate($row[self::COL_GRANTING_DATE] ?? ''),
+            'degree_type' => $this->parseDegreeType($row[self::COL_DEGREE_TYPE] ?? ''),
+            'notes' => $this->cleanString($row[self::COL_NOTES] ?? ''),
+            'adjustment_content' => $this->cleanString($row[self::COL_ADJUSTMENT_CONTENT] ?? ''),
+            'adjustment_decision' => $this->cleanString($row[self::COL_ADJUSTMENT_DECISION] ?? ''),
+            'adjustment_date' => $this->parseDate($row[self::COL_ADJUSTMENT_DATE] ?? ''),
+            'reissue_number' => $this->cleanString($row[self::COL_REISSUE_NUMBER] ?? ''),
+            'reissue_content' => $this->cleanString($row[self::COL_REISSUE_CONTENT] ?? ''),
+            'reissue_decision' => $this->cleanString($row[self::COL_REISSUE_DECISION] ?? ''),
+            'reissue_date' => $this->parseDate($row[self::COL_REISSUE_DATE] ?? ''),
+        ];
+    }
+
+    /**
+     * Find or create major with cache
+     */
+    protected function findOrCreateMajor(?string $majorName): ?Major
+    {
+        if (empty($majorName)) {
+            return null;
+        }
+
+        // Check cache by name
+        if (isset(self::$majorsByName[$majorName])) {
+            return self::$majorsByName[$majorName];
+        }
+
+        // Find in database
+        $major = Major::where('major_name', $majorName)->first();
+        if ($major) {
+            self::$majorsByName[$majorName] = $major;
+            return $major;
+        }
+
+        // Generate code and check cache/database
+        $majorCode = $this->generateMajorCode($majorName);
+        if (isset(self::$majorsByCode[$majorCode])) {
+            $major = self::$majorsByCode[$majorCode];
+            self::$majorsByName[$majorName] = $major;
+            return $major;
+        }
+
+        $major = Major::where('major_code', $majorCode)->first();
+        if ($major) {
+            self::$majorsByCode[$majorCode] = $major;
+            self::$majorsByName[$majorName] = $major;
+            return $major;
+        }
+
+        // Create new major
+        $major = Major::create([
+            'major_name' => $majorName,
+            'major_code' => $majorCode
         ]);
 
-        // Kiểm tra có data để tạo reissue hay không (chỉ cần có AC hoặc AD)
-        if (!empty($reissueNumber) || !empty($reissueContent)) {
-            // Tạo DiplomaBlank mới cho văn bằng cấp lại từ ô AC (nếu có)
-            $newDiplomaBlank = null;
-            if (!empty($reissueNumber)) {
-                $typeId = $this->getTypeIdForDegreeType($degreeType);
-                $newDiplomaBlank = DiplomaBlank::firstOrCreate(
-                    ['serial_number' => $reissueNumber],
-                    [
-                        'import_id' => $this->diplomaBlankImportId,
-                        'type_id' => $typeId,
-                        'status' => DiplomaBlankStatus::ISSUED,
-                    ]
-                );
+        // Cache it
+        self::$majorsByName[$majorName] = $major;
+        self::$majorsByCode[$majorCode] = $major;
 
-                Log::info('Created new diploma blank for reissue', [
-                    'serial_number' => $reissueNumber,
-                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
-                ]);
-            }
+        Log::info('Created new major', [
+            'major_name' => $majorName,
+            'major_code' => $major->major_code,
+            'major_id' => $major->major_id
+        ]);
 
-            // Tạo DegreeReissue với old = W (diploma_blank_id từ degree), new = AC
-            $reissue = DegreeReissue::create([
-                'degree_id' => $degree->degree_id,
-                'old_diploma_blank_id' => $diplomaBlank?->diploma_blank_id, // Phôi cũ từ ô W
-                'new_diploma_blank_id' => $newDiplomaBlank?->diploma_blank_id, // Phôi mới từ ô AC
-                'edit_content' => $reissueContent ?: 'Cấp lại văn bằng',
-                'recall_decision' => $reissueDecision,
-                'decision_date' => $reissueDate,
-                'created_by' => Auth::id(),
-            ]);
+        return $major;
+    }
 
-            Log::info('Created degree reissue', [
-                'reissue_id' => $reissue->reissue_id,
-                'old_blank_id' => $reissue->old_diploma_blank_id,
-                'new_blank_id' => $reissue->new_diploma_blank_id
-            ]);
+    /**
+     * Find or create student
+     */
+    protected function findOrCreateStudent(array $rowData, ?Major $major): Student
+    {
+        $student = Student::where('full_name', $rowData['full_name'])
+            ->where('date_of_birth', $rowData['date_of_birth'])
+            ->where('place_of_birth', $rowData['place_of_birth'])
+            ->first();
 
-            // CẬP NHẬT degree->diploma_blank_id thành phôi mới (AC) nếu có
+        if ($student) {
+            return $student;
+        }
+
+        $cleanRegNumber = preg_replace('/[^A-Z0-9]/', '', $rowData['registration_number']);
+        $studentCode = 'IMP_' . $cleanRegNumber;
+
+        return Student::create([
+            'student_code' => $studentCode,
+            'full_name' => $rowData['full_name'],
+            'date_of_birth' => $rowData['date_of_birth'],
+            'place_of_birth' => $rowData['place_of_birth'],
+            'hometown' => $rowData['hometown'],
+            'place_of_origin' => $rowData['place_of_origin'],
+            'gender' => $rowData['gender'],
+            'nation' => $rowData['nation'],
+            'nationality' => $rowData['nationality'],
+            'course' => $rowData['course'],
+            'class_name' => $rowData['class_name'],
+            'academic_year' => $rowData['academic_year'],
+            'major_id' => $major?->major_id,
+            'training_type' => $rowData['training_type'],
+            'number_in_the_book' => $rowData['registration_number'],
+            'status' => 1, // Graduate
+        ]);
+    }
+
+    /**
+     * Create diploma blank if needed
+     */
+    protected function createDiplomaBlankIfNeeded(?string $diplomaNumber, string $degreeType): ?DiplomaBlank
+    {
+        if (empty($diplomaNumber)) {
+            return null;
+        }
+
+        $typeId = $this->getTypeIdForDegreeType($degreeType);
+        return DiplomaBlank::firstOrCreate(
+            ['serial_number' => $diplomaNumber],
+            [
+                'import_id' => $this->diplomaBlankImportId,
+                'type_id' => $typeId,
+                'status' => DiplomaBlankStatus::ISSUED,
+            ]
+        );
+    }
+
+    /**
+     * Create degree record
+     */
+    protected function createDegree(Student $student, ?DiplomaBlank $diplomaBlank, ?Major $major, array $rowData): Degree
+    {
+        return Degree::create([
+            'student_id' => $student->student_id,
+            'degree_type' => $rowData['degree_type'],
+            'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
+            'registration_number' => $rowData['registration_number'],
+            'granting_date' => $rowData['granting_date'],
+            'graduation_year' => $rowData['graduation_year'],
+            'ranking' => $rowData['ranking'],
+            'council_decision_number' => $rowData['council_decision_number'],
+            'council_decision_date' => $rowData['council_decision_date'],
+            'graduation_decision_number' => $rowData['graduation_decision_number'],
+            'graduation_decision_date' => $rowData['graduation_decision_date'],
+            'major_id' => $major?->major_id,
+            'major_name' => $rowData['major_name'],
+            'defense_date' => $rowData['defense_date'],
+            'status' => DegreeStatus::ISSUED, // Mặc định là đã cấp khi import
+            'notes' => $rowData['notes'],
+        ]);
+    }
+
+    /**
+     * Process adjustment change log
+     */
+    protected function processAdjustment(Degree $degree, array $rowData): void
+    {
+        if (empty($rowData['adjustment_content']) && empty($rowData['adjustment_decision'])) {
+            return;
+        }
+
+        ChangeLog::create([
+            'entity_type' => class_basename(Degree::class),
+            'entity_id' => $degree->degree_id,
+            'change_description' => $rowData['adjustment_content'] ?: 'Điều chỉnh thông tin từ import',
+            'decision_number' => $rowData['adjustment_decision'],
+            'decision_date' => $rowData['adjustment_date'],
+            'action_type' => 'update',
+            'changed_by' => Auth::id(),
+            'additional_data' => [
+                'source' => 'import',
+                'document_reference' => $this->documentReference,
+            ]
+        ]);
+    }
+
+    /**
+     * Process degree reissue
+     */
+    protected function processReissue(Degree $degree, ?DiplomaBlank $oldDiplomaBlank, array $rowData): void
+    {
+        if (empty($rowData['reissue_number']) && empty($rowData['reissue_content'])) {
+            return;
+        }
+
+        Log::info('Reissue data check', [
+            'registration_number' => $rowData['registration_number'],
+            'reissueNumber' => $rowData['reissue_number'],
+            'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id
+        ]);
+
+        $newDiplomaBlank = null;
+        if (!empty($rowData['reissue_number'])) {
+            $newDiplomaBlank = $this->createDiplomaBlankIfNeeded(
+                $rowData['reissue_number'],
+                $rowData['degree_type']
+            );
+
             if ($newDiplomaBlank) {
-                $degree->update([
+                Log::info('Created new diploma blank for reissue', [
+                    'serial_number' => $rowData['reissue_number'],
                     'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
                 ]);
-
-                Log::info('Updated degree diploma_blank_id to new blank', [
-                    'degree_id' => $degree->degree_id,
-                    'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
-                ]);
             }
+        }
+
+        $reissue = DegreeReissue::create([
+            'degree_id' => $degree->degree_id,
+            'old_diploma_blank_id' => $oldDiplomaBlank?->diploma_blank_id,
+            'new_diploma_blank_id' => $newDiplomaBlank?->diploma_blank_id,
+            'edit_content' => $rowData['reissue_content'] ?: 'Cấp lại văn bằng',
+            'recall_decision' => $rowData['reissue_decision'],
+            'decision_date' => $rowData['reissue_date'],
+            'created_by' => Auth::id(),
+        ]);
+
+        Log::info('Created degree reissue', [
+            'reissue_id' => $reissue->reissue_id,
+            'old_blank_id' => $reissue->old_diploma_blank_id,
+            'new_blank_id' => $reissue->new_diploma_blank_id
+        ]);
+
+        if ($newDiplomaBlank) {
+            $degree->update(['diploma_blank_id' => $newDiplomaBlank->diploma_blank_id]);
+            Log::info('Updated degree diploma_blank_id to new blank', [
+                'degree_id' => $degree->degree_id,
+                'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+            ]);
         }
     }
 
@@ -471,12 +519,22 @@ class DegreeImport implements ToCollection, WithStartRow
     }
 
     /**
-     * Load diploma blank types into cache
+     * Load all caches for better performance
      */
-    protected function loadDiplomaBlankTypes(): void
+    protected function loadCaches(): void
     {
+        // Load diploma blank types
         if (self::$diplomaBlankTypes === null) {
             self::$diplomaBlankTypes = DiplomaBlankType::all()->keyBy('prefix');
+        }
+
+        // Load existing majors into cache
+        if (empty(self::$majorsByName)) {
+            $majors = Major::all();
+            foreach ($majors as $major) {
+                self::$majorsByName[$major->major_name] = $major;
+                self::$majorsByCode[$major->major_code] = $major;
+            }
         }
     }
 
