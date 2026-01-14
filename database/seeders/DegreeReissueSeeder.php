@@ -18,7 +18,10 @@ class DegreeReissueSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::transaction(function () {
+        // Lưu event dispatcher để bật lại sau
+        $dispatcher = Degree::getEventDispatcher();
+
+        DB::transaction(function () use ($dispatcher) {
             // Lấy một số degrees có diploma_blank_id để tạo lịch sử cấp lại
             $degrees = Degree::with(['student', 'diplomaBlank.type'])
                 ->whereNotNull('diploma_blank_id')
@@ -135,10 +138,10 @@ class DegreeReissueSeeder extends Seeder
                     $totalReissues++;
                 }
 
-                // Cập nhật diploma_blank_id cuối cùng cho degree (disable auto-logging)
-                $degree->disableLogging();
+                // Cập nhật diploma_blank_id cuối cùng cho degree (tắt Observer)
+                Degree::unsetEventDispatcher();
                 $degree->update(['diploma_blank_id' => $currentBlankId]);
-                $degree->enableLogging();
+                Degree::setEventDispatcher($dispatcher);
             }
 
             $this->command->info('✓ Đã tạo ' . $totalReissues . ' lịch sử cấp lại văn bằng mẫu');

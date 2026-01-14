@@ -896,6 +896,7 @@
                                                                     $fieldLabels = [
                                                                         'registration_number' => 'Số đăng ký',
                                                                         'degree_type' => 'Loại văn bằng',
+                                                                        'diploma_blank_id' => 'Số hiệu văn bằng',
                                                                         'major_name' => 'Ngành/Chuyên ngành',
                                                                         'ranking' => 'Xếp loại',
                                                                         'granting_date' => 'Ngày cấp',
@@ -940,12 +941,31 @@
                                                                     'average' => 'Trung bình',
                                                                     'below_average' => 'Trung bình khá',
                                                                 ];
-                                                                $oldValueDisplay =
-                                                                    $valueMapping[strtolower($adjustment->old_value)] ??
-                                                                    $adjustment->old_value;
-                                                                $newValueDisplay =
-                                                                    $valueMapping[strtolower($adjustment->new_value)] ??
-                                                                    $adjustment->new_value;
+
+                                                                // Nếu field là diploma_blank_id, lấy serial_number thay vì hiển thị ID
+                                                                if ($adjustment->changed_field === 'diploma_blank_id') {
+                                                                    $oldBlank = \App\Models\DiplomaBlank::find(
+                                                                        $adjustment->old_value,
+                                                                    );
+                                                                    $newBlank = \App\Models\DiplomaBlank::find(
+                                                                        $adjustment->new_value,
+                                                                    );
+                                                                    $oldValueDisplay = $oldBlank
+                                                                        ? $oldBlank->serial_number
+                                                                        : $adjustment->old_value;
+                                                                    $newValueDisplay = $newBlank
+                                                                        ? $newBlank->serial_number
+                                                                        : $adjustment->new_value;
+                                                                } else {
+                                                                    $oldValueDisplay =
+                                                                        $valueMapping[
+                                                                            strtolower($adjustment->old_value)
+                                                                        ] ?? $adjustment->old_value;
+                                                                    $newValueDisplay =
+                                                                        $valueMapping[
+                                                                            strtolower($adjustment->new_value)
+                                                                        ] ?? $adjustment->new_value;
+                                                                }
                                                             @endphp
                                                             <p class="mb-2 mt-2 text-sm">
                                                                 <span
@@ -2021,41 +2041,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                        <i class="fas fa-tag mr-1"></i>
-                                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                    </p>
-                                                                                ` : ''}
+                                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                            <i class="fas fa-tag mr-1"></i>
+                                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                        </p>
+                                                                                    ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                    <p class="mb-2 text-sm">
-                                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                    </p>
-                                                                                ` : ''}
+                                                                                        <p class="mb-2 text-sm">
+                                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                        </p>
+                                                                                    ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                <span class="flex items-center">
-                                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                </span>
-                                                                            ` : ''}
+                                                                                    <span class="flex items-center">
+                                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                    </span>
+                                                                                ` : ''}
                                             ${adj.decision_date ? `
-                                                                                <span class="flex items-center">
-                                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                </span>
-                                                                            ` : ''}
+                                                                                    <span class="flex items-center">
+                                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                    </span>
+                                                                                ` : ''}
                                             ${adj.changed_by ? `
-                                                                                <span class="flex items-center">
-                                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                    ${adj.changed_by.full_name || 'N/A'}
-                                                                                </span>
-                                                                            ` : ''}
+                                                                                    <span class="flex items-center">
+                                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                        ${adj.changed_by.full_name || 'N/A'}
+                                                                                    </span>
+                                                                                ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}

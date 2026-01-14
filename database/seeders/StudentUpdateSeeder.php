@@ -31,6 +31,9 @@ class StudentUpdateSeeder extends Seeder
             return;
         }
 
+        // Lưu event dispatcher để bật lại sau
+        $dispatcher = Student::getEventDispatcher();
+
         $this->command->info('Bắt đầu seed student updates...');
 
         foreach ($students as $index => $student) {
@@ -42,11 +45,11 @@ class StudentUpdateSeeder extends Seeder
                 $oldClass = $student->class_name;
                 $newClass = $oldClass . ' (Chuyển lớp)';
 
-                // Cập nhật student (disable auto-logging)
-                $student->disableLogging();
+                // Cập nhật student (tắt Observer để không tạo log tự động)
+                Student::unsetEventDispatcher();
                 $student->class_name = $newClass;
                 $student->save();
-                $student->enableLogging();
+                Student::setEventDispatcher($dispatcher);
 
                 // Tạo log thủ công với đầy đủ thông tin quyết định
                 ChangeLog::create([
@@ -68,10 +71,10 @@ class StudentUpdateSeeder extends Seeder
             // Update 2: Thay đổi trạng thái
             if ($index === 0) {
                 $oldStatus = $student->status->label();
-                $student->disableLogging();
+                Student::unsetEventDispatcher();
                 $student->status = \App\Enums\StudentStatus::Graduate;
                 $student->save();
-                $student->enableLogging();
+                Student::setEventDispatcher($dispatcher);
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -95,13 +98,13 @@ class StudentUpdateSeeder extends Seeder
                 $oldHometown = $student->hometown;
                 $oldOrigin = $student->place_of_origin;
 
-                $student->disableLogging();
+                Student::unsetEventDispatcher();
                 $student->update([
                     'place_of_birth' => 'Hà Nội',
                     'hometown' => 'Nam Định',
                     'place_of_origin' => 'Thanh Hóa',
                 ]);
-                $student->enableLogging();
+                Student::setEventDispatcher($dispatcher);
 
                 // Tạo log cho từng trường
                 $decisionDate = now()->subDays(rand(30, 180));
@@ -152,10 +155,10 @@ class StudentUpdateSeeder extends Seeder
             // Update 4: Thay đổi niên khóa
             if ($index === 2) {
                 $oldYear = $student->academic_year;
-                $student->disableLogging();
+                Student::unsetEventDispatcher();
                 $student->academic_year = '2020-2024';
                 $student->save();
-                $student->enableLogging();
+                Student::setEventDispatcher($dispatcher);
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -177,10 +180,10 @@ class StudentUpdateSeeder extends Seeder
             if ($index === 3) {
                 $oldNumber = $student->number_in_the_book;
                 $newNumber = str_pad($index + 100, 4, '0', STR_PAD_LEFT);
-                $student->disableLogging();
+                Student::unsetEventDispatcher();
                 $student->number_in_the_book = $newNumber;
                 $student->save();
-                $student->enableLogging();
+                Student::setEventDispatcher($dispatcher);
 
                 ChangeLog::create([
                     'entity_type' => 'Student',
@@ -208,9 +211,9 @@ class StudentUpdateSeeder extends Seeder
             $this->command->info("\nTest soft delete và restore:");
 
             $studentName = $testStudent->full_name;
-            $testStudent->disableLogging();
+            Student::unsetEventDispatcher();
             $testStudent->delete();
-            $testStudent->enableLogging();
+            Student::setEventDispatcher($dispatcher);
 
             ChangeLog::create([
                 'entity_type' => 'Student',
@@ -226,9 +229,9 @@ class StudentUpdateSeeder extends Seeder
 
             sleep(1);
 
-            $testStudent->disableLogging();
+            Student::unsetEventDispatcher();
             $testStudent->restore();
-            $testStudent->enableLogging();
+            Student::setEventDispatcher($dispatcher);
 
             ChangeLog::create([
                 'entity_type' => 'Student',

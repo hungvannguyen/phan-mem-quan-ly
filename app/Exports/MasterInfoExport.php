@@ -144,9 +144,9 @@ class MasterInfoExport
             }
 
             // Get latest change log for this degree (from eager loaded collection)
-            // Chỉ lấy logs có action_type là update/updated, không lấy create/created
+            // Chỉ lấy logs có action_type là update, không lấy create
             $latestChangeLog = $degree->changeLogs
-                ->whereIn('action_type', ['update', 'updated'])
+                ->where('action_type', 'update')
                 ->sortByDesc('created_at')
                 ->first();
 

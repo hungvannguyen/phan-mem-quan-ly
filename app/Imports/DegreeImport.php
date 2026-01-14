@@ -308,35 +308,23 @@ class DegreeImport implements ToCollection, WithStartRow
             'notes' => $notes,
         ]);
 
-        // Tạo ChangeLog khởi tạo cho degree vừa import
-        ChangeLog::create([
-            'entity_type' => Degree::class,
-            'entity_id' => $degree->degree_id,
-            'change_description' => 'Khởi tạo từ import file: ' . ($this->documentReference ?? 'N/A'),
-            'decision_number' => $graduationDecisionNumber ?? null,
-            'decision_date' => $graduationDecisionDate ?? null,
-            'action_type' => 'created',
-            'changed_by' => Auth::id(),
-            'additional_data' => [
-                'degree_type' => $degreeType,
-                'diploma_blank_serial' => $diplomaNumber ?? null,
-                'registration_number' => $registrationNumber,
-            ]
-        ]);
+        // ChangeLog creation được xử lý tự động bởi DegreeObserver
 
         // Xử lý ChangeLog điều chỉnh (Z, AA, AB)
+        // Đây là dữ liệu lịch sử từ file import, không phải thay đổi thực tế
+        // nên cần tạo thủ công (Observer không detect được)
         $adjustmentContent = $this->cleanString($row[25] ?? '');
         $adjustmentDecision = $this->cleanString($row[26] ?? '');
         $adjustmentDate = $this->parseDate($row[27] ?? '');
 
         if (!empty($adjustmentContent) || !empty($adjustmentDecision)) {
             ChangeLog::create([
-                'entity_type' => Degree::class,
+                'entity_type' => class_basename(Degree::class),
                 'entity_id' => $degree->degree_id,
-                'change_description' => $adjustmentContent ?: 'Điều chỉnh thông tin',
+                'change_description' => $adjustmentContent ?: 'Điều chỉnh thông tin từ import',
                 'decision_number' => $adjustmentDecision,
                 'decision_date' => $adjustmentDate,
-                'action_type' => 'updated',
+                'action_type' => 'update',
                 'changed_by' => Auth::id(),
                 'additional_data' => [
                     'source' => 'import',
