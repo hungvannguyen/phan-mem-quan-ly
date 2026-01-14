@@ -233,12 +233,15 @@ trait LogsChanges
 
     /**
      * Relationship với change logs
-     * Dùng hasMany thay vì morphMany vì entity_type lưu class basename
+     * Dùng hasMany thay vì morphMany vì entity_type lưu class basename hoặc full class name
      */
     public function changeLogs()
     {
         return $this->hasMany(ChangeLog::class, 'entity_id', $this->getKeyName())
-            ->where('entity_type', class_basename($this))
+            ->where(function($query) {
+                $query->where('entity_type', class_basename($this))
+                      ->orWhere('entity_type', get_class($this));
+            })
             ->orderBy('created_at', 'desc');
     }
 

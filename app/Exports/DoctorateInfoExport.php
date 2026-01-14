@@ -144,7 +144,11 @@ class DoctorateInfoExport
             }
 
             // Get latest change log for this degree (from eager loaded collection)
-            $latestChangeLog = $degree->changeLogs->sortByDesc('created_at')->first();
+            // Chỉ lấy logs có action_type là update/updated, không lấy create/created
+            $latestChangeLog = $degree->changeLogs
+                ->whereIn('action_type', ['update', 'updated'])
+                ->sortByDesc('created_at')
+                ->first();
 
             // Get latest reissue for this degree (from eager loaded collection)
             $latestReissue = $degree->reissues->sortByDesc('decision_date')->first();

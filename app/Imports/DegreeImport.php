@@ -324,14 +324,94 @@ class DegreeImport implements ToCollection, WithStartRow
             ]
         ]);
 
-        // TODO: Xử lý ChangeLog điều chỉnh (Z, AA, AB) và cấp lại (AC, AD, AE, AF) sẽ được thêm sau
-        // $adjustmentContent = $this->cleanString($row[25] ?? '');
-        // $adjustmentDecision = $this->cleanString($row[26] ?? '');
-        // $adjustmentDate = $this->parseDate($row[27] ?? '');
-        // $reissueNumber = $this->cleanString($row[28] ?? '');
-        // $reissueContent = $this->cleanString($row[29] ?? '');
-        // $reissueDecision = $this->cleanString($row[30] ?? '');
-        // $reissueDate = $this->parseDate($row[31] ?? '');
+        // Xử lý ChangeLog điều chỉnh (Z, AA, AB)
+        $adjustmentContent = $this->cleanString($row[25] ?? '');
+        $adjustmentDecision = $this->cleanString($row[26] ?? '');
+        $adjustmentDate = $this->parseDate($row[27] ?? '');
+
+        if (!empty($adjustmentContent) || !empty($adjustmentDecision)) {
+            ChangeLog::create([
+                'entity_type' => Degree::class,
+                'entity_id' => $degree->degree_id,
+                'change_description' => $adjustmentContent ?: 'Điều chỉnh thông tin',
+                'decision_number' => $adjustmentDecision,
+                'decision_date' => $adjustmentDate,
+                'action_type' => 'updated',
+                'changed_by' => Auth::id(),
+                'additional_data' => [
+                    'source' => 'import',
+                    'document_reference' => $this->documentReference,
+                ]
+            ]);
+        }
+
+        // Xử lý DegreeReissue (AC, AD, AE, AF)
+        $reissueNumber = $this->cleanString($row[28] ?? ''); // AC - Số hiệu văn bằng cấp lại
+        $reissueContent = $this->cleanString($row[29] ?? ''); // AD - Nội dung chỉnh sửa
+        $reissueDecision = $this->cleanString($row[30] ?? ''); // AE - QĐ thu hồi
+        $reissueDate = $this->parseDate($row[31] ?? ''); // AF - Ngày QĐ cấp lại
+
+        // Log để debug
+        Log::info('Reissue data check', [
+            'registration_number' => $registrationNumber,
+            'reissueNumber' => $reissueNumber,
+            'reissueContent' => $reissueContent,
+            'reissueDecision' => $reissueDecision,
+            'reissueDate' => $reissueDate,
+            'diplomaNumber' => $diplomaNumber,
+            'diplomaBlankId' => $diplomaBlank?->diploma_blank_id
+        ]);
+
+        // Kiểm tra có data để tạo reissue hay không (chỉ cần có AC hoặc AD)
+        if (!empty($reissueNumber) || !empty($reissueContent)) {
+            // Tạo DiplomaBlank mới cho văn bằng cấp lại từ ô AC (nếu có)
+            $newDiplomaBlank = null;
+            if (!empty($reissueNumber)) {
+                $typeId = $this->getTypeIdForDegreeType($degreeType);
+                $newDiplomaBlank = DiplomaBlank::firstOrCreate(
+                    ['serial_number' => $reissueNumber],
+                    [
+                        'import_id' => $this->diplomaBlankImportId,
+                        'type_id' => $typeId,
+                        'status' => DiplomaBlankStatus::ISSUED,
+                    ]
+                );
+
+                Log::info('Created new diploma blank for reissue', [
+                    'serial_number' => $reissueNumber,
+                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                ]);
+            }
+
+            // Tạo DegreeReissue với old = W (diploma_blank_id từ degree), new = AC
+            $reissue = DegreeReissue::create([
+                'degree_id' => $degree->degree_id,
+                'old_diploma_blank_id' => $diplomaBlank?->diploma_blank_id, // Phôi cũ từ ô W
+                'new_diploma_blank_id' => $newDiplomaBlank?->diploma_blank_id, // Phôi mới từ ô AC
+                'edit_content' => $reissueContent ?: 'Cấp lại văn bằng',
+                'recall_decision' => $reissueDecision,
+                'decision_date' => $reissueDate,
+                'created_by' => Auth::id(),
+            ]);
+
+            Log::info('Created degree reissue', [
+                'reissue_id' => $reissue->reissue_id,
+                'old_blank_id' => $reissue->old_diploma_blank_id,
+                'new_blank_id' => $reissue->new_diploma_blank_id
+            ]);
+
+            // CẬP NHẬT degree->diploma_blank_id thành phôi mới (AC) nếu có
+            if ($newDiplomaBlank) {
+                $degree->update([
+                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                ]);
+
+                Log::info('Updated degree diploma_blank_id to new blank', [
+                    'degree_id' => $degree->degree_id,
+                    'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                ]);
+            }
+        }
     }
 
     /**

@@ -848,12 +848,14 @@
                                             @foreach ($degree->changeLogs->take(3) as $adjustment)
                                                 <div class="flex gap-3 rounded-lg bg-purple-50 p-3 text-sm">
                                                     <div class="flex-shrink-0">
-                                                        @if ($adjustment->action_type === 'create')
+                                                        @if (in_array($adjustment->action_type, ['create', 'created']))
                                                             <i class="fas fa-plus-circle text-green-600"></i>
-                                                        @elseif($adjustment->action_type === 'update')
+                                                        @elseif(in_array($adjustment->action_type, ['update', 'updated']))
                                                             <i class="fas fa-edit text-purple-600"></i>
-                                                        @elseif($adjustment->action_type === 'delete')
+                                                        @elseif(in_array($adjustment->action_type, ['delete', 'deleted']))
                                                             <i class="fas fa-trash text-red-600"></i>
+                                                        @elseif($adjustment->action_type === 'reissued')
+                                                            <i class="fas fa-sync-alt text-blue-600"></i>
                                                         @else
                                                             <i class="fas fa-undo text-blue-600"></i>
                                                         @endif
@@ -862,15 +864,22 @@
                                                         @php
                                                             $actionLabels = [
                                                                 'create' => ['label' => 'Tạo mới', 'color' => 'green'],
+                                                                'created' => ['label' => 'Tạo mới', 'color' => 'green'],
                                                                 'update' => [
                                                                     'label' => 'Cập nhật',
                                                                     'color' => 'purple',
                                                                 ],
+                                                                'updated' => [
+                                                                    'label' => 'Điều chỉnh',
+                                                                    'color' => 'purple',
+                                                                ],
                                                                 'delete' => ['label' => 'Xóa', 'color' => 'red'],
+                                                                'deleted' => ['label' => 'Xóa', 'color' => 'red'],
                                                                 'restore' => [
                                                                     'label' => 'Khôi phục',
                                                                     'color' => 'blue',
                                                                 ],
+                                                                'reissued' => ['label' => 'Cấp lại', 'color' => 'blue'],
                                                             ];
                                                             $action = $actionLabels[$adjustment->action_type] ?? [
                                                                 'label' => 'Khác',
@@ -911,6 +920,9 @@
                                                                 </span>
                                                             @endif
                                                         </div>
+                                                        <p class="font-medium text-gray-900">
+                                                            {{ $adjustment->change_description ?: 'Điều chỉnh thông tin' }}
+                                                        </p>
                                                         @if ($adjustment->old_value && $adjustment->new_value)
                                                             @php
                                                                 // Map giá trị tiếng Anh sang tiếng Việt
@@ -935,17 +947,13 @@
                                                                     $valueMapping[strtolower($adjustment->new_value)] ??
                                                                     $adjustment->new_value;
                                                             @endphp
-                                                            <p class="mb-2 text-sm">
+                                                            <p class="mb-2 mt-2 text-sm">
                                                                 <span
                                                                     class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">{{ $oldValueDisplay }}</span>
                                                                 <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
                                                                 <span
                                                                     class="rounded bg-green-100 px-2 py-0.5 font-medium text-green-700">{{ $newValueDisplay }}</span>
                                                             </p>
-                                                        @endif
-                                                        @if ($adjustment->change_description)
-                                                            <p class="font-medium text-gray-900">
-                                                                {{ $adjustment->change_description }}</p>
                                                         @endif
                                                         <div class="mt-1 flex flex-wrap gap-x-4 text-xs text-gray-600">
                                                             @if ($adjustment->decision_number)
@@ -2013,41 +2021,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                    <i class="fas fa-tag mr-1"></i>
-                                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                </p>
-                                                                            ` : ''}
+                                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                        <i class="fas fa-tag mr-1"></i>
+                                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                    </p>
+                                                                                ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                <p class="mb-2 text-sm">
-                                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                </p>
-                                                                            ` : ''}
+                                                                                    <p class="mb-2 text-sm">
+                                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                    </p>
+                                                                                ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                            <span class="flex items-center">
-                                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                            </span>
-                                                                        ` : ''}
+                                                                                <span class="flex items-center">
+                                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                </span>
+                                                                            ` : ''}
                                             ${adj.decision_date ? `
-                                                                            <span class="flex items-center">
-                                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                            </span>
-                                                                        ` : ''}
+                                                                                <span class="flex items-center">
+                                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                </span>
+                                                                            ` : ''}
                                             ${adj.changed_by ? `
-                                                                            <span class="flex items-center">
-                                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                ${adj.changed_by.full_name || 'N/A'}
-                                                                            </span>
-                                                                        ` : ''}
+                                                                                <span class="flex items-center">
+                                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                    ${adj.changed_by.full_name || 'N/A'}
+                                                                                </span>
+                                                                            ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
