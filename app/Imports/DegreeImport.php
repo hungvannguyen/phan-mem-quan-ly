@@ -320,7 +320,6 @@ class DegreeImport implements ToCollection, WithStartRow
             'class_name' => $rowData['class_name'],
             'academic_year' => $rowData['academic_year'],
             'major_id' => $major?->major_id,
-            'training_type' => $rowData['training_type'],
             'number_in_the_book' => $rowData['registration_number'],
             'status' => 1, // Graduate
         ]);
@@ -366,6 +365,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'major_id' => $major?->major_id,
             'major_name' => $rowData['major_name'],
             'defense_date' => $rowData['defense_date'],
+            'training_type' => $rowData['training_type'],
             'status' => DegreeStatus::ISSUED, // Mặc định là đã cấp khi import
             'notes' => $rowData['notes'],
         ]);

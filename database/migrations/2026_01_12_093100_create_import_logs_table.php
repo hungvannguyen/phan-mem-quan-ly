@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('total_rows')->nullable();
             $table->integer('success_rows')->nullable();
             $table->integer('error_rows')->nullable();
-            $table->text('error_details')->nullable();
+            $table->longText('error_details')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

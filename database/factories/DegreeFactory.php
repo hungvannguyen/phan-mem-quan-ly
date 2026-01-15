@@ -47,6 +47,15 @@ class DegreeFactory extends Factory
             'Xây dựng dân dụng',
         ];
 
+        $trainingTypes = [
+            'Chính quy',
+            'Chính quy',
+            'Chính quy', // Tăng tỷ lệ chính quy
+            'Liên thông',
+            'Vừa làm vừa học',
+            'Từ xa',
+        ];
+
         return [
             'student_id' => Student::factory(),
             'diploma_blank_id' => DiplomaBlank::factory()->available(),
@@ -58,6 +67,7 @@ class DegreeFactory extends Factory
             'defense_date' => null, // Will be set for master/doctor degrees
             'training_start_date' => $trainingStartDate->format('Y-m-d'),
             'training_end_date' => $trainingEndDate->format('Y-m-d'),
+            'training_type' => $this->faker->randomElement($trainingTypes),
             'ranking' => $this->faker->randomElement(['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình']),
             'council_decision_number' => $this->faker->regexify('[0-9]{3}/QĐ-HĐ-[0-9]{4}'),
             'council_decision_date' => $councilDecisionDate->format('Y-m-d'),

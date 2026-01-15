@@ -28,6 +28,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('major_id')->nullable();
             $table->foreign('major_id')->references('major_id')->on('majors')->onDelete('set null');
             $table->string('major_name', 255)->nullable()->comment('Tên chuyên ngành');
+            $table->enum('training_type', ['Chính quy', 'Liên thông', 'Từ xa', 'Vừa làm vừa học'])
+                ->nullable()
+                ->comment('Hình thức đào tạo');
             $table->enum('status', ['NotIssued', 'Issued', 'Recalled'])
                 ->default('NotIssued')
                 ->comment('Trạng thái: NotIssued=Chưa cấp, Issued=Đã cấp, Recalled=Thu hồi');

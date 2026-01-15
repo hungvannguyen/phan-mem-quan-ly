@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->enum('training_type', ['Chính quy', 'Liên thông', 'Từ xa', 'Vừa làm vừa học'])
-                ->default('Chính quy')
-                ->after('status')
-                ->comment('Hình thức đào tạo');
-        });
+        // Training type moved to degrees table
+        // Schema::table('students', function (Blueprint $table) {
+        //     $table->enum('training_type', ['Chính quy', 'Liên thông', 'Từ xa', 'Vừa làm vừa học'])
+        //         ->default('Chính quy')
+        //         ->after('status')
+        //         ->comment('Hình thức đào tạo');
+        // });
     }
 
     /**
@@ -24,8 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            $table->dropColumn('training_type');
-        });
+        // Training type moved to degrees table
+        // Schema::table('students', function (Blueprint $table) {
+        //     $table->dropColumn('training_type');
+        // });
     }
 };

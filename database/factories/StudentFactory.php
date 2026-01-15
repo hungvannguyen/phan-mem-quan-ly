@@ -38,16 +38,6 @@ class StudentFactory extends Factory
         $yearStart = $this->faker->numberBetween(2010, 2023);
         $yearEnd = $yearStart + 4;
 
-        // Nhiều hình thức đào tạo hơn (must match enum in migration)
-        $trainingTypes = [
-            'Chính quy',
-            'Chính quy',
-            'Chính quy', // Tăng tỷ lệ chính quy
-            'Liên thông',
-            'Vừa làm vừa học',
-            'Từ xa',
-        ];
-
         $vietnamProvinces = [
             'Hà Nội',
             'Hồ Chí Minh',
@@ -117,7 +107,6 @@ class StudentFactory extends Factory
             'gender' => $gender->value,
             'nation' => $this->faker->randomElement(['Kinh', 'Tày', 'Thái', 'Mường', 'Khmer', 'Hoa', 'Nùng', 'H\'Mông']),
             'nationality' => 'Việt Nam',
-            'training_type' => $this->faker->randomElement($trainingTypes),
             'number_in_the_book' => 'VB-' . $this->faker->unique()->numberBetween(100000, 999999),
             'status' => $this->faker->randomElement(StudentStatus::cases())->value,
         ];

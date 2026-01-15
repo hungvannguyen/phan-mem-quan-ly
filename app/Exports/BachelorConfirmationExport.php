@@ -55,7 +55,7 @@ class BachelorConfirmationExport
         $registrationNumber = $degree->registration_number ?? '';
         $numberInBook = $this->student->number_in_the_book ?? '';
         $ranking = $degree->ranking ?? '';
-        $trainingType = $this->student->training_type ?? 'Chính quy';
+        $trainingType = $degree->training_type ?? 'Chính quy';
 
         // Set values for template placeholders
         $templateProcessor->setValue('ho_ten_sv', $fullName);

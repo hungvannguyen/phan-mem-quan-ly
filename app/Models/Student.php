@@ -42,7 +42,6 @@ class Student extends Model
         'nationality',
         'number_in_the_book',
         'status',
-        'training_type',
     ];
 
     /**
@@ -65,7 +64,6 @@ class Student extends Model
             'nationality' => 'string',
             'number_in_the_book' => 'string',
             'status' => StudentStatus::class,
-            'training_type' => 'string',
         ];
     }
 

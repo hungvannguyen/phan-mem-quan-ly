@@ -71,7 +71,10 @@ class BachelorInfoExport
         }
 
         if (!empty($this->filters['training_type'])) {
-            $query->where('training_type', $this->filters['training_type']);
+            $query->whereHas('degrees', function ($q) {
+                $q->where('training_type', $this->filters['training_type'])
+                    ->whereNotNull('registration_number');
+            });
         }
 
         if (!empty($this->filters['gender'])) {
@@ -163,7 +166,7 @@ class BachelorInfoExport
             $sheet->setCellValue('M' . $currentRow, $student->course ?? ''); // Khoá
             $sheet->setCellValue('N' . $currentRow, $student->class_name ?? ''); // Lớp
             $sheet->setCellValue('O' . $currentRow, $student->academic_year ?? ''); // Niên khoá
-            $sheet->setCellValue('P' . $currentRow, $student->training_type ?? 'Chính quy'); // Hình thức đào tạo
+            $sheet->setCellValue('P' . $currentRow, $degree->training_type ?? 'Chính quy'); // Hình thức đào tạo
             $sheet->setCellValue('Q' . $currentRow, $degree->decision_number ?? ''); // Số quyết định
             $sheet->setCellValue('R' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày quyết định
             $sheet->setCellValue('S' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp

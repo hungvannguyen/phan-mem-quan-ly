@@ -178,7 +178,7 @@ class AdvancedPoliticalTheoryInfoExport
             $sheet->setCellValue('D' . $currentRow, $student->place_of_birth ?? ''); // Nơi sinh
             $sheet->setCellValue('E' . $currentRow, $this->getGenderLabel($student->gender)); // Giới tính
             $sheet->setCellValue('F' . $currentRow, $student->nation ?? ''); // Dân tộc
-            $sheet->setCellValue('G' . $currentRow, $student->training_type ?? 'Chính quy'); // Loại hình đào tạo
+            $sheet->setCellValue('G' . $currentRow, $degree->training_type ?? 'Chính quy'); // Loại hình đào tạo
             $sheet->setCellValue('H' . $currentRow, $student->course ?? ''); // Khóa
             $sheet->setCellValue('I' . $currentRow, $degree->ranking ?? ''); // Xếp loại tốt nghiệp
             $sheet->setCellValue('J' . $currentRow, $degree->diplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng (serial number)

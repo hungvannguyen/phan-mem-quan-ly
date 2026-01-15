@@ -52,7 +52,7 @@ class DiplomaVerificationExport
         $fullName = $this->student->full_name ?? '';
         $dateOfBirth = $this->student->date_of_birth ? $this->student->date_of_birth->format('d/m/Y') : '';
         $ranking = $degree->ranking ?? '';
-        $trainingType = $this->student->training_type ?? 'Chính quy';
+        $trainingType = $degree->training_type ?? 'Chính quy';
 
         // Set values for template placeholders
         $donVi = $this->params['don_vi_yeu_cau'] ?? '';

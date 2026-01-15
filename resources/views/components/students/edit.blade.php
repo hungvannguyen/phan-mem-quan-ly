@@ -830,6 +830,12 @@
                                             @endif
                                         </span>
                                     </div>
+                                    @if ($degree->training_type)
+                                        <div class="detail-item">
+                                            <span class="label">Hình thức đào tạo:</span>
+                                            <span class="value">{{ $degree->training_type }}</span>
+                                        </div>
+                                    @endif
                                     @if ($degree->training_start_date)
                                         <div class="detail-item">
                                             <span class="label">Thời gian đào tạo từ:</span>
@@ -1416,6 +1422,20 @@
                 </div>
 
                 <div class="field-group">
+                    <label for="training_type" class="field-label">Hình thức đào tạo</label>
+                    <select name="training_type" id="training_type" class="field-input">
+                        <option value="">Chọn hình thức đào tạo</option>
+                        <option value="Chính quy" {{ old('training_type') == 'Chính quy' ? 'selected' : '' }}>Chính quy
+                        </option>
+                        <option value="Liên thông" {{ old('training_type') == 'Liên thông' ? 'selected' : '' }}>Liên
+                            thông</option>
+                        <option value="Từ xa" {{ old('training_type') == 'Từ xa' ? 'selected' : '' }}>Từ xa</option>
+                        <option value="Vừa làm vừa học"
+                            {{ old('training_type') == 'Vừa làm vừa học' ? 'selected' : '' }}>Vừa làm vừa học</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
                     <label for="notes" class="field-label">Ghi chú</label>
                     <textarea name="notes" id="notes" rows="3" class="field-input" placeholder="Nhập ghi chú (tùy chọn)">{{ old('notes') }}</textarea>
                 </div>
@@ -1552,6 +1572,17 @@
                         @foreach ($majors as $major)
                             <option value="{{ $major->major_id }}">{{ $major->major_name }}</option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="edit_training_type" class="field-label">Hình thức đào tạo</label>
+                    <select name="training_type" id="edit_training_type" class="field-input">
+                        <option value="">Chọn hình thức đào tạo</option>
+                        <option value="Chính quy">Chính quy</option>
+                        <option value="Liên thông">Liên thông</option>
+                        <option value="Từ xa">Từ xa</option>
+                        <option value="Vừa làm vừa học">Vừa làm vừa học</option>
                     </select>
                 </div>
 
@@ -2172,41 +2203,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                                <i class="fas fa-tag mr-1"></i>
-                                                                                                ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                            </p>
-                                                                                        ` : ''}
+                                                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                                            <i class="fas fa-tag mr-1"></i>
+                                                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                                        </p>
+                                                                                                    ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                            <p class="mb-2 text-sm">
-                                                                                                <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                                <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                            </p>
-                                                                                        ` : ''}
+                                                                                                        <p class="mb-2 text-sm">
+                                                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                                        </p>
+                                                                                                    ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                        <span class="flex items-center">
-                                                                                            <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                            <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                        </span>
-                                                                                    ` : ''}
+                                                                                                    <span class="flex items-center">
+                                                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                                    </span>
+                                                                                                ` : ''}
                                             ${adj.decision_date ? `
-                                                                                        <span class="flex items-center">
-                                                                                            <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                            <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                        </span>
-                                                                                    ` : ''}
+                                                                                                    <span class="flex items-center">
+                                                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                                    </span>
+                                                                                                ` : ''}
                                             ${adj.changed_by ? `
-                                                                                        <span class="flex items-center">
-                                                                                            <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                            ${adj.changed_by.full_name || 'N/A'}
-                                                                                        </span>
-                                                                                    ` : ''}
+                                                                                                    <span class="flex items-center">
+                                                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                                        ${adj.changed_by.full_name || 'N/A'}
+                                                                                                    </span>
+                                                                                                ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2528,6 +2559,7 @@
             document.getElementById('edit_council_decision_number').value = degree.council_decision_number || '';
             document.getElementById('edit_graduation_decision_number').value = degree.graduation_decision_number || '';
             document.getElementById('edit_major_id').value = degree.major_id || '';
+            document.getElementById('edit_training_type').value = degree.training_type || '';
             document.getElementById('edit_notes').value = degree.notes || '';
 
             // Set council decision date

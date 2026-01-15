@@ -198,7 +198,7 @@ class IntermediatePoliticalTheoryInfoExport
             $sheet->setCellValue('J' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
             $sheet->setCellValue('K' . $currentRow, $student->class ?? ''); // Lớp
             $sheet->setCellValue('L' . $currentRow, $student->course ?? ''); // Khóa
-            $sheet->setCellValue('M' . $currentRow, $student->training_type ?? 'Chính quy'); // Loại hình đào tạo
+            $sheet->setCellValue('M' . $currentRow, $degree->training_type ?? 'Chính quy'); // Loại hình đào tạo
             $sheet->setCellValue('N' . $currentRow, $degree->decision_number ?? ''); // Số quyết định công nhận tốt nghiệp
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng công nhận tốt nghiệp
             $sheet->setCellValue('P' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp

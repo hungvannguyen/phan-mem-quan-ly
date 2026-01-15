@@ -15,10 +15,10 @@ return new class extends Migration {
             $table->string('student_code', 20)->unique();
             $table->string('full_name', 100);
             $table->date('date_of_birth');
-            $table->string('class_name', 50);
+            $table->string('class_name', 50)->nullable();
             $table->string('course', 20)->nullable();
             $table->string('academic_year', 20)->nullable();
-            $table->foreignId('major_id')->constrained('majors', 'major_id');
+            $table->foreignId('major_id')->nullable()->constrained('majors', 'major_id');
             $table->string('place_of_birth');
             $table->string('hometown')->nullable();
             $table->string('place_of_origin')->nullable();
