@@ -22,8 +22,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Import cho thông tin chứng chỉ
- * Cấu trúc file Excel theo template Certificate (26 cột A-Z)
+ * Import cho thông tin cấp bằng Lý luận chính trị
+ * Cấu trúc file Excel: Có thể khác với DegreeImport
  */
 class PoliticalTheoryImport implements ToCollection, WithStartRow
 {
@@ -76,7 +76,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
      */
     public function startRow(): int
     {
-        return 3;
+        return 5;
     }
 
     /**

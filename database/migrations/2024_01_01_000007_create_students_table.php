@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->ulid('student_id')->primary();
             $table->string('student_code', 20)->unique();
             $table->string('full_name', 100);
-            $table->date('date_of_birth');
+            $table->date('date_of_birth')->nullable();
             $table->string('class_name', 50)->nullable();
             $table->string('course', 20)->nullable();
             $table->string('academic_year', 20)->nullable();
