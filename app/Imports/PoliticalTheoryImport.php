@@ -329,7 +329,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'decision_number' => $rowData['adjustment_decision'],
             'decision_date' => $rowData['adjustment_date'],
             'action_type' => 'update',
-            'changed_by' => Auth::id(),
+            'changed_by' => Auth::id() ?? null,
             'additional_data' => [
                 'source' => 'import',
                 'document_reference' => $this->documentReference,
@@ -371,7 +371,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'edit_content' => $rowData['reissue_content'] ?: 'Cấp lại chứng chỉ',
             'recall_decision' => $rowData['reissue_decision'],
             'decision_date' => $rowData['reissue_date'],
-            'created_by' => Auth::id(),
+            'created_by' => Auth::id() ?? null,
         ]);
 
         Log::info('Created certificate reissue', [

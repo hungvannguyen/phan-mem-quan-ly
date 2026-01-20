@@ -337,7 +337,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'decision_number' => $rowData['adjustment_decision'],
             'decision_date' => $rowData['adjustment_date'],
             'action_type' => 'update',
-            'changed_by' => Auth::id() ?? 1, // Fallback ID admin nếu chạy CLI
+            'changed_by' => Auth::id() ?? null, // Không dùng fallback cố định để tránh FK lỗi
             'additional_data' => [
                 'source' => 'import',
                 'document_reference' => $this->documentReference,
@@ -366,7 +366,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'edit_content' => $rowData['reissue_content'] ?: 'Cấp lại văn bằng',
             'recall_decision' => $rowData['reissue_decision'],
             'decision_date' => $rowData['reissue_date'],
-            'created_by' => Auth::id() ?? 1,
+            'created_by' => Auth::id() ?? null,
         ]);
 
         if ($newDiplomaBlank) {
