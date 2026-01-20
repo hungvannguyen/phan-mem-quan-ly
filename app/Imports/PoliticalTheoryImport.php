@@ -40,31 +40,32 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
 
     // Column mapping constants (26 columns A-Z)
     // A - Số TT (index 0)
-    private const COL_DEGREE_TYPE = 1;              // B - Loại Văn bằng
-    private const COL_FULL_NAME = 2;                // C - Họ và tên
-    private const COL_DATE_OF_BIRTH = 3;            // D - Ngày Sinh
-    private const COL_PLACE_OF_BIRTH = 4;           // E - Nơi Sinh
-    private const COL_HOMETOWN = 5;                 // F - Quê quán
-    private const COL_GENDER = 6;                   // G - Giới tính
-    private const COL_NATION = 7;                   // H - Dân tộc
-    private const COL_TRAINING_TYPE = 8;            // I - Loại hình đào tạo
-    private const COL_COURSE = 9;                   // J - Khoá
-    private const COL_RANKING = 10;                 // K - Xếp loại tốt nghiệp
-    private const COL_DIPLOMA_NUMBER = 11;          // L - Số hiệu văn bằng
-    private const COL_REGISTRATION_NUMBER = 12;     // M - Số vào sổ gốc cấp văn bằng
-    private const COL_ACADEMIC_YEAR = 13;           // N - Khoá học
-    private const COL_GRADUATION_DECISION_NUMBER = 14; // O - Số QĐ (QĐ công nhận tốt nghiệp)
-    private const COL_GRADUATION_DECISION_DATE = 15;   // P - Ngày Tháng (QĐ công nhận tốt nghiệp)
-    private const COL_GRANTING_DATE = 16;           // Q - Ngày cấp
-    private const COL_STATUS_TEXT = 17;             // R - Tình trạng
-    private const COL_ADJUSTMENT_CONTENT = 18;      // S - Nội dung điều chỉnh
-    private const COL_ADJUSTMENT_DECISION = 19;     // T - QĐ điều chỉnh thông tin
-    private const COL_ADJUSTMENT_DATE = 20;         // U - Ngày QĐ (Điều chỉnh thông tin)
-    private const COL_REISSUE_NUMBER = 21;          // V - Số hiệu văn bằng (Cấp lại)
-    private const COL_REISSUE_CONTENT = 22;         // W - Nội dung chỉnh sửa (Cấp lại)
-    private const COL_REISSUE_DECISION = 23;        // X - QĐ thu hồi, huỷ bỏ và cấp lại
-    private const COL_REISSUE_DATE = 24;            // Y - Ngày QĐ (Cấp lại)
-    private const COL_NOTES = 25;                   // Z - Ghi chú
+    private const STUDENT_CODE = 1;               // A - Mã học viên
+    private const COL_DEGREE_TYPE = 2;              // B - Loại Văn bằng
+    private const COL_FULL_NAME = 3;                // C - Họ và tên
+    private const COL_DATE_OF_BIRTH = 4;            // D - Ngày Sinh
+    private const COL_PLACE_OF_BIRTH = 5;           // E - Nơi Sinh
+    private const COL_HOMETOWN = 6;                 // F - Quê quán
+    private const COL_GENDER = 7;                   // G - Giới tính
+    private const COL_NATION = 8;                   // H - Dân tộc
+    private const COL_TRAINING_TYPE = 9;            // I - Loại hình đào tạo
+    private const COL_COURSE = 10;                   // J - Khoá
+    private const COL_RANKING = 11;                 // K - Xếp loại tốt nghiệp
+    private const COL_DIPLOMA_NUMBER = 12;          // L - Số hiệu văn bằng
+    private const COL_REGISTRATION_NUMBER = 13;     // M - Số vào sổ gốc cấp văn bằng
+    private const COL_ACADEMIC_YEAR = 14;           // N - Khoá học
+    private const COL_GRADUATION_DECISION_NUMBER = 15; // O - Số QĐ (QĐ công nhận tốt nghiệp)
+    private const COL_GRADUATION_DECISION_DATE = 16;   // P - Ngày Tháng (QĐ công nhận tốt nghiệp)
+    private const COL_GRANTING_DATE = 17;           // Q - Ngày cấp
+    private const COL_STATUS_TEXT = 18;             // R - Tình trạng
+    private const COL_ADJUSTMENT_CONTENT = 19;      // S - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_DECISION = 20;     // T - QĐ điều chỉnh thông tin
+    private const COL_ADJUSTMENT_DATE = 21;         // U - Ngày QĐ (Điều chỉnh thông tin)
+    private const COL_REISSUE_NUMBER = 22;          // V - Số hiệu văn bằng (Cấp lại)
+    private const COL_REISSUE_CONTENT = 23;         // W - Nội dung chỉnh sửa (Cấp lại)
+    private const COL_REISSUE_DECISION = 24;        // X - QĐ thu hồi, huỷ bỏ và cấp lại
+    private const COL_REISSUE_DATE = 25;            // Y - Ngày QĐ (Cấp lại)
+    private const COL_NOTES = 26;                   // Z - Ghi chú
 
     public function __construct(string $documentReference = null)
     {

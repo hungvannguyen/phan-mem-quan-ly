@@ -38,29 +38,30 @@ class CertificateImport implements ToCollection, WithStartRow
 
     // --- ĐỊNH NGHĨA CỘT THEO YÊU CẦU ---
     // Index bắt đầu từ 0 (Cột A)
-    private const COL_FULL_NAME = 1;                // B - Họ và tên
-    private const COL_DATE_OF_BIRTH = 2;            // C - Ngày sinh
-    private const COL_PLACE_OF_BIRTH = 3;           // D - Nơi sinh
-    private const COL_GENDER = 4;                   // E - Giới tính
-    private const COL_NATION = 5;                   // F - Dân tộc
-    private const COL_TRAINING_PROGRAM = 6;         // G - Chương trình bồi dưỡng (Map vào major_name hoặc degree_type)
-    private const COL_RANKING = 7;                  // H - Xếp Loại
-    private const COL_DIPLOMA_NUMBER = 8;           // I - Số hiệu chứng chỉ
-    private const COL_REGISTRATION_NUMBER = 9;      // J - Số vào sổ gốc cấp chứng chỉ
-    private const COL_TRAINING_START = 10;          // K - Thời gian đào tạo từ ngày
-    private const COL_TRAINING_END = 11;            // L - Thời gian đài tạo đến ngày
-    private const COL_GRADUATION_DECISION_NUMBER = 12; // M - Số QĐ (QĐ công nhận tốt nghiệp)
-    private const COL_GRADUATION_DECISION_DATE = 13;   // N - Ngày Tháng (QĐ công nhận tốt nghiệp)
-    private const COL_GRANTING_DATE = 14;           // O - Ngày cấp (Theo thứ tự bảng chữ cái sau N là O)
-    private const COL_STATUS_TEXT = 15;             // P - Tình trạng
-    private const COL_ADJUSTMENT_CONTENT = 16;      // Q - Nội dung điều chỉnh
-    private const COL_ADJUSTMENT_DECISION = 17;     // R - QĐ điều chỉnh thông tin
-    private const COL_ADJUSTMENT_DATE = 18;         // S - Ngày QĐ (Điều chỉnh)
-    private const COL_REISSUE_NUMBER = 19;          // T - Số hiệu văn bằng (Cấp lại)
-    private const COL_REISSUE_CONTENT = 20;         // U - Nội dung chỉnh sửa (Cấp lại)
-    private const COL_REISSUE_DECISION = 21;        // V - QĐ thu hồi, huỷ bỏ và cấp lại
-    private const COL_REISSUE_DATE = 22;            // W - Ngày QĐ (Cấp lại)
-    private const COL_NOTES = 23;                   // X - Ghi chú
+    private const STUDENT_CODE = 1;               // A - Mã học viên
+    private const COL_FULL_NAME = 2;                // B - Họ và tên
+    private const COL_DATE_OF_BIRTH = 3;            // C - Ngày sinh
+    private const COL_PLACE_OF_BIRTH = 4;           // D - Nơi sinh
+    private const COL_GENDER = 5;                   // E - Giới tính
+    private const COL_NATION = 6;                   // F - Dân tộc
+    private const COL_TRAINING_PROGRAM = 7;         // G - Chương trình bồi dưỡng (Map vào major_name hoặc degree_type)
+    private const COL_RANKING = 8;                  // H - Xếp Loại
+    private const COL_DIPLOMA_NUMBER = 9;           // I - Số hiệu chứng chỉ
+    private const COL_REGISTRATION_NUMBER = 10;      // J - Số vào sổ gốc cấp chứng chỉ
+    private const COL_TRAINING_START = 11;          // K - Thời gian đào tạo từ ngày
+    private const COL_TRAINING_END = 12;            // L - Thời gian đài tạo đến ngày
+    private const COL_GRADUATION_DECISION_NUMBER = 13; // M - Số QĐ (QĐ công nhận tốt nghiệp)
+    private const COL_GRADUATION_DECISION_DATE = 14;   // N - Ngày Tháng (QĐ công nhận tốt nghiệp)
+    private const COL_GRANTING_DATE = 15;           // O - Ngày cấp (Theo thứ tự bảng chữ cái sau N là O)
+    private const COL_STATUS_TEXT = 16;             // P - Tình trạng
+    private const COL_ADJUSTMENT_CONTENT = 17;      // Q - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_DECISION = 18;     // R - QĐ điều chỉnh thông tin
+    private const COL_ADJUSTMENT_DATE = 19;         // S - Ngày QĐ (Điều chỉnh)
+    private const COL_REISSUE_NUMBER = 20;          // T - Số hiệu văn bằng (Cấp lại)
+    private const COL_REISSUE_CONTENT = 21;         // U - Nội dung chỉnh sửa (Cấp lại)
+    private const COL_REISSUE_DECISION = 22;        // V - QĐ thu hồi, huỷ bỏ và cấp lại
+    private const COL_REISSUE_DATE = 23;            // W - Ngày QĐ (Cấp lại)
+    private const COL_NOTES = 24;                   // X - Ghi chú
 
     public function __construct(string $documentReference = null)
     {
@@ -182,6 +183,7 @@ class CertificateImport implements ToCollection, WithStartRow
     protected function parseRowData(array $row): array
     {
         return [
+            'student_code' => $this->cleanString($row[self::STUDENT_CODE] ?? ''),
             'full_name' => $this->cleanString($row[self::COL_FULL_NAME] ?? ''),
             'date_of_birth' => $this->parseDate($row[self::COL_DATE_OF_BIRTH] ?? ''),
             'place_of_birth' => $this->cleanString($row[self::COL_PLACE_OF_BIRTH] ?? ''),
@@ -238,7 +240,7 @@ class CertificateImport implements ToCollection, WithStartRow
         }
 
         $dataToCreate = [
-            'student_code' => $studentCode,
+            'student_code' => sl,
             'full_name' => $rowData['full_name'],
             'date_of_birth' => $rowData['date_of_birth'],
             'place_of_birth' => $rowData['place_of_birth'],

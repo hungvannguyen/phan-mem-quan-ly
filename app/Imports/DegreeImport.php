@@ -39,38 +39,39 @@ class DegreeImport implements ToCollection, WithStartRow
     protected static $majorsByCode = [];
 
     // Column mapping constants
-    private const COL_DEGREE_TYPE = 1;
-    private const COL_FULL_NAME = 2;
-    private const COL_DATE_OF_BIRTH = 3;
-    private const COL_PLACE_OF_BIRTH = 4;
-    private const COL_HOMETOWN = 5;
-    private const COL_PLACE_OF_ORIGIN = 6;
-    private const COL_GENDER = 7;
-    private const COL_NATION = 8;
-    private const COL_NATIONALITY = 9;
-    private const COL_COURSE = 10;
-    private const COL_CLASS_NAME = 11;
-    private const COL_ACADEMIC_YEAR = 12;
-    private const COL_MAJOR_NAME = 13;
-    private const COL_TRAINING_TYPE = 14;
-    private const COL_COUNCIL_DECISION_NUMBER = 15;
-    private const COL_COUNCIL_DECISION_DATE = 16;
-    private const COL_DEFENSE_DATE = 17;
-    private const COL_GRADUATION_DECISION_NUMBER = 18;
-    private const COL_GRADUATION_DECISION_DATE = 19;
-    private const COL_GRADUATION_YEAR = 20;
-    private const COL_RANKING = 21;
-    private const COL_DIPLOMA_NUMBER = 22;
-    private const COL_REGISTRATION_NUMBER = 23;
-    private const COL_GRANTING_DATE = 24;
-    private const COL_ADJUSTMENT_CONTENT = 25;
-    private const COL_ADJUSTMENT_DECISION = 26;
-    private const COL_ADJUSTMENT_DATE = 27;
-    private const COL_REISSUE_NUMBER = 28;
-    private const COL_REISSUE_CONTENT = 29;
-    private const COL_REISSUE_DECISION = 30;
-    private const COL_REISSUE_DATE = 31;
-    private const COL_NOTES = 32;
+    private const STUDENT_CODE = 1;               // A - Mã học viên
+    private const COL_DEGREE_TYPE = 2;
+    private const COL_FULL_NAME = 3;
+    private const COL_DATE_OF_BIRTH = 4;
+    private const COL_PLACE_OF_BIRTH = 5;
+    private const COL_HOMETOWN = 6;
+    private const COL_PLACE_OF_ORIGIN = 7;
+    private const COL_GENDER = 8;
+    private const COL_NATION = 9;
+    private const COL_NATIONALITY = 10;
+    private const COL_COURSE = 11;
+    private const COL_CLASS_NAME = 12;
+    private const COL_ACADEMIC_YEAR = 13;
+    private const COL_MAJOR_NAME = 14;
+    private const COL_TRAINING_TYPE = 15;
+    private const COL_COUNCIL_DECISION_NUMBER = 16;
+    private const COL_COUNCIL_DECISION_DATE = 17;
+    private const COL_DEFENSE_DATE = 18;
+    private const COL_GRADUATION_DECISION_NUMBER = 19;
+    private const COL_GRADUATION_DECISION_DATE = 20;
+    private const COL_GRADUATION_YEAR = 21;
+    private const COL_RANKING = 22;
+    private const COL_DIPLOMA_NUMBER = 23;
+    private const COL_REGISTRATION_NUMBER = 24;
+    private const COL_GRANTING_DATE = 25;
+    private const COL_ADJUSTMENT_CONTENT = 26;
+    private const COL_ADJUSTMENT_DECISION = 27;
+    private const COL_ADJUSTMENT_DATE = 28;
+    private const COL_REISSUE_NUMBER = 29;
+    private const COL_REISSUE_CONTENT = 30;
+    private const COL_REISSUE_DECISION = 31;
+    private const COL_REISSUE_DATE = 32;
+    private const COL_NOTES = 33;
 
     public function __construct(string $documentReference = null)
     {
@@ -199,6 +200,7 @@ class DegreeImport implements ToCollection, WithStartRow
     protected function parseRowData(array $row): array
     {
         return [
+            'student_code' => $this->cleanString($row[self::STUDENT_CODE] ?? ''),
             'full_name' => $this->cleanString($row[self::COL_FULL_NAME] ?? ''),
             'date_of_birth' => $this->parseDate($row[self::COL_DATE_OF_BIRTH] ?? ''),
             'place_of_birth' => $this->cleanString($row[self::COL_PLACE_OF_BIRTH] ?? ''),
