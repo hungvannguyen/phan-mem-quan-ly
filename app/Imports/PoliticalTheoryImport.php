@@ -186,6 +186,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     protected function parseRowData(array $row): array
     {
         return [
+            'student_code' => $this->cleanString($row[self::STUDENT_CODE] ?? ''),
             'full_name' => $this->cleanString($row[self::COL_FULL_NAME] ?? ''),
             'date_of_birth' => $this->parseDate($row[self::COL_DATE_OF_BIRTH] ?? ''),
             'place_of_birth' => $this->cleanString($row[self::COL_PLACE_OF_BIRTH] ?? ''),
@@ -218,52 +219,43 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     /**
      * Find or create student
      */
-    protected function findOrCreateStudent(array $rowData, ?Major $major): Student
+    protected function findOrCreateStudent(array $rowData): Student
     {
-        $student = Student::where('full_name', $rowData['full_name'])
-            ->where('date_of_birth', $rowData['date_of_birth'])
-            ->where('place_of_birth', $rowData['place_of_birth'])
-            ->first();
-
-        if ($student) {
-            // Không update gì, giữ nguyên thông tin student đã có
-            return $student;
-        }
-
-        $cleanRegNumber = preg_replace('/[^A-Z0-9]/', '', $rowData['registration_number']);
-        $studentCode = 'CERT_' . $cleanRegNumber;
-
-        $dataToCreate = [
-            'student_code' => $studentCode,
-            'full_name' => $rowData['full_name'],
-            'date_of_birth' => $rowData['date_of_birth'],
-            'place_of_birth' => $rowData['place_of_birth'],
-            'hometown' => $rowData['hometown'],
-            'gender' => $rowData['gender'],
-            'nation' => $rowData['nation'],
-            'nationality' => 'Việt Nam',
-            'course' => $rowData['course'],
-            'academic_year' => $rowData['academic_year'],
-            'major_id' => null,
-            'number_in_the_book' => $rowData['registration_number'],
-            'class_name' => null, // EXPLICITLY NULL - Certificate không có class_name
-            'status' => 1,
+        // 1. Chuẩn bị dữ liệu để map vào database
+        // Đây là những dữ liệu sẽ được dùng để tạo mới HOẶC cập nhật
+        $dataToSync = [
+            'full_name'          => $rowData['full_name'],
+            'date_of_birth'      => $rowData['date_of_birth'],
+            'place_of_birth'     => $rowData['place_of_birth'],
+            'gender'             => $rowData['gender'],
+            'nation'             => $rowData['nation'],
         ];
 
-        Log::info('PoliticalTheoryImport: Data being passed to Student::create', $dataToCreate);
+        // 2. Sử dụng updateOrCreate
+        // Tham số 1: Điều kiện tìm kiếm (ở đây là student_code)
+        // Tham số 2: Dữ liệu cần lưu (sẽ update nếu tìm thấy, hoặc create merge với tham số 1 nếu không thấy)
 
-        $student = Student::create($dataToCreate);
-
-        // Fresh từ database để chắc chắn
-        $student->refresh();
-
-        Log::info('PoliticalTheoryImport: Student sau khi create và refresh', [
-            'student_id' => $student->student_id,
-            'student_code' => $student->student_code,
-            'class_name' => $student->class_name,
-            'course' => $student->course,
-            'class_name_is_null' => is_null($student->class_name),
+        Log::info('PoliticalTheoryImport: Processing student', [
+            'student_code' => $rowData['student_code']
         ]);
+
+        $student = Student::updateOrCreate(
+            ['student_code' => $rowData['student_code']], // Điều kiện duy nhất (unique key)
+            $dataToSync                                    // Dữ liệu cần cập nhật/tạo mới
+        );
+
+        // Logic của Laravel:
+        // - Nếu tìm thấy: Nó sẽ fill $dataToSync và save(). (Chỉ chạy query update nếu dữ liệu thực sự thay đổi - isDirty)
+        // - Nếu không thấy: Nó sẽ tạo mới bản ghi với student_code + $dataToSync.
+
+        // Log kết quả để kiểm tra (có thể bỏ qua nếu muốn code gọn hơn)
+        if ($student->wasRecentlyCreated) {
+            Log::info('PoliticalTheoryImport: Created new student', ['id' => $student->student_id]);
+        } elseif ($student->wasChanged()) {
+            Log::info('PoliticalTheoryImport: Updated existing student', ['id' => $student->student_id]);
+        } else {
+            Log::info('PoliticalTheoryImport: Student existed and no changes detected', ['id' => $student->student_id]);
+        }
 
         return $student;
     }
@@ -301,6 +293,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'degree_type' => 'certificate', // Luôn là certificate
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
             'registration_number' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['registration_number'],
             'granting_date' => $rowData['granting_date'],
             'graduation_year' => $graduationYear,
             'ranking' => $rowData['ranking'],

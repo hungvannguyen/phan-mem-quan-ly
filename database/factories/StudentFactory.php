@@ -105,10 +105,9 @@ class StudentFactory extends Factory
             'hometown' => $this->faker->randomElement($vietnamProvinces),
             'place_of_origin' => $this->faker->randomElement($vietnamProvinces),
             'gender' => $gender->value,
-            'nation' => $this->faker->randomElement(['Kinh', 'Tày', 'Thái', 'Mường', 'Khmer', 'Hoa', 'Nùng', 'H\'Mông']),
+            'nation' => $this->faker->randomElement(['Kinh', 'Tày', 'Thái', 'Mường', 'Khmer', 'Hoa', 'Nùng', "H'Mông"]),
             'nationality' => 'Việt Nam',
-            'number_in_the_book' => 'VB-' . $this->faker->unique()->numberBetween(100000, 999999),
-            'status' => $this->faker->randomElement(StudentStatus::cases())->value,
+            'status' => $this->faker->randomElement(StudentStatus::cases())->value
         ];
     }
 

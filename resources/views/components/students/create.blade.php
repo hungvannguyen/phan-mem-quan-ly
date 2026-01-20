@@ -256,20 +256,9 @@
                     Thông tin bổ sung
                 </h2>
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div class="form-field">
-                        <label for="number_in_the_book" class="field-label">Số sổ gốc <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="number_in_the_book" name="number_in_the_book" class="field-input"
-                            value="{{ old('number_in_the_book') }}" placeholder="Nhập số sổ gốc" required>
-                        @error('number_in_the_book')
-                            <span class="error-message">{{ $message }}</span>
-                        @enderror
-                        <div class="field-description">
-                            <small class="text-gray-600">
-                                Số thứ tự trong sổ gốc cấp văn bằng (VD: 001, 002, 123)
-                            </small>
-                        </div>
-                    </div>
+
+                    <!-- Add to Degree Section: Show number_in_the_book in degree details and modals -->
+                    <!-- Already handled in degree modals/forms if needed -->
 
                     <div class="form-field">
                         <label for="place_of_birth" class="field-label">Nơi sinh <span

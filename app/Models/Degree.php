@@ -29,6 +29,7 @@ class Degree extends Model
         'degree_type',
         'diploma_blank_id',
         'registration_number',
+        'number_in_the_book',
         'granting_date',
         'graduation_year',
         'ranking',
@@ -56,6 +57,7 @@ class Degree extends Model
         return [
             'degree_type' => 'string',
             'registration_number' => 'string',
+            'number_in_the_book' => 'string',
             'granting_date' => 'date',
             'defense_date' => 'date',
             'training_start_date' => 'date',

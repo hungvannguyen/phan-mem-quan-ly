@@ -217,46 +217,44 @@ class CertificateImport implements ToCollection, WithStartRow
      */
     protected function findOrCreateStudent(array $rowData): Student
     {
-        // Thử tìm học viên dựa trên thông tin cá nhân
-        $student = Student::where('full_name', $rowData['full_name'])
-            ->where('date_of_birth', $rowData['date_of_birth'])
-            ->where('place_of_birth', $rowData['place_of_birth'])
-            ->first();
-
-        if ($student) {
-            return $student;
-        }
-
-        // Tạo mã sinh viên giả định cho hệ thống chứng chỉ
-        $cleanRegNumber = preg_replace('/[^A-Z0-9]/', '', $rowData['registration_number']);
-        $studentCode = 'CERT_' . ($cleanRegNumber ?: uniqid());
-
-        // Tính toán academic_year từ thời gian đào tạo (nếu có)
-        $academicYear = null;
-        if ($rowData['training_start'] && $rowData['training_end']) {
-            $yearStart = date('Y', strtotime($rowData['training_start']));
-            $yearEnd = date('Y', strtotime($rowData['training_end']));
-            $academicYear = ($yearStart == $yearEnd) ? $yearStart : "$yearStart-$yearEnd";
-        }
-
-        $dataToCreate = [
-            'student_code' => sl,
-            'full_name' => $rowData['full_name'],
-            'date_of_birth' => $rowData['date_of_birth'],
-            'place_of_birth' => $rowData['place_of_birth'],
-            'hometown' => $rowData['place_of_birth'], // Excel mới không có quê quán, dùng tạm nơi sinh
-            'gender' => $rowData['gender'],
-            'nation' => $rowData['nation'],
-            'nationality' => 'Việt Nam',
-            'course' => null, // Excel không có cột Khoá
-            'academic_year' => $academicYear,
-            'major_id' => null,
-            'number_in_the_book' => $rowData['registration_number'],
-            'class_name' => null,
-            'status' => 1,
+        // 1. Chuẩn bị dữ liệu để map vào database
+        // Đây là những dữ liệu sẽ được dùng để tạo mới HOẶC cập nhật
+        $dataToSync = [
+            'full_name'          => $rowData['full_name'],
+            'date_of_birth'      => $rowData['date_of_birth'],
+            'place_of_birth'     => $rowData['place_of_birth'],
+            'gender'             => $rowData['gender'],
+            'nation'             => $rowData['nation'],
+            'status'             => $rowData['status'],
         ];
 
-        return Student::create($dataToCreate);
+        // 2. Sử dụng updateOrCreate
+        // Tham số 1: Điều kiện tìm kiếm (ở đây là student_code)
+        // Tham số 2: Dữ liệu cần lưu (sẽ update nếu tìm thấy, hoặc create merge với tham số 1 nếu không thấy)
+
+        Log::info('PoliticalTheoryImport: Processing student', [
+            'student_code' => $rowData['student_code']
+        ]);
+
+        $student = Student::updateOrCreate(
+            ['student_code' => $rowData['student_code']], // Điều kiện duy nhất (unique key)
+            $dataToSync                                    // Dữ liệu cần cập nhật/tạo mới
+        );
+
+        // Logic của Laravel:
+        // - Nếu tìm thấy: Nó sẽ fill $dataToSync và save(). (Chỉ chạy query update nếu dữ liệu thực sự thay đổi - isDirty)
+        // - Nếu không thấy: Nó sẽ tạo mới bản ghi với student_code + $dataToSync.
+
+        // Log kết quả để kiểm tra (có thể bỏ qua nếu muốn code gọn hơn)
+        if ($student->wasRecentlyCreated) {
+            Log::info('PoliticalTheoryImport: Created new student', ['id' => $student->student_id]);
+        } elseif ($student->wasChanged()) {
+            Log::info('PoliticalTheoryImport: Updated existing student', ['id' => $student->student_id]);
+        } else {
+            Log::info('PoliticalTheoryImport: Student existed and no changes detected', ['id' => $student->student_id]);
+        }
+
+        return $student;
     }
 
     /**
@@ -311,6 +309,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'degree_type' => 'certificate',
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
             'registration_number' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['registration_number'],
             'granting_date' => $grantingDate,
             'graduation_year' => $graduationYear,
             'ranking' => $rowData['ranking'],

@@ -40,9 +40,8 @@ class Student extends Model
         'gender',
         'nation',
         'nationality',
-        'number_in_the_book',
         'status',
-    ];
+    ]; // number_in_the_book removed
 
     /**
      * Get the attributes that should be cast.
@@ -62,7 +61,6 @@ class Student extends Model
             'gender' => StudentGender::class,
             'nation' => 'string',
             'nationality' => 'string',
-            'number_in_the_book' => 'string',
             'status' => StudentStatus::class,
         ];
     }

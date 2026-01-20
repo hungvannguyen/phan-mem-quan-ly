@@ -44,7 +44,6 @@ class StudentRequest extends FormRequest
             'gender' => 'nullable|integer|in:0,1',
             'nation' => 'required|string|max:100',
             'nationality' => 'required|string|max:100',
-            'number_in_the_book' => 'required|string|max:100',
             'status' => 'required|integer|in:0,1,2',
         ];
     }

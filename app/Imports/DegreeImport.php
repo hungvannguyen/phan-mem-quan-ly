@@ -294,37 +294,51 @@ class DegreeImport implements ToCollection, WithStartRow
     /**
      * Find or create student
      */
-    protected function findOrCreateStudent(array $rowData, ?Major $major): Student
+    protected function findOrCreateStudent(array $rowData): Student
     {
-        $student = Student::where('full_name', $rowData['full_name'])
-            ->where('date_of_birth', $rowData['date_of_birth'])
-            ->where('place_of_birth', $rowData['place_of_birth'])
-            ->first();
+        // 1. Chuẩn bị dữ liệu để map vào database
+        // Đây là những dữ liệu sẽ được dùng để tạo mới HOẶC cập nhật
+        $dataToSync = [
+            'full_name'          => $rowData['full_name'],
+            'date_of_birth'      => $rowData['date_of_birth'],
+            'place_of_birth'     => $rowData['place_of_birth'],
+            'hometown'           => $rowData['hometown'],
+            'place_of_origin'    => $rowData['place_of_origin'],
+            'gender'             => $rowData['gender'],
+            'nation'             => $rowData['nation'],
+            'nationality'        => $rowData['nationality'],
+            'course'             => $rowData['course'],
+            'class_name'         => $rowData['class_name'],
+            'academic_year'      => $rowData['academic_year'],
+        ];
 
-        if ($student) {
-            return $student;
+        // 2. Sử dụng updateOrCreate
+        // Tham số 1: Điều kiện tìm kiếm (ở đây là student_code)
+        // Tham số 2: Dữ liệu cần lưu (sẽ update nếu tìm thấy, hoặc create merge với tham số 1 nếu không thấy)
+
+        Log::info('PoliticalTheoryImport: Processing student', [
+            'student_code' => $rowData['student_code']
+        ]);
+
+        $student = Student::updateOrCreate(
+            ['student_code' => $rowData['student_code']], // Điều kiện duy nhất (unique key)
+            $dataToSync                                    // Dữ liệu cần cập nhật/tạo mới
+        );
+
+        // Logic của Laravel:
+        // - Nếu tìm thấy: Nó sẽ fill $dataToSync và save(). (Chỉ chạy query update nếu dữ liệu thực sự thay đổi - isDirty)
+        // - Nếu không thấy: Nó sẽ tạo mới bản ghi với student_code + $dataToSync.
+
+        // Log kết quả để kiểm tra (có thể bỏ qua nếu muốn code gọn hơn)
+        if ($student->wasRecentlyCreated) {
+            Log::info('PoliticalTheoryImport: Created new student', ['id' => $student->student_id]);
+        } elseif ($student->wasChanged()) {
+            Log::info('PoliticalTheoryImport: Updated existing student', ['id' => $student->student_id]);
+        } else {
+            Log::info('PoliticalTheoryImport: Student existed and no changes detected', ['id' => $student->student_id]);
         }
 
-        $cleanRegNumber = preg_replace('/[^A-Z0-9]/', '', $rowData['registration_number']);
-        $studentCode = 'IMP_' . $cleanRegNumber;
-
-        return Student::create([
-            'student_code' => $studentCode,
-            'full_name' => $rowData['full_name'],
-            'date_of_birth' => $rowData['date_of_birth'],
-            'place_of_birth' => $rowData['place_of_birth'],
-            'hometown' => $rowData['hometown'],
-            'place_of_origin' => $rowData['place_of_origin'],
-            'gender' => $rowData['gender'],
-            'nation' => $rowData['nation'],
-            'nationality' => $rowData['nationality'],
-            'course' => $rowData['course'],
-            'class_name' => $rowData['class_name'],
-            'academic_year' => $rowData['academic_year'],
-            'major_id' => $major?->major_id,
-            'number_in_the_book' => $rowData['registration_number'],
-            'status' => 1, // Graduate
-        ]);
+        return $student;
     }
 
     /**
@@ -357,6 +371,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'degree_type' => $rowData['degree_type'],
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
             'registration_number' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['registration_number'],
             'granting_date' => $rowData['granting_date'],
             'graduation_year' => $rowData['graduation_year'],
             'ranking' => $rowData['ranking'],

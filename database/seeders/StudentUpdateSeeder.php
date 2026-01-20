@@ -177,29 +177,7 @@ class StudentUpdateSeeder extends Seeder
             }
 
             // Update 5: Thay đổi số sổ gốc
-            if ($index === 3) {
-                $oldNumber = $student->number_in_the_book;
-                $newNumber = str_pad($index + 100, 4, '0', STR_PAD_LEFT);
-                Student::unsetEventDispatcher();
-                $student->number_in_the_book = $newNumber;
-                $student->save();
-                Student::setEventDispatcher($dispatcher);
-
-                ChangeLog::create([
-                    'entity_type' => 'Student',
-                    'entity_id' => $student->student_id,
-                    'changed_field' => 'number_in_the_book',
-                    'old_value' => $oldNumber,
-                    'new_value' => $newNumber,
-                    'change_description' => 'Thay đổi số sổ gốc',
-                    'decision_number' => 'QĐ-HVANND-' . now()->year . '-' . str_pad(400 + $index, 4, '0', STR_PAD_LEFT),
-                    'decision_date' => now()->subDays(rand(30, 180)),
-                    'changed_by' => $user->user_id,
-                    'action_type' => 'update',
-                ]);
-
-                $this->command->info("  ✓ Đổi số sổ gốc: {$oldNumber} → {$newNumber}");
-            }
+            // Đã chuyển xử lý số sổ gốc sang Degree, không cập nhật ở Student nữa
 
             // Delay nhỏ để các timestamp khác nhau
             usleep(100000); // 0.1 second

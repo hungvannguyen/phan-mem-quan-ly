@@ -61,6 +61,7 @@ class DegreeFactory extends Factory
             'diploma_blank_id' => DiplomaBlank::factory()->available(),
             'degree_type' => $this->faker->randomElement(['bachelor', 'master', 'doctor']),
             'registration_number' => $this->faker->unique()->regexify('[0-9]{4}/[A-Z]{2}-[0-9]{4}'),
+            'number_in_the_book' => 'VB-' . $this->faker->unique()->numberBetween(100000, 999999),
             'major_name' => $this->faker->randomElement($majorNames),
             'granting_date' => $grantingDate->format('Y-m-d'),
             'graduation_year' => $graduationYear,

@@ -11,6 +11,8 @@ use App\Models\ChangeLog;
 use App\Models\DiplomaBlankType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\DiplomaBlank;
 use App\Enums\DegreeStatus;
 use App\Enums\DiplomaBlankStatus;
@@ -174,6 +176,7 @@ class DiplomaManagementController extends Controller
             'degree_type' => 'required|string|in:bachelor,master,doctor,certificate',
             'diploma_blank_id' => 'required|exists:diploma_blanks,diploma_blank_id',
             'registration_number' => 'required|string|max:255|unique:degrees,registration_number',
+            'number_in_the_book' => 'required|string|max:100|unique:degrees,number_in_the_book',
             'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
             'granting_date' => 'required|date|before_or_equal:today',
             'training_start_date' => 'nullable|date',
@@ -285,6 +288,7 @@ class DiplomaManagementController extends Controller
             'student_id' => 'required|exists:students,student_id',
             'degree_type' => 'required|string|in:bachelor,master,doctor,certificate',
             'registration_number' => 'required|string|max:255|unique:degrees,registration_number,' . $degree->degree_id . ',degree_id',
+            'number_in_the_book' => 'required|string|max:100|unique:degrees,number_in_the_book,' . $degree->degree_id . ',degree_id',
             'graduation_year' => 'required|integer|min:1990|max:' . date('Y'),
             'granting_date' => 'required|date|before_or_equal:today',
             'training_start_date' => 'nullable|date',
@@ -496,7 +500,7 @@ class DiplomaManagementController extends Controller
                 newValue: $newValue,
                 decisionNumber: $validated['decision_number'],
                 decisionDate: $validated['decision_date'],
-                changedBy: auth()->user()->user_id,
+                changedBy: Auth::user()->user_id,
                 actionType: 'update'
             );
 
@@ -549,7 +553,7 @@ class DiplomaManagementController extends Controller
     public function storeReissue(Request $request, Degree $degree)
     {
         try {
-            \Log::info('Reissue request received', [
+            Log::info('Reissue request received', [
                 'all_data' => $request->all(),
                 'degree_id' => $degree->degree_id
             ]);
@@ -563,18 +567,18 @@ class DiplomaManagementController extends Controller
                 'notes' => 'nullable|string',
             ]);
 
-            \Log::info('Validation passed', ['validated' => $validated]);
+            Log::info('Validation passed', ['validated' => $validated]);
 
             DB::beginTransaction();
 
             // Get old and new diploma blanks
             $oldBlank = $degree->diplomaBlank;
 
-            \Log::info('Looking for blank', ['blank_id' => $validated['new_diploma_blank_id']]);
+            Log::info('Looking for blank', ['blank_id' => $validated['new_diploma_blank_id']]);
 
             $newBlank = DiplomaBlank::findOrFail($validated['new_diploma_blank_id']);
 
-            \Log::info('Found new blank', [
+            Log::info('Found new blank', [
                 'blank_id' => $newBlank->diploma_blank_id,
                 'status' => $newBlank->status,
                 'expected_status' => DiplomaBlankStatus::IN_STOCK
@@ -583,7 +587,7 @@ class DiplomaManagementController extends Controller
             // Validate new blank is in stock
             if ($newBlank->status !== DiplomaBlankStatus::IN_STOCK) {
                 DB::rollBack();
-                \Log::warning('Blank not in stock', ['status' => $newBlank->status]);
+                Log::warning('Blank not in stock', ['status' => $newBlank->status]);
                 return redirect()->back()
                     ->with('error', 'Phôi văn bằng đã chọn không còn trong kho')
                     ->withInput();
@@ -598,11 +602,11 @@ class DiplomaManagementController extends Controller
             $validated['is_recalled'] = ($oldBlankStatus === 'recalled');
             $validated['is_destroyed'] = ($oldBlankStatus === 'destroyed');
 
-            \Log::info('About to create reissue', ['validated_data' => $validated]);
+            Log::info('About to create reissue', ['validated_data' => $validated]);
 
             $reissue = DegreeReissue::create($validated);
 
-            \Log::info('Reissue created', ['reissue_id' => $reissue->reissue_id]);
+            Log::info('Reissue created', ['reissue_id' => $reissue->reissue_id]);
 
             // Update old blank status based on selection
             if ($oldBlank) {
@@ -624,12 +628,12 @@ class DiplomaManagementController extends Controller
 
             DB::commit();
 
-            \Log::info('Reissue created successfully');
+            Log::info('Reissue created successfully');
 
             return redirect()->back()
                 ->with('success', 'Đã lưu lịch sử cấp lại văn bằng thành công');
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error in storeReissue', [
+            Log::error('Validation error in storeReissue', [
                 'errors' => $e->errors(),
                 'input' => $request->all()
             ]);
@@ -638,7 +642,7 @@ class DiplomaManagementController extends Controller
                 ->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error storing degree reissue: ' . $e->getMessage(), [
+            Log::error('Error storing degree reissue: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()
@@ -659,7 +663,7 @@ class DiplomaManagementController extends Controller
             return redirect()->back()
                 ->with('success', 'Đã xóa lịch sử cấp lại thành công');
         } catch (\Exception $e) {
-            \Log::error('Error deleting degree reissue: ' . $e->getMessage());
+            Log::error('Error deleting degree reissue: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Có lỗi xảy ra khi xóa lịch sử cấp lại');
         }
@@ -698,7 +702,7 @@ class DiplomaManagementController extends Controller
                 'blanks' => $blanks
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error getting available blanks: ' . $e->getMessage());
+            Log::error('Error getting available blanks: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Có lỗi xảy ra khi lấy danh sách phôi'

@@ -10,7 +10,6 @@
                     <th class="th">Ngành đào tạo</th>
                     <th class="th">Dân tộc</th>
                     <th class="th">Quốc tịch</th>
-                    <th class="th">Số sổ gốc</th>
                     <th class="th">Số văn bằng</th>
                     <th class="th">Trạng thái</th>
                     <th class="th">Hành động</th>
@@ -71,15 +70,6 @@
                                 <span class="nationality">{{ $student->nationality ?? '--' }}</span>
                                 @if ($student->nationality && $student->nationality !== 'Việt Nam')
                                     <i class="fas fa-globe-americas text-info ml-1" title="Quốc tịch nước ngoài"></i>
-                                @endif
-                            </div>
-                        </td>
-                        <td class="td">
-                            <div class="book-number">
-                                @if ($student->number_in_the_book)
-                                    <span class="book-number-text">{{ $student->number_in_the_book }}</span>
-                                @else
-                                    <span class="text-muted">--</span>
                                 @endif
                             </div>
                         </td>

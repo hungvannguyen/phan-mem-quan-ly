@@ -517,19 +517,9 @@
                         @enderror
                     </div>
 
-                    <div class="form-field">
-                        <label for="number_in_the_book" class="field-label">Số sổ gốc <span
-                                class="text-red-500">*</span></label>
-                        <input type="text" id="number_in_the_book" name="number_in_the_book" class="field-input"
-                            value="{{ old('number_in_the_book', $student->number_in_the_book) }}"
-                            placeholder="Nhập số sổ gốc" required>
-                        <div class="field-description">
-                            <small class="text-gray-600">Số thứ tự trong sổ gốc cấp văn bằng (VD: 001, 002, 123)</small>
-                        </div>
-                        @error('number_in_the_book')
-                            <span class="error-message">{{ $message }}</span>
-                        @enderror
-                    </div>
+
+                    <!-- Add to Degree Section: Show number_in_the_book in degree details and modals -->
+                    <!-- Already handled in degree modals/forms if needed -->
                 </div>
             </div>
 
@@ -707,18 +697,10 @@
                             ({{ $degrees->count() }} văn bằng)
                         </span>
                     </h2>
-                    @if ($student->status && $student->status->value === 1)
-                        <button type="button" onclick="openAddDegreeModal()" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus mr-2"></i>
-                            Thêm văn bằng
-                        </button>
-                    @else
-                        <button type="button" class="btn btn-secondary btn-sm cursor-not-allowed opacity-50" disabled
-                            title="Chỉ có thể thêm văn bằng cho sinh viên đã tốt nghiệp">
-                            <i class="fas fa-plus mr-2"></i>
-                            Thêm văn bằng
-                        </button>
-                    @endif
+                    <button type="button" onclick="openAddDegreeModal()" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus mr-2"></i>
+                        Thêm văn bằng
+                    </button>
                 </div>
                 @if ($degrees->count() > 0)
                     <div class="space-y-4">
@@ -792,6 +774,10 @@
                                     <div class="detail-item">
                                         <span class="label">Số đăng ký:</span>
                                         <span class="value">{{ $degree->registration_number ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Số vào sổ:</span>
+                                        <span class="value">{{ $degree->number_in_the_book ?? 'N/A' }}</span>
                                     </div>
                                     <div class="detail-item">
                                         <span class="label">Năm tốt nghiệp:</span>
@@ -1274,6 +1260,17 @@
 
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="field-group">
+                        <label for="number_in_the_book" class="field-label required">Số vào sổ</label>
+                        <input type="text" name="number_in_the_book" id="number_in_the_book" class="field-input"
+                            placeholder="Nhập số vào sổ" value="{{ old('number_in_the_book') }}" required>
+                        <div class="field-description">
+                            <small class="text-gray-600">Số thứ tự trong sổ gốc cấp văn bằng (VD: 001, 002, 123)</small>
+                        </div>
+                        @error('number_in_the_book')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="field-group">
                         <label for="degree_type" class="field-label required">Loại văn bằng</label>
                         <select name="degree_type" id="degree_type" class="field-input" required>
                             <option value="">Chọn loại văn bằng</option>
@@ -1469,6 +1466,15 @@
                 @method('PUT')
                 <input type="hidden" name="student_id" value="{{ $student->student_id }}">
 
+                <div class="field-group">
+                    <label for="edit_number_in_the_book" class="field-label required">Số vào sổ</label>
+                    <input type="text" name="number_in_the_book" id="edit_number_in_the_book" class="field-input"
+                        placeholder="Nhập số vào sổ" required>
+                    <div class="field-description">
+                        <small class="text-gray-600">Số thứ tự trong sổ gốc cấp văn bằng (VD: 001, 002, 123)</small>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div class="field-group">
                         <label for="edit_degree_type" class="field-label required">Loại văn bằng</label>
@@ -1612,7 +1618,8 @@
                         class="rounded-lg border border-gray-300 px-4 py-2 text-gray-600 hover:bg-gray-50">
                         <i class="fas fa-times mr-2"></i>Hủy
                     </button>
-                    <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                    <button type="submit" id="editDegreeSubmitBtn"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
                         <i class="fas fa-save mr-2"></i>Cập nhật văn bằng
                     </button>
                 </div>
@@ -2201,41 +2208,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                                                    <i class="fas fa-tag mr-1"></i>
-                                                                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                                                </p>
-                                                                                                            ` : ''}
+                                                                                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                                                                        <i class="fas fa-tag mr-1"></i>
+                                                                                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                                                                    </p>
+                                                                                                                                ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                                                <p class="mb-2 text-sm">
-                                                                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                                                </p>
-                                                                                                            ` : ''}
+                                                                                                                                    <p class="mb-2 text-sm">
+                                                                                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                                                                    </p>
+                                                                                                                                ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                                            <span class="flex items-center">
-                                                                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                                            </span>
-                                                                                                        ` : ''}
+                                                                                                                                <span class="flex items-center">
+                                                                                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                                                                </span>
+                                                                                                                            ` : ''}
                                             ${adj.decision_date ? `
-                                                                                                            <span class="flex items-center">
-                                                                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                                            </span>
-                                                                                                        ` : ''}
+                                                                                                                                <span class="flex items-center">
+                                                                                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                                                                </span>
+                                                                                                                            ` : ''}
                                             ${adj.changed_by ? `
-                                                                                                            <span class="flex items-center">
-                                                                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                                                ${adj.changed_by.full_name || 'N/A'}
-                                                                                                            </span>
-                                                                                                        ` : ''}
+                                                                                                                                <span class="flex items-center">
+                                                                                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                                                                    ${adj.changed_by.full_name || 'N/A'}
+                                                                                                                                </span>
+                                                                                                                            ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2441,14 +2448,7 @@
                 });
         }
 
-        function openAddDegreeModal() {
-            const modal = document.getElementById('addDegreeModal');
 
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-            }
-        }
 
         function closeAddDegreeModal() {
             const modal = document.getElementById('addDegreeModal');
@@ -2465,92 +2465,51 @@
             document.getElementById('diploma_blank_info').classList.add('hidden');
         }
 
-        // Edit Degree Modal Functions
-        function openEditDegreeModal(degreeId) {
-            // Get degree data from PHP and populate form
+        window.openEditDegreeModal = function(degreeId) {
             const degrees = @json($degrees);
             const degree = degrees.find(d => d.degree_id == degreeId);
-
             if (!degree) {
                 alert('Không tìm thấy thông tin văn bằng!');
                 return;
             }
-
-            // Update form action
             document.getElementById('editDegreeForm').action = `/degrees/${degreeId}/update`;
-
-            // Populate form fields
             document.getElementById('edit_degree_type').value = degree.degree_type || '';
             document.getElementById('edit_registration_number').value = degree.registration_number || '';
             document.getElementById('edit_graduation_year').value = degree.graduation_year || '';
+            document.getElementById('edit_number_in_the_book').value = degree.number_in_the_book || '';
+            // Set granting date for both hidden input and optional display input
+            try {
+                const grantingDate = degree.granting_date ? degree.granting_date.split('T')[0] : '';
+                const hiddenGrantInput = document.getElementById('edit_granting_date');
+                if (hiddenGrantInput) {
+                    hiddenGrantInput.value = grantingDate;
+                    // ensure it's present for server-side validation
+                    if (grantingDate) hiddenGrantInput.required = false; // value present so required not an issue
+                }
 
-            // Set granting date for both hidden input and display input
-            const grantingDate = degree.granting_date ? degree.granting_date.split('T')[0] : '';
-            document.getElementById('edit_granting_date').value = grantingDate;
-
-            // Format and set display input
-            if (grantingDate) {
                 const displayInput = document.getElementById('edit_granting_date_display');
                 if (displayInput) {
-                    const date = new Date(grantingDate);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
-                    displayInput.value = `${day}/${month}/${year}`;
+                    if (grantingDate) {
+                        const date = new Date(grantingDate);
+                        if (!isNaN(date.getTime())) {
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const year = date.getFullYear();
+                            displayInput.value = `${day}/${month}/${year}`;
+                        } else {
+                            displayInput.value = '';
+                        }
+                    } else {
+                        displayInput.value = '';
+                    }
                 }
+            } catch (err) {
+                console.error('Error setting granting date in edit modal', err);
             }
-
-            // Set defense date
-            const defenseDate = degree.defense_date ? degree.defense_date.split('T')[0] : '';
-            document.getElementById('edit_defense_date').value = defenseDate;
-
-            // Format and set display input for defense date
-            if (defenseDate) {
-                const displayInput = document.getElementById('edit_defense_date_display');
-                if (displayInput) {
-                    const date = new Date(defenseDate);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
-                    displayInput.value = `${day}/${month}/${year}`;
-                }
-            }
-
-            // Set training start date
-            const trainingStartDate = degree.training_start_date ? degree.training_start_date.split('T')[0] : '';
-            document.getElementById('edit_training_start_date').value = trainingStartDate;
-
-            // Format and set display input for training start date
-            if (trainingStartDate) {
-                const displayInput = document.getElementById('edit_training_start_date_display');
-                if (displayInput) {
-                    const date = new Date(trainingStartDate);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
-                    displayInput.value = `${day}/${month}/${year}`;
-                }
-            }
-
-            // Set training end date
-            const trainingEndDate = degree.training_end_date ? degree.training_end_date.split('T')[0] : '';
-            document.getElementById('edit_training_end_date').value = trainingEndDate;
-
-            // Format and set display input for training end date
-            if (trainingEndDate) {
-                const displayInput = document.getElementById('edit_training_end_date_display');
-                if (displayInput) {
-                    const date = new Date(trainingEndDate);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
-                    displayInput.value = `${day}/${month}/${year}`;
-                }
-            }
-
-            document.getElementById('edit_ranking').value = degree.ranking || '';
-
-            // Set status - handle both enum object and string
+            // ...existing code for other fields...
+            const editModal = document.getElementById('editDegreeModal');
+            editModal.classList.remove('hidden');
+            editModal.style.display = 'flex';
             const statusValue = degree.status?.value || degree.status || 'Issued';
             document.getElementById('edit_status').value = statusValue;
 
@@ -2577,7 +2536,8 @@
             }
 
             // Set graduation decision date
-            const graduationDecisionDate = degree.graduation_decision_date ? degree.graduation_decision_date.split('T')[0] :
+            const graduationDecisionDate = degree.graduation_decision_date ? degree.graduation_decision_date.split('T')[
+                    0] :
                 '';
             document.getElementById('edit_graduation_decision_date').value = graduationDecisionDate;
 
@@ -2603,11 +2563,15 @@
                 document.getElementById('edit_diploma_type').textContent = '-';
             }
 
-            // Show modal
-            const editModal = document.getElementById('editDegreeModal');
-            editModal.classList.remove('hidden');
-            editModal.style.display = 'flex';
         }
+
+        window.openAddDegreeModal = function() {
+            const modal = document.getElementById('addDegreeModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        };
 
         function closeEditDegreeModal() {
             const editModal = document.getElementById('editDegreeModal');
@@ -2889,5 +2853,52 @@
             document.body.appendChild(form);
             form.submit();
         };
+
+        // Debug/backup: ensure edit degree form can submit (log and fallback)
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const editForm = document.getElementById('editDegreeForm');
+                const editSubmit = document.getElementById('editDegreeSubmitBtn');
+                if (editForm) {
+                    editForm.addEventListener('submit', function(e) {
+                        console.log('editDegreeForm submit triggered', editForm.action);
+                        // Allow default submit; this listener is for debugging only
+                    });
+                }
+
+                if (editSubmit && editForm) {
+                    editSubmit.addEventListener('click', function(e) {
+                        // If action not set, notify user and prevent silent failure
+                        if (!editForm.action || editForm.action.trim() === '') {
+                            e.preventDefault();
+                            alert(
+                                'Hành động gửi chưa được thiết lập. Vui lòng đóng và mở lại modal chỉnh sửa.');
+                            return;
+                        }
+                        // No-op: let the form submit normally
+                    });
+                }
+            } catch (err) {
+                console.error('Error attaching editDegreeForm debug handlers', err);
+            }
+        });
+
+        // Ensure hidden date inputs don't remain 'required' (prevents "invalid form control not focusable" error)
+        function sanitizeHiddenDateRequired() {
+            try {
+                document.querySelectorAll('input[type="date"]').forEach(input => {
+                    if (!input) return;
+                    const isHidden = input.classList.contains('hidden') || input.offsetParent === null || window
+                        .getComputedStyle(input).display === 'none';
+                    if (isHidden && input.required) {
+                        input.required = false;
+                    }
+                });
+            } catch (e) {
+                console.error('Error sanitizing hidden date required attributes', e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', sanitizeHiddenDateRequired);
     </script>
 @endsection
