@@ -2208,41 +2208,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                                                                    <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                                                                        <i class="fas fa-tag mr-1"></i>
-                                                                                                                                        ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                                                                    </p>
-                                                                                                                                ` : ''}
+                                                                                                                                        <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                                                                            <i class="fas fa-tag mr-1"></i>
+                                                                                                                                            ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                                                                        </p>
+                                                                                                                                    ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                                                                    <p class="mb-2 text-sm">
-                                                                                                                                        <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                                                                        <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                                                                        <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                                                                    </p>
-                                                                                                                                ` : ''}
+                                                                                                                                        <p class="mb-2 text-sm">
+                                                                                                                                            <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                                                                            <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                                                                            <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                                                                        </p>
+                                                                                                                                    ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                                                                <span class="flex items-center">
-                                                                                                                                    <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                                                                    <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                                                                </span>
-                                                                                                                            ` : ''}
+                                                                                                                                    <span class="flex items-center">
+                                                                                                                                        <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                                                                        <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                                                                    </span>
+                                                                                                                                ` : ''}
                                             ${adj.decision_date ? `
-                                                                                                                                <span class="flex items-center">
-                                                                                                                                    <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                                                                    <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                                                                </span>
-                                                                                                                            ` : ''}
+                                                                                                                                    <span class="flex items-center">
+                                                                                                                                        <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                                                                        <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                                                                    </span>
+                                                                                                                                ` : ''}
                                             ${adj.changed_by ? `
-                                                                                                                                <span class="flex items-center">
-                                                                                                                                    <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                                                                    ${adj.changed_by.full_name || 'N/A'}
-                                                                                                                                </span>
-                                                                                                                            ` : ''}
+                                                                                                                                    <span class="flex items-center">
+                                                                                                                                        <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                                                                        ${adj.changed_by.full_name || 'N/A'}
+                                                                                                                                    </span>
+                                                                                                                                ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}
@@ -2505,6 +2505,34 @@
                 }
             } catch (err) {
                 console.error('Error setting granting date in edit modal', err);
+            }
+            // Set defense date (hidden ISO input + display input)
+            try {
+                const defenseDate = degree.defense_date ? degree.defense_date.split('T')[0] : '';
+                const hiddenDefenseInput = document.getElementById('edit_defense_date');
+                if (hiddenDefenseInput) {
+                    hiddenDefenseInput.value = defenseDate;
+                    if (defenseDate) hiddenDefenseInput.required = false;
+                }
+
+                const displayDefense = document.getElementById('edit_defense_date_display');
+                if (displayDefense) {
+                    if (defenseDate) {
+                        const date = new Date(defenseDate);
+                        if (!isNaN(date.getTime())) {
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const year = date.getFullYear();
+                            displayDefense.value = `${day}/${month}/${year}`;
+                        } else {
+                            displayDefense.value = '';
+                        }
+                    } else {
+                        displayDefense.value = '';
+                    }
+                }
+            } catch (err) {
+                console.error('Error setting defense date in edit modal', err);
             }
             // ...existing code for other fields...
             const editModal = document.getElementById('editDegreeModal');
@@ -2872,7 +2900,8 @@
                         if (!editForm.action || editForm.action.trim() === '') {
                             e.preventDefault();
                             alert(
-                                'Hành động gửi chưa được thiết lập. Vui lòng đóng và mở lại modal chỉnh sửa.');
+                                'Hành động gửi chưa được thiết lập. Vui lòng đóng và mở lại modal chỉnh sửa.'
+                                );
                             return;
                         }
                         // No-op: let the form submit normally

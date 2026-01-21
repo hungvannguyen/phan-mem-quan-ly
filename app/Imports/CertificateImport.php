@@ -38,30 +38,30 @@ class CertificateImport implements ToCollection, WithStartRow
 
     // --- ĐỊNH NGHĨA CỘT THEO YÊU CẦU ---
     // Index bắt đầu từ 0 (Cột A)
-    private const STUDENT_CODE = 1;               // A - Mã học viên
-    private const COL_FULL_NAME = 2;                // B - Họ và tên
-    private const COL_DATE_OF_BIRTH = 3;            // C - Ngày sinh
-    private const COL_PLACE_OF_BIRTH = 4;           // D - Nơi sinh
-    private const COL_GENDER = 5;                   // E - Giới tính
-    private const COL_NATION = 6;                   // F - Dân tộc
-    private const COL_TRAINING_PROGRAM = 7;         // G - Chương trình bồi dưỡng (Map vào major_name hoặc degree_type)
-    private const COL_RANKING = 8;                  // H - Xếp Loại
-    private const COL_DIPLOMA_NUMBER = 9;           // I - Số hiệu chứng chỉ
-    private const COL_REGISTRATION_NUMBER = 10;      // J - Số vào sổ gốc cấp chứng chỉ
-    private const COL_TRAINING_START = 11;          // K - Thời gian đào tạo từ ngày
-    private const COL_TRAINING_END = 12;            // L - Thời gian đài tạo đến ngày
-    private const COL_GRADUATION_DECISION_NUMBER = 13; // M - Số QĐ (QĐ công nhận tốt nghiệp)
-    private const COL_GRADUATION_DECISION_DATE = 14;   // N - Ngày Tháng (QĐ công nhận tốt nghiệp)
-    private const COL_GRANTING_DATE = 15;           // O - Ngày cấp (Theo thứ tự bảng chữ cái sau N là O)
-    private const COL_STATUS_TEXT = 16;             // P - Tình trạng
-    private const COL_ADJUSTMENT_CONTENT = 17;      // Q - Nội dung điều chỉnh
-    private const COL_ADJUSTMENT_DECISION = 18;     // R - QĐ điều chỉnh thông tin
-    private const COL_ADJUSTMENT_DATE = 19;         // S - Ngày QĐ (Điều chỉnh)
-    private const COL_REISSUE_NUMBER = 20;          // T - Số hiệu văn bằng (Cấp lại)
-    private const COL_REISSUE_CONTENT = 21;         // U - Nội dung chỉnh sửa (Cấp lại)
-    private const COL_REISSUE_DECISION = 22;        // V - QĐ thu hồi, huỷ bỏ và cấp lại
-    private const COL_REISSUE_DATE = 23;            // W - Ngày QĐ (Cấp lại)
-    private const COL_NOTES = 24;                   // X - Ghi chú
+    private const STUDENT_CODE = 1;               // B - Mã học viên
+    private const COL_FULL_NAME = 2;                // C - Họ và tên
+    private const COL_DATE_OF_BIRTH = 3;            // D - Ngày sinh
+    private const COL_PLACE_OF_BIRTH = 4;           // E - Nơi sinh
+    private const COL_GENDER = 5;                   // F - Giới tính
+    private const COL_NATION = 6;                   // G - Dân tộc
+    private const COL_TRAINING_PROGRAM = 7;         // H - Chương trình bồi dưỡng (Map vào major_name hoặc degree_type)
+    private const COL_RANKING = 8;                  // I - Xếp Loại
+    private const COL_DIPLOMA_NUMBER = 9;      // J - Số hiệu chứng chỉ
+    private const COL_NUMBER_IN_THE_BOOK = 10;      // K - Số vào sổ gốc cấp chứng chỉ
+    private const COL_TRAINING_START = 11;          // L - Thời gian đào tạo từ ngày
+    private const COL_TRAINING_END = 12;            // M - Thời gian đài tạo đến ngày
+    private const COL_GRADUATION_DECISION_NUMBER = 13; // N - Số QĐ (QĐ công nhận tốt nghiệp)
+    private const COL_GRADUATION_DECISION_DATE = 14;   // O - Ngày Tháng (QĐ công nhận tốt nghiệp)
+    private const COL_GRANTING_DATE = 15;           // P - Ngày cấp (Theo thứ tự bảng chữ cái sau N là O)
+    private const COL_STATUS_TEXT = 16;             // Q - Tình trạng
+    private const COL_ADJUSTMENT_CONTENT = 17;      // R - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_DECISION = 18;     // S - QĐ điều chỉnh thông tin
+    private const COL_ADJUSTMENT_DATE = 19;         // T - Ngày QĐ (Điều chỉnh)
+    private const COL_REISSUE_NUMBER = 20;          // U - Số hiệu văn bằng (Cấp lại)
+    private const COL_REISSUE_CONTENT = 21;         // V - Nội dung chỉnh sửa (Cấp lại)
+    private const COL_REISSUE_DECISION = 22;        // W - QĐ thu hồi, huỷ bỏ và cấp lại
+    private const COL_REISSUE_DATE = 23;            // X - Ngày QĐ (Cấp lại)
+    private const COL_NOTES = 24;                   // Y - Ghi chú
 
     public function __construct(string $documentReference = null)
     {
@@ -153,10 +153,10 @@ class CertificateImport implements ToCollection, WithStartRow
         }
 
         // Kiểm tra degree đã tồn tại dựa trên số vào sổ
-        $existingDegree = Degree::where('registration_number', $rowData['registration_number'])->first();
+        $existingDegree = Degree::where('number_in_the_book', $rowData['number_in_the_book'])->first();
         if ($existingDegree) {
             Log::info('Certificate already exists, skipping', [
-                'registration_number' => $rowData['registration_number']
+                'number_in_the_book' => $rowData['number_in_the_book']
             ]);
             return;
         }
@@ -192,7 +192,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'training_program' => $this->cleanString($row[self::COL_TRAINING_PROGRAM] ?? ''), // Chương trình bồi dưỡng
             'ranking' => $this->cleanString($row[self::COL_RANKING] ?? ''),
             'diploma_number' => $this->cleanString($row[self::COL_DIPLOMA_NUMBER] ?? ''),
-            'registration_number' => $this->cleanString($row[self::COL_REGISTRATION_NUMBER] ?? ''),
+            'number_in_the_book' => $this->cleanString($row[self::COL_NUMBER_IN_THE_BOOK] ?? ''),
             'training_start' => $this->parseDate($row[self::COL_TRAINING_START] ?? ''),
             'training_end' => $this->parseDate($row[self::COL_TRAINING_END] ?? ''),
             'graduation_decision_number' => $this->cleanString($row[self::COL_GRADUATION_DECISION_NUMBER] ?? ''),
@@ -225,7 +225,6 @@ class CertificateImport implements ToCollection, WithStartRow
             'place_of_birth'     => $rowData['place_of_birth'],
             'gender'             => $rowData['gender'],
             'nation'             => $rowData['nation'],
-            'status'             => $rowData['status'],
         ];
 
         // 2. Sử dụng updateOrCreate
@@ -260,13 +259,13 @@ class CertificateImport implements ToCollection, WithStartRow
     /**
      * Create diploma blank if needed
      */
-    protected function createDiplomaBlankIfNeeded(?string $diplomaNumber): ?DiplomaBlank
+    protected function createDiplomaBlankIfNeeded(?string $diplomaNumber,string $degreeType): ?DiplomaBlank
     {
         if (empty($diplomaNumber)) {
             return null;
         }
 
-        $typeId = $this->getTypeIdForCertificateType();
+        $typeId = $this->getTypeIdForCertificateType($degreeType);
         return DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
@@ -308,9 +307,12 @@ class CertificateImport implements ToCollection, WithStartRow
             'student_id' => $student->student_id,
             'degree_type' => 'certificate',
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
-            'registration_number' => $rowData['registration_number'],
-            'number_in_the_book' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['number_in_the_book'],
             'granting_date' => $grantingDate,
+            'training_start_date' => $rowData['training_start'],
+            'training_end_date' => $rowData['training_end'],
+            'graduation_decision_number' => $rowData['graduation_decision_number'],
+            'graduation_decision_date' => $rowData['graduation_decision_date'],
             'graduation_year' => $graduationYear,
             'ranking' => $rowData['ranking'],
             'graduation_decision_number' => $rowData['graduation_decision_number'],
@@ -406,31 +408,28 @@ class CertificateImport implements ToCollection, WithStartRow
     /**
      * Get type_id for Certificate
      */
-    protected function getTypeIdForCertificateType(): ?int
+    protected function getTypeIdForCertificateType(string $degreeType): ?int
     {
-        // Logic tìm loại phôi chứng chỉ
-        $type = self::$diplomaBlankTypes->first(function ($item) {
-            return str_contains(mb_strtolower($item->type_name), 'chứng chỉ')
-                || str_starts_with($item->prefix, 'CC');
-        });
+       // Map degree_type to prefix
+        $prefixMap = [
+            'Chứng chỉ Nghiệp vụ 6 tháng' => 'NV-6T',  // Chứng chỉ nghiệp vụ 6 tháng
+            'Chứng chỉ Trình độ TC lý luận chính trị' => 'TD-TC-LLCT', //
+            'Chứng chỉ Quân sự-Võ thuật 45 ngày' => 'QSVT-45N',
+            'Chứng chỉ Bổ sung kiến thức' => 'BSKT',
+            'Chứng chỉ Bồi dưỡng khác' => 'BD-KHAC'
+        ];
 
-        if ($type) {
-            return $type->type_id;
+        // Default to the first mapping value (BD-KHAC) when no specific degree type is provided.
+        $prefix = reset($prefixMap) ?? 'BD-KHAC';
+
+        // Get from cache
+        if (isset(self::$diplomaBlankTypes[$prefix])) {
+            return self::$diplomaBlankTypes[$prefix]->type_id;
         }
 
-        // Tạo mới nếu chưa có
-        $newType = DiplomaBlankType::firstOrCreate(
-            ['prefix' => 'CC'],
-            [
-                'type_name' => 'Chứng chỉ đào tạo',
-                'description' => 'Chứng chỉ bồi dưỡng, ngắn hạn',
-            ]
-        );
-
-        // Refresh cache
-        self::$diplomaBlankTypes->push($newType);
-
-        return $newType->type_id;
+        // Fallback: query database
+        $type = DiplomaBlankType::where('prefix', $prefix)->first();
+        return $type?->type_id;
     }
 
     public function getStatistics(): array

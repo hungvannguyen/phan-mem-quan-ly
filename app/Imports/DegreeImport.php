@@ -39,39 +39,39 @@ class DegreeImport implements ToCollection, WithStartRow
     protected static $majorsByCode = [];
 
     // Column mapping constants
-    private const STUDENT_CODE = 1;               // A - Mã học viên
-    private const COL_DEGREE_TYPE = 2;
-    private const COL_FULL_NAME = 3;
-    private const COL_DATE_OF_BIRTH = 4;
-    private const COL_PLACE_OF_BIRTH = 5;
-    private const COL_HOMETOWN = 6;
-    private const COL_PLACE_OF_ORIGIN = 7;
-    private const COL_GENDER = 8;
-    private const COL_NATION = 9;
-    private const COL_NATIONALITY = 10;
-    private const COL_COURSE = 11;
-    private const COL_CLASS_NAME = 12;
-    private const COL_ACADEMIC_YEAR = 13;
-    private const COL_MAJOR_NAME = 14;
-    private const COL_TRAINING_TYPE = 15;
-    private const COL_COUNCIL_DECISION_NUMBER = 16;
-    private const COL_COUNCIL_DECISION_DATE = 17;
-    private const COL_DEFENSE_DATE = 18;
-    private const COL_GRADUATION_DECISION_NUMBER = 19;
-    private const COL_GRADUATION_DECISION_DATE = 20;
-    private const COL_GRADUATION_YEAR = 21;
-    private const COL_RANKING = 22;
-    private const COL_DIPLOMA_NUMBER = 23;
-    private const COL_REGISTRATION_NUMBER = 24;
-    private const COL_GRANTING_DATE = 25;
-    private const COL_ADJUSTMENT_CONTENT = 26;
-    private const COL_ADJUSTMENT_DECISION = 27;
-    private const COL_ADJUSTMENT_DATE = 28;
-    private const COL_REISSUE_NUMBER = 29;
-    private const COL_REISSUE_CONTENT = 30;
-    private const COL_REISSUE_DECISION = 31;
-    private const COL_REISSUE_DATE = 32;
-    private const COL_NOTES = 33;
+    private const STUDENT_CODE = 1;               // B - Mã học viên
+    private const COL_DEGREE_TYPE = 2;            // C - Loại văn bằng
+    private const COL_FULL_NAME = 3;              // D - Họ và tên
+    private const COL_DATE_OF_BIRTH = 4;        // E - Ngày sinh
+    private const COL_PLACE_OF_BIRTH = 5;       // F - Nơi sinh
+    private const COL_HOMETOWN = 6;         // G - Quê quán
+    private const COL_PLACE_OF_ORIGIN = 7;      // H - Nguyên quán
+    private const COL_GENDER = 8;           // I - Giới tính
+    private const COL_NATION = 9;       // J - Dân tộc
+    private const COL_NATIONALITY = 10;     // K - Quốc tịch
+    private const COL_COURSE = 11;         // L - Khóa học
+    private const COL_CLASS_NAME = 12;       // M - Lớp học
+    private const COL_ACADEMIC_YEAR = 13;   // N - Niên khóa
+    private const COL_MAJOR_NAME = 14;     // O - Chuyên ngành
+    private const COL_TRAINING_TYPE = 15;  // P - Hình thức đào tạo
+    private const COL_COUNCIL_DECISION_NUMBER = 16;  // Q - Số QĐ thành lập hội đồng
+    private const COL_COUNCIL_DECISION_DATE = 17; // R - Ngày QĐ thành lập hội đồng
+    private const COL_DEFENSE_DATE = 18;     // S - Ngày bảo vệ
+    private const COL_GRADUATION_DECISION_NUMBER = 19; // T - Số QĐ tốt nghiệp
+    private const COL_GRADUATION_DECISION_DATE = 20; // U - Ngày QĐ tốt nghiệp
+    private const COL_GRADUATION_YEAR = 21;   // V - Năm tốt nghiệp
+    private const COL_RANKING = 22;         // W - Xếp loại
+    private const COL_DIPLOMA_NUMBER = 23;   // X - Số hiệu văn bằng
+    private const COL_NUMBER_IN_THE_BOOK = 24; // Y - Số trong sổ
+    private const COL_GRANTING_DATE = 25;   // Z - Ngày cấp bằng
+    private const COL_ADJUSTMENT_CONTENT = 26; // AA - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_DECISION = 27; // AB - Số QĐ điều chỉnh
+    private const COL_ADJUSTMENT_DATE = 28;  // AC - Ngày QĐ điều chỉnh
+    private const COL_REISSUE_NUMBER = 29;   // AD - Số hiệu cấp lại
+    private const COL_REISSUE_CONTENT = 30;  // AE - Nội dung cấp lại
+    private const COL_REISSUE_DECISION = 31; // AF - Số QĐ cấp lại
+    private const COL_REISSUE_DATE = 32;   // AG - Ngày QĐ cấp lại
+    private const COL_NOTES = 33;          // AH - Ghi chú
 
     public function __construct(string $documentReference = null)
     {
@@ -169,10 +169,10 @@ class DegreeImport implements ToCollection, WithStartRow
         $major = $this->findOrCreateMajor($rowData['major_name']);
 
         // Kiểm tra degree đã tồn tại (early return để tránh xử lý thừa)
-        $existingDegree = Degree::where('registration_number', $rowData['registration_number'])->first();
+        $existingDegree = Degree::where('number_in_the_book', $rowData['number_in_the_book'])->first();
         if ($existingDegree) {
             Log::info('Degree already exists, skipping', [
-                'registration_number' => $rowData['registration_number'],
+                'number_in_the_book' => $rowData['number_in_the_book'],
                 'existing_degree_id' => $existingDegree->degree_id
             ]);
             return;
@@ -208,7 +208,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'place_of_origin' => $this->cleanString($row[self::COL_PLACE_OF_ORIGIN] ?? ''),
             'gender' => $this->parseGender($row[self::COL_GENDER] ?? ''),
             'nation' => $this->cleanString($row[self::COL_NATION] ?? ''),
-            'nationality' => $this->cleanString($row[self::COL_NATIONALITY] ?? 'Việt Nam'),
+            'nationality' => $this->cleanString($row[self::COL_NATIONALITY] ?? ''),
             'course' => $this->cleanString($row[self::COL_COURSE] ?? ''),
             'class_name' => $this->cleanString($row[self::COL_CLASS_NAME] ?? ''),
             'academic_year' => $this->cleanString($row[self::COL_ACADEMIC_YEAR] ?? ''),
@@ -222,7 +222,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'graduation_year' => $this->cleanString($row[self::COL_GRADUATION_YEAR] ?? ''),
             'ranking' => $this->cleanString($row[self::COL_RANKING] ?? ''),
             'diploma_number' => $this->cleanString($row[self::COL_DIPLOMA_NUMBER] ?? ''),
-            'registration_number' => $this->cleanString($row[self::COL_REGISTRATION_NUMBER] ?? ''),
+            'number_in_the_book' => $this->cleanString($row[self::COL_NUMBER_IN_THE_BOOK] ?? ''),
             'granting_date' => $this->parseDate($row[self::COL_GRANTING_DATE] ?? ''),
             'degree_type' => $this->parseDegreeType($row[self::COL_DEGREE_TYPE] ?? ''),
             'notes' => $this->cleanString($row[self::COL_NOTES] ?? ''),
@@ -316,10 +316,6 @@ class DegreeImport implements ToCollection, WithStartRow
         // Tham số 1: Điều kiện tìm kiếm (ở đây là student_code)
         // Tham số 2: Dữ liệu cần lưu (sẽ update nếu tìm thấy, hoặc create merge với tham số 1 nếu không thấy)
 
-        Log::info('PoliticalTheoryImport: Processing student', [
-            'student_code' => $rowData['student_code']
-        ]);
-
         $student = Student::updateOrCreate(
             ['student_code' => $rowData['student_code']], // Điều kiện duy nhất (unique key)
             $dataToSync                                    // Dữ liệu cần cập nhật/tạo mới
@@ -328,15 +324,6 @@ class DegreeImport implements ToCollection, WithStartRow
         // Logic của Laravel:
         // - Nếu tìm thấy: Nó sẽ fill $dataToSync và save(). (Chỉ chạy query update nếu dữ liệu thực sự thay đổi - isDirty)
         // - Nếu không thấy: Nó sẽ tạo mới bản ghi với student_code + $dataToSync.
-
-        // Log kết quả để kiểm tra (có thể bỏ qua nếu muốn code gọn hơn)
-        if ($student->wasRecentlyCreated) {
-            Log::info('PoliticalTheoryImport: Created new student', ['id' => $student->student_id]);
-        } elseif ($student->wasChanged()) {
-            Log::info('PoliticalTheoryImport: Updated existing student', ['id' => $student->student_id]);
-        } else {
-            Log::info('PoliticalTheoryImport: Student existed and no changes detected', ['id' => $student->student_id]);
-        }
 
         return $student;
     }
@@ -366,13 +353,14 @@ class DegreeImport implements ToCollection, WithStartRow
      */
     protected function createDegree(Student $student, ?DiplomaBlank $diplomaBlank, ?Major $major, array $rowData): Degree
     {
+
         return Degree::create([
             'student_id' => $student->student_id,
             'degree_type' => $rowData['degree_type'],
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
-            'registration_number' => $rowData['registration_number'],
-            'number_in_the_book' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['number_in_the_book'],
             'granting_date' => $rowData['granting_date'],
+            'defense_date' => $rowData['defense_date'],
             'graduation_year' => $rowData['graduation_year'],
             'ranking' => $rowData['ranking'],
             'council_decision_number' => $rowData['council_decision_number'],
@@ -381,7 +369,6 @@ class DegreeImport implements ToCollection, WithStartRow
             'graduation_decision_date' => $rowData['graduation_decision_date'],
             'major_id' => $major?->major_id,
             'major_name' => $rowData['major_name'],
-            'defense_date' => $rowData['defense_date'],
             'training_type' => $rowData['training_type'],
             'status' => DegreeStatus::ISSUED, // Mặc định là đã cấp khi import
             'notes' => $rowData['notes'],
@@ -422,7 +409,7 @@ class DegreeImport implements ToCollection, WithStartRow
         }
 
         Log::info('Reissue data check', [
-            'registration_number' => $rowData['registration_number'],
+            'number_in_the_book' => $rowData['number_in_the_book'],
             'reissueNumber' => $rowData['reissue_number'],
             'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id
         ]);

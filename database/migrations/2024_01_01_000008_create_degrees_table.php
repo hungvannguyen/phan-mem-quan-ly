@@ -17,11 +17,11 @@ return new class extends Migration {
                 ->default('bachelor')
                 ->comment('Loại văn bằng: bachelor=Cử nhân, master=Thạc sĩ, doctor=Tiến sĩ, certificate=Chứng chỉ');
             $table->foreignId('diploma_blank_id')->nullable()->constrained('diploma_blanks', 'diploma_blank_id');
-            $table->string('registration_number', 50)->unique();
-            $table->string('number_in_the_book')->unique();
-            $table->date('granting_date');
-            $table->integer('graduation_year');
-            $table->string('ranking', 50)->nullable();
+            $table->string('registration_number', 50)->unique()->nullable()->comment('Số đăng ký văn bằng');
+            $table->string('number_in_the_book', 50)->unique()->nullable()->comment('Số trong sổ');
+            $table->date('granting_date')->nullable()->comment('Ngày cấp bằng');
+            $table->integer('graduation_year')->nullable()->comment('Năm tốt nghiệp');
+            $table->string('ranking', 50)->nullable()->comment('Xếp loại tốt nghiệp');
             $table->string('council_decision_number', 50)->nullable()->comment('Số QĐ thành lập hội đồng đánh giá luận án');
             $table->date('council_decision_date')->nullable()->comment('Ngày QĐ thành lập hội đồng đánh giá luận án');
             $table->string('graduation_decision_number', 50)->nullable()->comment('Số QĐ công nhận tốt nghiệp');
