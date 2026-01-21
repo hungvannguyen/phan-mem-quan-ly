@@ -169,7 +169,7 @@ class CertificateImport implements ToCollection, WithStartRow
         }
 
         // Tạo diploma blank (Phôi) và degree (Văn bằng/Chứng chỉ)
-        $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number']);
+        $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
         $degree = $this->createDegree($student, $diplomaBlank, $rowData);
 
         // Xử lý điều chỉnh và cấp lại
@@ -190,6 +190,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'gender' => $this->parseGender($row[self::COL_GENDER] ?? ''),
             'nation' => $this->cleanString($row[self::COL_NATION] ?? ''),
             'training_program' => $this->cleanString($row[self::COL_TRAINING_PROGRAM] ?? ''), // Chương trình bồi dưỡng
+            'degree_type' => $this->cleanString($row[self::COL_TRAINING_PROGRAM] ?? ''),
             'ranking' => $this->cleanString($row[self::COL_RANKING] ?? ''),
             'diploma_number' => $this->cleanString($row[self::COL_DIPLOMA_NUMBER] ?? ''),
             'number_in_the_book' => $this->cleanString($row[self::COL_NUMBER_IN_THE_BOOK] ?? ''),
@@ -259,7 +260,7 @@ class CertificateImport implements ToCollection, WithStartRow
     /**
      * Create diploma blank if needed
      */
-    protected function createDiplomaBlankIfNeeded(?string $diplomaNumber,string $degreeType): ?DiplomaBlank
+    protected function createDiplomaBlankIfNeeded(?string $diplomaNumber, string $degreeType): ?DiplomaBlank
     {
         if (empty($diplomaNumber)) {
             return null;
@@ -359,7 +360,7 @@ class CertificateImport implements ToCollection, WithStartRow
 
         $newDiplomaBlank = null;
         if (!empty($rowData['reissue_number'])) {
-            $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number']);
+            $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number'], $rowData['degree_type']);
         }
 
         DegreeReissue::create([
@@ -401,35 +402,46 @@ class CertificateImport implements ToCollection, WithStartRow
     protected function loadCaches(): void
     {
         if (self::$diplomaBlankTypes === null) {
-            self::$diplomaBlankTypes = DiplomaBlankType::all();
+            self::$diplomaBlankTypes = DiplomaBlankType::all()->keyBy('prefix');
         }
     }
 
     /**
      * Get type_id for Certificate
      */
-    protected function getTypeIdForCertificateType(string $degreeType): ?int
+    protected function getTypeIdForCertificateType(?string $degreeType = null): ?int
     {
-       // Map degree_type to prefix
-        $prefixMap = [
-            'Chứng chỉ Nghiệp vụ 6 tháng' => 'NV-6T',  // Chứng chỉ nghiệp vụ 6 tháng
-            'Chứng chỉ Trình độ TC lý luận chính trị' => 'TD-TC-LLCT', //
-            'Chứng chỉ Quân sự-Võ thuật 45 ngày' => 'QSVT-45N',
-            'Chứng chỉ Bổ sung kiến thức' => 'BSKT',
-            'Chứng chỉ Bồi dưỡng khác' => 'BD-KHAC'
-        ];
-
-        // Default to the first mapping value (BD-KHAC) when no specific degree type is provided.
-        $prefix = reset($prefixMap) ?? 'BD-KHAC';
-
-        // Get from cache
-        if (isset(self::$diplomaBlankTypes[$prefix])) {
-            return self::$diplomaBlankTypes[$prefix]->type_id;
+        // Use raw degreeType string from Excel to find/create DiplomaBlankType
+        $key = trim((string) $degreeType);
+        if ($key === '') {
+            $key = 'BD-KHAC';
         }
 
-        // Fallback: query database
-        $type = DiplomaBlankType::where('prefix', $prefix)->first();
-        return $type?->type_id;
+        // Normalize a search-friendly prefix (replace spaces/slashes/hyphens)
+        $searchPrefix = mb_strtoupper(str_replace([' ', '/', '-'], '_', $key));
+
+        // Check cache first
+        if (isset(self::$diplomaBlankTypes[$searchPrefix])) {
+            return self::$diplomaBlankTypes[$searchPrefix]->type_id;
+        }
+
+        // Try find by prefix or by type_name (case-insensitive)
+        $type = DiplomaBlankType::whereRaw('upper(prefix) = ?', [$searchPrefix])
+            ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
+            ->first();
+
+        if (!$type) {
+            $type = DiplomaBlankType::create([
+                'prefix' => $searchPrefix,
+                'type_name' => $key,
+                'description' => 'Tự động tạo từ tiến trình Import',
+            ]);
+        }
+
+        // Update cache
+        self::$diplomaBlankTypes[$type->prefix] = $type;
+
+        return $type->type_id;
     }
 
     public function getStatistics(): array

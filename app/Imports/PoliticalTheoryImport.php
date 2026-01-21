@@ -202,7 +202,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'graduation_decision_number' => $this->cleanString($row[self::COL_GRADUATION_DECISION_NUMBER] ?? ''),
             'graduation_decision_date' => $this->parseDate($row[self::COL_GRADUATION_DECISION_DATE] ?? ''),
             'granting_date' => $this->parseDate($row[self::COL_GRANTING_DATE] ?? ''),
-            'degree_type' => $this->parseCertificateType($row[self::COL_DEGREE_TYPE] ?? ''),
+            'degree_type' => $this->cleanString($row[self::COL_DEGREE_TYPE] ?? ''),
             'status_text' => $this->cleanString($row[self::COL_STATUS_TEXT] ?? ''),
             'status' => $this->parseStatusFromText($this->cleanString($row[self::COL_STATUS_TEXT] ?? '')),
             'notes' => $this->cleanString($row[self::COL_NOTES] ?? ''),
@@ -269,7 +269,9 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             return null;
         }
 
+        // Lấy hoặc tạo mới DiplomaBlankType trước
         $typeId = $this->getTypeIdForCertificateType($degreeType);
+
         return DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
@@ -347,7 +349,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
 
         $newDiplomaBlank = null;
         if (!empty($rowData['reissue_number'])) {
-            $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number'],$rowData['degree_type']);
+            $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number'], $rowData['degree_type']);
 
             if ($newDiplomaBlank) {
                 Log::info('Created new diploma blank for certificate reissue', [
@@ -382,26 +384,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         }
     }
 
-    /**
-     * Parse certificate type from Vietnamese text
-     */
-    protected function parseCertificateType(?string $type): string
-    {
-        if (empty($type)) {
-            return 'cao_cap'; // Mặc định hoặc giá trị an toàn
-        }
 
-        $type = mb_strtolower($this->removeVietnameseTones($type));
-
-        if (str_contains($type, 'cao cap')) {
-            return 'cao_cap';
-        }
-        if (str_contains($type, 'trung cap')) {
-            return 'trung_cap';
-        }
-
-        return 'cao_cap';
-    }
 
     /**
      * Parse status from Vietnamese text to DegreeStatus enum
@@ -489,23 +472,37 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
      */
     protected function getTypeIdForCertificateType(string $degreeType): ?int
     {
-        // Map degree_type to prefix
-        $prefixMap = [
-           'cao_cap'   => 'CC-LLCT',
-            'trung_cap' => 'TC-LLCT',
-        ];
-
-        // Default to the first mapping value (CC-LLCT) when no specific degree type is provided.
-        $prefix = reset($prefixMap) ?? 'CC-LLCT';
-
-        // Get from cache
-        if (isset(self::$diplomaBlankTypes[$prefix])) {
-            return self::$diplomaBlankTypes[$prefix]->type_id;
+        // Sử dụng trực tiếp giá trị degreeType từ hàng Excel để tìm/ tạo DiplomaBlankType
+        $key = trim((string) $degreeType);
+        if ($key === '') {
+            $key = 'cao_cap';
         }
 
-        // Fallback: query database
-        $type = DiplomaBlankType::where('prefix', $prefix)->first();
-        return $type?->type_id;
+        // Chuẩn hóa prefix để lưu/so sánh (ví dụ: 'cao_cap' -> 'CAO_CAP')
+        $searchPrefix = mb_strtoupper(str_replace(' ', '_', $key));
+
+        // Kiểm tra cache trước
+        if (isset(self::$diplomaBlankTypes[$searchPrefix])) {
+            return self::$diplomaBlankTypes[$searchPrefix]->type_id;
+        }
+
+        // Tìm theo prefix hoặc theo tên (case-insensitive). Nếu không có thì tạo mới.
+        $type = DiplomaBlankType::whereRaw('upper(prefix) = ?', [$searchPrefix])
+            ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
+            ->first();
+
+        if (!$type) {
+            $type = DiplomaBlankType::create([
+                'prefix' => $searchPrefix,
+                'type_name' => $key,
+                'description' => 'Tự động tạo từ tiến trình Import Lý luận chính trị',
+            ]);
+        }
+
+        // Cập nhật cache
+        self::$diplomaBlankTypes[$type->prefix] = $type;
+
+        return $type->type_id;
     }
 
     /**

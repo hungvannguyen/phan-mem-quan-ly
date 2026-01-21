@@ -224,7 +224,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'diploma_number' => $this->cleanString($row[self::COL_DIPLOMA_NUMBER] ?? ''),
             'number_in_the_book' => $this->cleanString($row[self::COL_NUMBER_IN_THE_BOOK] ?? ''),
             'granting_date' => $this->parseDate($row[self::COL_GRANTING_DATE] ?? ''),
-            'degree_type' => $this->parseDegreeType($row[self::COL_DEGREE_TYPE] ?? ''),
+            'degree_type' => $this->cleanString($row[self::COL_DEGREE_TYPE] ?? ''),
             'notes' => $this->cleanString($row[self::COL_NOTES] ?? ''),
             'adjustment_content' => $this->cleanString($row[self::COL_ADJUSTMENT_CONTENT] ?? ''),
             'adjustment_decision' => $this->cleanString($row[self::COL_ADJUSTMENT_DECISION] ?? ''),
@@ -353,10 +353,9 @@ class DegreeImport implements ToCollection, WithStartRow
      */
     protected function createDegree(Student $student, ?DiplomaBlank $diplomaBlank, ?Major $major, array $rowData): Degree
     {
-
         return Degree::create([
             'student_id' => $student->student_id,
-            'degree_type' => $rowData['degree_type'],
+            'degree_type' => $this->mapDegreeTypeForDb($rowData['degree_type']),
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
             'number_in_the_book' => $rowData['number_in_the_book'],
             'granting_date' => $rowData['granting_date'],
@@ -373,6 +372,34 @@ class DegreeImport implements ToCollection, WithStartRow
             'status' => DegreeStatus::ISSUED, // Mặc định là đã cấp khi import
             'notes' => $rowData['notes'],
         ]);
+    }
+
+    /**
+     * Map raw degree type (from Excel) to DB-safe values (enum keys)
+     */
+    protected function mapDegreeTypeForDb(?string $type): string
+    {
+        if (empty($type)) {
+            return 'bachelor';
+        }
+
+        $normalized = mb_strtolower($this->removeVietnameseTones(trim($type)));
+
+        if (str_contains($normalized, 'tien si') || str_contains($normalized, 'doctor')) {
+            return 'doctor';
+        }
+
+        if (str_contains($normalized, 'thac si') || str_contains($normalized, 'master')) {
+            return 'master';
+        }
+
+        // Vietnamese for 'cử nhân' -> 'cu nhan'
+        if (str_contains($normalized, 'cu nhan') || str_contains($normalized, 'cu\u00a0nhan') || str_contains($normalized, 'bachelor')) {
+            return 'bachelor';
+        }
+
+        // Default fallback
+        return 'bachelor';
     }
 
     /**
@@ -454,26 +481,7 @@ class DegreeImport implements ToCollection, WithStartRow
         }
     }
 
-    /**
-     * Parse degree type from Vietnamese text
-     */
-    protected function parseDegreeType(?string $type): string
-    {
-        if (empty($type)) {
-            return 'bachelor';
-        }
 
-        $type = mb_strtolower($this->removeVietnameseTones($type));
-
-        if (str_contains($type, 'tien si') || str_contains($type, 'doctor')) {
-            return 'doctor';
-        }
-        if (str_contains($type, 'thac si') || str_contains($type, 'master')) {
-            return 'master';
-        }
-
-        return 'bachelor';
-    }
 
     /**
      * Normalize training type to match enum values
@@ -547,23 +555,37 @@ class DegreeImport implements ToCollection, WithStartRow
      */
     protected function getTypeIdForDegreeType(string $degreeType): ?int
     {
-        // Map degree_type to prefix
-        $prefixMap = [
-            'bachelor' => 'BCN',  // Bằng Cử nhân
-            'master' => 'BTS',    // Bằng Thạc sĩ
-            'doctor' => 'BTSI', // Bằng Tiến sĩ
-        ];
-
-        $prefix = $prefixMap[$degreeType] ?? 'BCN';
-
-        // Get from cache
-        if (isset(self::$diplomaBlankTypes[$prefix])) {
-            return self::$diplomaBlankTypes[$prefix]->type_id;
+        // Sử dụng trực tiếp giá trị degreeType từ hàng Excel để tìm/ tạo DiplomaBlankType
+        $key = trim((string) $degreeType);
+        if ($key === '') {
+            $key = 'bachelor';
         }
 
-        // Fallback: query database
-        $type = DiplomaBlankType::where('prefix', $prefix)->first();
-        return $type?->type_id;
+        // Chuẩn hóa prefix để lưu/so sánh (ví dụ: 'bachelor' -> 'BACHELOR')
+        $searchPrefix = mb_strtoupper(str_replace(' ', '_', $key));
+
+        // Kiểm tra cache trước
+        if (isset(self::$diplomaBlankTypes[$searchPrefix])) {
+            return self::$diplomaBlankTypes[$searchPrefix]->type_id;
+        }
+
+        // Tìm theo prefix hoặc theo tên (case-insensitive). Nếu không có thì tạo mới.
+        $type = DiplomaBlankType::whereRaw('upper(prefix) = ?', [$searchPrefix])
+            ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
+            ->first();
+
+        if (!$type) {
+            $type = DiplomaBlankType::create([
+                'prefix' => $searchPrefix,
+                'type_name' => $key,
+                'description' => 'Tự động tạo từ tiến trình Import',
+            ]);
+        }
+
+        // Cập nhật cache
+        self::$diplomaBlankTypes[$type->prefix] = $type;
+
+        return $type->type_id;
     }
 
     /**
