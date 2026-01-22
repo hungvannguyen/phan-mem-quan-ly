@@ -7,6 +7,7 @@ use App\Models\DiplomaBlankType;
 use App\Models\Degree;
 use App\Models\Major;
 use App\Enums\DiplomaBlankStatus;
+use App\Enums\StudentGender;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,28 @@ class StatisticsController extends Controller
             'monthlyComparison',
             'majors'
         ));
+    }
+
+    /**
+     * Normalize incoming gender filter values to stored enum values.
+     * Accepts 'Male','Female','Nam','Nữ', or numeric strings.
+     */
+    private function normalizeGenderFilter($gender)
+    {
+        if (is_numeric($gender)) {
+            return (int) $gender;
+        }
+
+        $g = mb_strtolower(trim((string) $gender));
+        if (in_array($g, ['male', 'nam', 'anh'])) {
+            return StudentGender::Male->value;
+        }
+
+        if (in_array($g, ['female', 'nu', 'nữ', 'chị', 'chi'])) {
+            return StudentGender::Female->value;
+        }
+
+        return null;
     }
 
     /**
@@ -352,10 +375,10 @@ class StatisticsController extends Controller
 
         // Gender statistics
         $maleCount = (clone $query)->whereHas('student', function ($q) {
-            $q->where('gender', 'Male');
+            $q->where('gender', StudentGender::Male->value);
         })->count();
         $femaleCount = (clone $query)->whereHas('student', function ($q) {
-            $q->where('gender', 'Female');
+            $q->where('gender', StudentGender::Female->value);
         })->count();
 
         // Ranking counts
@@ -505,6 +528,8 @@ class StatisticsController extends Controller
     private function getStatsByColumn($query, $column)
     {
         $stats = (clone $query)
+            ->whereNotNull($column)
+            ->where($column, '!=', '')
             ->select($column, DB::raw('count(*) as count'))
             ->groupBy($column)
             ->get();
@@ -560,9 +585,12 @@ class StatisticsController extends Controller
         }
 
         if ($request->filled('gender')) {
-            $stats->whereHas('student', function ($q) use ($request) {
-                $q->where('gender', $request->gender);
-            });
+            $genderValue = $this->normalizeGenderFilter($request->gender);
+            if ($genderValue !== null) {
+                $stats->whereHas('student', function ($q) use ($genderValue) {
+                    $q->where('gender', $genderValue);
+                });
+            }
         }
 
         if ($request->filled('ranking')) {
@@ -570,10 +598,13 @@ class StatisticsController extends Controller
         }
 
         if ($request->filled('training_type')) {
-            $stats->whereHas('student', function ($q) use ($request) {
-                $q->where('training_type', $request->training_type);
-            });
+            // training_type lives on degrees table
+            $stats->where('degrees.training_type', $request->training_type);
         }
+
+        // Exclude empty/null grouping keys to avoid empty labels
+        $stats->whereNotNull($tableName . '.' . $column)
+            ->where($tableName . '.' . $column, '!=', '');
 
         $result = $stats->groupBy($tableName . '.' . $column)->get();
 
@@ -614,8 +645,7 @@ class StatisticsController extends Controller
     {
         // Rebuild query with proper table qualification to avoid ambiguous column errors
         $stats = Degree::query()
-            ->join('students', 'students.student_id', '=', 'degrees.student_id')
-            ->select('students.training_type', DB::raw('count(*) as count'))
+            ->select('degrees.training_type', DB::raw('count(*) as count'))
             ->whereNotNull('degrees.diploma_blank_id'); // Base condition
 
         // Apply same filters from original query
@@ -642,7 +672,13 @@ class StatisticsController extends Controller
         }
 
         if ($request->filled('gender')) {
-            $stats->where('students.gender', $request->gender);
+            $genderValue = $this->normalizeGenderFilter($request->gender);
+            if ($genderValue !== null) {
+                $stats->where('degrees.student_id', '!=', null)
+                    ->whereHas('student', function ($q) use ($genderValue) {
+                        $q->where('gender', $genderValue);
+                    });
+            }
         }
 
         if ($request->filled('ranking')) {
@@ -650,10 +686,14 @@ class StatisticsController extends Controller
         }
 
         if ($request->filled('training_type')) {
-            $stats->where('students.training_type', $request->training_type);
+            $stats->where('degrees.training_type', $request->training_type);
         }
 
-        $result = $stats->groupBy('students.training_type')->get();
+        // Exclude null/empty training_type
+        $stats->whereNotNull('degrees.training_type')
+            ->where('degrees.training_type', '!=', '');
+
+        $result = $stats->groupBy('degrees.training_type')->get();
 
         return [
             'labels' => $result->pluck('training_type')->toArray(),

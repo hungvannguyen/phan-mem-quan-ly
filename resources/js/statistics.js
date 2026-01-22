@@ -850,6 +850,30 @@ window.applyDiplomaFilters = applyDiplomaFilters;
 window.applyCertificateFilters = applyCertificateFilters;
 window.resetDiplomaFilters = resetDiplomaFilters;
 window.resetCertificateFilters = resetCertificateFilters;
+// Expose refresh function to global scope for the header button
+async function refreshAllCharts() {
+    showLoading();
+    try {
+        // Reload both diploma and certificate statistics (no filters)
+        await Promise.all([
+            loadDefaultDiplomaStatistics(),
+            loadDefaultCertificateStatistics()
+        ]);
+
+        // If there is server-provided general statistics object, try to refresh it by reloading the page data
+        // Note: generalStatistics is injected server-side on page render; updating it requires an endpoint.
+        // We refresh displayed counts from window.generalStatistics if present.
+        if (window.generalStatistics) {
+            updateStatsDisplay(window.generalStatistics);
+        }
+    } catch (err) {
+        console.error('Error refreshing charts:', err);
+        alert('Có lỗi khi làm mới biểu đồ');
+    } finally {
+        hideLoading();
+    }
+}
+window.refreshAllCharts = refreshAllCharts;
 
 function showLoading() {
     const overlay = document.getElementById('loadingOverlay');
