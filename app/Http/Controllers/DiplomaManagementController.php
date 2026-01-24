@@ -9,6 +9,7 @@ use App\Models\Degree;
 use App\Models\DegreeReissue;
 use App\Models\ChangeLog;
 use App\Models\DiplomaBlankType;
+use App\Enums\StudentStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -197,8 +198,8 @@ class DiplomaManagementController extends Controller
                 // Check if student exists and has graduated status
                 $student = Student::findOrFail($validated['student_id']);
 
-                if ($student->status->value !== 1) {
-                    throw new \Exception('Chỉ có thể cấp văn bằng cho sinh viên đã tốt nghiệp!');
+                if ($student->status === StudentStatus::DropOut) {
+                    throw new \Exception('Sinh viên đã bỏ học không thể cấp bằng!');
                 }
 
                 // Check diploma blank availability and lock it
@@ -310,7 +311,7 @@ class DiplomaManagementController extends Controller
 
             // Only check graduation status for bachelor, master, doctor degrees
             // Certificates can be issued to students regardless of graduation status
-            if (in_array($validated['degree_type'], ['bachelor', 'master', 'doctor']) && $student->status->value !== 1) {
+            if (in_array($validated['degree_type'], ['bachelor', 'master', 'doctor']) && $student->status === StudentStatus::DropOut) {
                 return redirect()->route('student.show', ['student' => $validated['student_id']])
                     ->with('error', 'Chỉ có thể cập nhật văn bằng Cử nhân/Thạc sĩ/Tiến sĩ cho sinh viên đã tốt nghiệp!');
             }

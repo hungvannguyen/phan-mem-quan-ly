@@ -145,9 +145,22 @@
                             </td>
                             <td class="td">
                                 <div class="action-buttons">
-                                    <button type="button" class="btn-action btn-view" title="Xem chi tiết">
-                                        Xem
-                                    </button>
+                                    @php
+                                        $isIssued = isset($status) && $status === \App\Enums\DiplomaBlankStatus::ISSUED;
+                                        $linkedStudentId = $blank->degree?->student_id ?? null;
+                                    @endphp
+
+                                    @if ($isIssued && $linkedStudentId)
+                                        <a href="{{ route('student.show', $linkedStudentId) }}"
+                                            class="btn-action btn-view" title="Xem chi tiết">
+                                            Xem
+                                        </a>
+                                    @else
+                                        <button type="button" class="btn-action btn-view cursor-not-allowed opacity-50"
+                                            title="Không có sinh viên liên kết hoặc phôi chưa được cấp" disabled>
+                                            Xem
+                                        </button>
+                                    @endif
 
                                     @php
                                         $currentStatus =

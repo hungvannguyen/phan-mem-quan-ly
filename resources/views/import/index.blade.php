@@ -40,7 +40,7 @@
                 <div class="alert alert-danger mb-4">
                     <i class="fas fa-times-circle"></i>
                     <div>
-                        <ul class="list-disc ml-6 mt-2">
+                        <ul class="ml-6 mt-2 list-disc">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -49,7 +49,7 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 <!-- Left Column - Import Form -->
                 <div class="lg:col-span-2">
                     <div class="search-card">
@@ -73,7 +73,7 @@
                                     <option value="political_theory">Lý luận chính trị</option>
                                     <option value="certificate">Chứng chỉ</option>
                                 </select>
-                                <p class="text-sm text-gray-500 mt-2">
+                                <p class="mt-2 text-sm text-gray-500">
                                     <i class="fas fa-info-circle"></i>
                                     Chọn loại dữ liệu phù hợp với file Excel của bạn
                                 </p>
@@ -85,8 +85,8 @@
                                     File Excel <span class="text-red-500">*</span>
                                 </label>
                                 <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls,.csv" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-                                <p class="text-sm text-gray-500 mt-2">
+                                    class="w-full rounded-md border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                                <p class="mt-2 text-sm text-gray-500">
                                     <i class="fas fa-info-circle"></i>
                                     Chấp nhận: .xlsx, .xls, .csv (Tối đa 10MB)
                                 </p>
@@ -114,7 +114,7 @@
                         <h3 class="section-subtitle mb-4">
                             <i class="fas fa-download text-green-600"></i> Templates
                         </h3>
-                        <p class="text-sm text-gray-600 mb-4">
+                        <p class="mb-4 text-sm text-gray-600">
                             Tải về file mẫu để biết cấu trúc đúng
                         </p>
                         <div class="space-y-2">
@@ -138,7 +138,7 @@
                         <h3 class="section-subtitle mb-4">
                             <i class="fas fa-info-circle text-blue-600"></i> Hướng dẫn
                         </h3>
-                        <ol class="list-decimal ml-5 space-y-2 text-sm text-gray-700">
+                        <ol class="ml-5 list-decimal space-y-2 text-sm text-gray-700">
                             <li>Chọn loại dữ liệu muốn import</li>
                             <li>Tải template tương ứng</li>
                             <li>Điền dữ liệu vào template</li>
@@ -146,7 +146,7 @@
                             <li>Kiểm tra logs để xem kết quả</li>
                         </ol>
 
-                        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <div class="mt-4 rounded-md border border-yellow-200 bg-yellow-50 p-3">
                             <p class="text-sm text-yellow-800">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <strong>Lưu ý:</strong> Đảm bảo file Excel đúng cấu trúc. File không đúng sẽ gây lỗi
@@ -156,7 +156,7 @@
                     </div>
 
                     <!-- Recent Stats -->
-                    <div class="search-card">
+                    {{-- <div class="search-card">
                         <h3 class="section-subtitle mb-4">
                             <i class="fas fa-chart-line text-purple-600"></i> Thống kê nhanh
                         </h3>
@@ -174,7 +174,7 @@
                                 <span class="font-semibold text-red-600">--</span>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
