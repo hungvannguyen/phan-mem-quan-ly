@@ -27,12 +27,12 @@ class AdvancedPoliticalTheoryInfoExport
 
         // Query students with certificate degrees (Cao cấp lý luận chính trị)
         $query = Student::with([
-                'major',
-                'degrees.major',
-                'degrees.diplomaBlank.type',
-                'degrees.changeLogs',
-                'degrees.reissues.newDiplomaBlank'
-            ])
+            'major',
+            'degrees.major',
+            'degrees.diplomaBlank.type',
+            'degrees.changeLogs',
+            'degrees.reissues.newDiplomaBlank'
+        ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate')
@@ -182,9 +182,9 @@ class AdvancedPoliticalTheoryInfoExport
             $sheet->setCellValue('H' . $currentRow, $student->course ?? ''); // Khóa
             $sheet->setCellValue('I' . $currentRow, $degree->ranking ?? ''); // Xếp loại tốt nghiệp
             $sheet->setCellValue('J' . $currentRow, $degree->diplomaBlank?->serial_number ?? ''); // Số hiệu văn bằng (serial number)
-            $sheet->setCellValue('K' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
+            $sheet->setCellValue('K' . $currentRow, $degree->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng (lấy từ Degree)
             $sheet->setCellValue('L' . $currentRow, $student->academic_year ?? ''); // Khóa học
-            $sheet->setCellValue('M' . $currentRow, $degree->decision_number ?? ''); // Số Quyết định
+            $sheet->setCellValue('M' . $currentRow, $degree->graduation_decision_number ?? ''); // Số Quyết định
             $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng

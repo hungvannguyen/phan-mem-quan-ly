@@ -27,12 +27,12 @@ class DoctorateInfoExport
 
         // Query students with doctorate degrees
         $query = Student::with([
-                'major',
-                'degrees.major',
-                'degrees.diplomaBlank.type',
-                'degrees.changeLogs',
-                'degrees.reissues.newDiplomaBlank'
-            ])
+            'major',
+            'degrees.major',
+            'degrees.diplomaBlank.type',
+            'degrees.changeLogs',
+            'degrees.reissues.newDiplomaBlank'
+        ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'doctor'); // Filter only doctorate degrees
@@ -173,7 +173,7 @@ class DoctorateInfoExport
             $sheet->setCellValue('M' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
             $sheet->setCellValue('N' . $currentRow, $student->course ?? ''); // Khoá
             $sheet->setCellValue('O' . $currentRow, $degree->training_type ?? 'Chính quy'); // Hình thức đào tạo
-            $sheet->setCellValue('P' . $currentRow, $degree->decision_number ?? ''); // Số quyết định
+            $sheet->setCellValue('P' . $currentRow, $degree->graduation_decision_number ?? ''); // Số quyết định
             $sheet->setCellValue('Q' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng (quyết định)
             $sheet->setCellValue('R' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('S' . $currentRow, 'Đã cấp'); // Tình trạng

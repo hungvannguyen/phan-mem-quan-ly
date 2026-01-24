@@ -27,12 +27,12 @@ class AllCertificatesInfoExport
 
         // Query students with certificate degrees (all types)
         $query = Student::with([
-                'major',
-                'degrees.major',
-                'degrees.diplomaBlank.type',
-                'degrees.changeLogs',
-                'degrees.reissues.newDiplomaBlank'
-            ])
+            'major',
+            'degrees.major',
+            'degrees.diplomaBlank.type',
+            'degrees.changeLogs',
+            'degrees.reissues.newDiplomaBlank'
+        ])
             ->whereHas('degrees', function ($q) {
                 $q->whereNotNull('registration_number')
                     ->where('degree_type', 'certificate');
@@ -183,10 +183,10 @@ class AllCertificatesInfoExport
             $sheet->setCellValue('G' . $currentRow, $trainingProgram); // Chương trình bồi dưỡng
             $sheet->setCellValue('H' . $currentRow, $degree->ranking ?? ''); // Xếp loại
             $sheet->setCellValue('I' . $currentRow, $degree->registration_number ?? ''); // Số hiệu chứng chỉ
-            $sheet->setCellValue('J' . $currentRow, $student->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng
+            $sheet->setCellValue('J' . $currentRow, $degree->number_in_the_book ?? ''); // Số vào sổ gốc cấp văn bằng (lấy từ Degree)
             $sheet->setCellValue('K' . $currentRow, $degree->training_start_date ? $degree->training_start_date->format('d/m/Y') : ''); // Thời gian đào tạo từ ngày
             $sheet->setCellValue('L' . $currentRow, $degree->training_end_date ? $degree->training_end_date->format('d/m/Y') : ''); // Thời gian đào tạo đến ngày
-            $sheet->setCellValue('M' . $currentRow, $degree->decision_number ?? ''); // Số quyết định công nhận tốt nghiệp
+            $sheet->setCellValue('M' . $currentRow, $degree->graduation_decision_number ?? ''); // Số quyết định công nhận tốt nghiệp
             $sheet->setCellValue('N' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày tháng công nhận tốt nghiệp
             $sheet->setCellValue('O' . $currentRow, $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''); // Ngày cấp
             $sheet->setCellValue('P' . $currentRow, 'Đã cấp'); // Tình trạng
