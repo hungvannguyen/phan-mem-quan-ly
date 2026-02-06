@@ -118,11 +118,11 @@
                             Tải về file mẫu để biết cấu trúc đúng
                         </p>
                         <div class="space-y-2">
-                            @forelse($templates ?? [] as $index => $template)
-                                <a href="{{ route('import.download-template', $index) }}"
+                            @forelse($templates ?? [] as $type => $name)
+                                <a href="{{ route('import.download-template', $type) }}"
                                     class="block text-blue-600 hover:text-blue-800 hover:underline">
                                     <i class="fas fa-file-excel text-green-600"></i>
-                                    {{ $template }}
+                                    {{ $name }}
                                 </a>
                             @empty
                                 <p class="text-sm text-gray-500">
