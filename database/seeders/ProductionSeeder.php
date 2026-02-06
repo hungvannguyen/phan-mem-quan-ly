@@ -17,8 +17,12 @@ class ProductionSeeder extends Seeder
     {
         $this->command->info('Running Production Seeder...');
 
-        // 1. Create admin role
+        // 1. Create all roles
         $adminRole = Role::create(['role_name' => 'Admin', 'description' => 'Quản trị viên hệ thống']);
+        Role::create(['role_name' => 'Quản lý phôi', 'description' => 'Quản lý phôi văn bằng']);
+        Role::create(['role_name' => 'Quản lý văn bằng', 'description' => 'Quản lý văn bằng đã cấp']);
+        Role::create(['role_name' => 'Quản lý chứng chỉ', 'description' => 'Quản lý chứng chỉ đã cấp']);
+        Role::create(['role_name' => 'Tra cứu', 'description' => 'Xem và tra cứu thông tin']);
 
         // 2. Seed permissions and assign to roles
         $this->call(PermissionSeeder::class);
