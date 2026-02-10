@@ -7,6 +7,7 @@ enum DegreeStatus: string
     case NOT_ISSUED = 'NotIssued';
     case ISSUED = 'Issued';
     case RECALLED = 'Recalled';
+    case CANCELLED = 'Cancelled';
 
     /**
      * Lấy danh sách tất cả status với label tiếng Việt
@@ -17,6 +18,7 @@ enum DegreeStatus: string
             self::NOT_ISSUED->value => 'Chưa cấp',
             self::ISSUED->value => 'Đã cấp',
             self::RECALLED->value => 'Thu hồi',
+            self::CANCELLED->value => 'Hủy',
         ];
     }
 
@@ -29,6 +31,7 @@ enum DegreeStatus: string
             self::NOT_ISSUED => 'Chưa cấp',
             self::ISSUED => 'Đã cấp',
             self::RECALLED => 'Thu hồi',
+            self::CANCELLED => 'Hủy',
         };
     }
 
@@ -41,6 +44,7 @@ enum DegreeStatus: string
             self::NOT_ISSUED => 'status-pending',
             self::ISSUED => 'status-completed',
             self::RECALLED => 'status-processing',
+            self::CANCELLED => 'status-cancelled',
         };
     }
 
@@ -53,6 +57,7 @@ enum DegreeStatus: string
             self::NOT_ISSUED => 'clock',
             self::ISSUED => 'check-circle',
             self::RECALLED => 'x-circle',
+            self::CANCELLED => 'slash-circle',
         };
     }
 
@@ -86,5 +91,13 @@ enum DegreeStatus: string
     public function isRecalled(): bool
     {
         return $this === self::RECALLED;
+    }
+
+    /**
+     * Kiểm tra đã bị hủy chưa
+     */
+    public function isCancelled(): bool
+    {
+        return $this === self::CANCELLED;
     }
 }

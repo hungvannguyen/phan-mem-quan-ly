@@ -3,10 +3,8 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th class="th">Mã sinh viên</th>
                     <th class="th">Họ và tên</th>
                     <th class="th">Ngày sinh</th>
-                    <th class="th">Lớp</th>
                     <th class="th">Ngành đào tạo</th>
                     <th class="th">Dân tộc</th>
                     <th class="th">Quốc tịch</th>
@@ -25,9 +23,6 @@
                 @forelse($students as $index => $student)
                     <tr class="table-row" data-student-id="{{ $student->student_id }}"
                         onclick="toggleRowHighlight(this)">
-                        <td class="td">
-                            <span class="student-code">{{ $student->student_code }}</span>
-                        </td>
                         <td class="td">
                             <div class="student-info">
                                 <span class="student-name">{{ $student->full_name }}</span>
@@ -48,9 +43,6 @@
                             @else
                                 <span class="text-muted">--</span>
                             @endif
-                        </td>
-                        <td class="td">
-                            <span class="class-name">{{ $student->class_name ?? '--' }}</span>
                         </td>
                         <td class="td">
                             @if ($student->major)
