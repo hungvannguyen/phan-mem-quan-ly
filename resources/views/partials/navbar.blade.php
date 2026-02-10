@@ -27,6 +27,14 @@
                 </a>
             @endif
 
+            @if (auth()->user()->hasPermission('diplomas.view'))
+                <a href="{{ route('diploma-management') }}"
+                    class="menu-item {{ request()->routeIs('diploma-management') ? 'menu-item-active' : '' }}">
+                    <i class="fas fa-graduation-cap"></i>
+                    Quản lý chứng chỉ
+                </a>
+            @endif
+
             @if (auth()->user()->hasPermission('users.view'))
                 <a href="{{ route('user-management') }}"
                     class="menu-item {{ request()->routeIs('user-management') || request()->routeIs('user.*') ? 'menu-item-active' : '' }}">

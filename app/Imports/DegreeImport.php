@@ -39,39 +39,39 @@ class DegreeImport implements ToCollection, WithStartRow
     protected static $majorsByCode = [];
 
     // Column mapping constants
-    private const STUDENT_CODE = 1;               // B - Mã học viên
-    private const COL_DEGREE_TYPE = 2;            // C - Loại văn bằng
-    private const COL_FULL_NAME = 3;              // D - Họ và tên
-    private const COL_DATE_OF_BIRTH = 4;        // E - Ngày sinh
-    private const COL_PLACE_OF_BIRTH = 5;       // F - Nơi sinh
-    private const COL_HOMETOWN = 6;         // G - Quê quán
-    private const COL_PLACE_OF_ORIGIN = 7;      // H - Nguyên quán
-    private const COL_GENDER = 8;           // I - Giới tính
-    private const COL_NATION = 9;       // J - Dân tộc
-    private const COL_NATIONALITY = 10;     // K - Quốc tịch
-    private const COL_COURSE = 11;         // L - Khóa học
-    private const COL_CLASS_NAME = 12;       // M - Lớp học
-    private const COL_ACADEMIC_YEAR = 13;   // N - Niên khóa
-    private const COL_MAJOR_NAME = 14;     // O - Chuyên ngành
-    private const COL_TRAINING_TYPE = 15;  // P - Hình thức đào tạo
-    private const COL_COUNCIL_DECISION_NUMBER = 16;  // Q - Số QĐ thành lập hội đồng
-    private const COL_COUNCIL_DECISION_DATE = 17; // R - Ngày QĐ thành lập hội đồng
-    private const COL_DEFENSE_DATE = 18;     // S - Ngày bảo vệ
-    private const COL_GRADUATION_DECISION_NUMBER = 19; // T - Số QĐ tốt nghiệp
-    private const COL_GRADUATION_DECISION_DATE = 20; // U - Ngày QĐ tốt nghiệp
-    private const COL_GRADUATION_YEAR = 21;   // V - Năm tốt nghiệp
-    private const COL_RANKING = 22;         // W - Xếp loại
-    private const COL_DIPLOMA_NUMBER = 23;   // X - Số hiệu văn bằng
-    private const COL_NUMBER_IN_THE_BOOK = 24; // Y - Số trong sổ
-    private const COL_GRANTING_DATE = 25;   // Z - Ngày cấp bằng
-    private const COL_ADJUSTMENT_CONTENT = 26; // AA - Nội dung điều chỉnh
-    private const COL_ADJUSTMENT_DECISION = 27; // AB - Số QĐ điều chỉnh
-    private const COL_ADJUSTMENT_DATE = 28;  // AC - Ngày QĐ điều chỉnh
-    private const COL_REISSUE_NUMBER = 29;   // AD - Số hiệu cấp lại
-    private const COL_REISSUE_CONTENT = 30;  // AE - Nội dung cấp lại
-    private const COL_REISSUE_DECISION = 31; // AF - Số QĐ cấp lại
-    private const COL_REISSUE_DATE = 32;   // AG - Ngày QĐ cấp lại
-    private const COL_NOTES = 33;          // AH - Ghi chú
+    // Mã sinh viên sẽ được tạo tự động, không lấy từ Excel
+    private const COL_DEGREE_TYPE = 1;            // B - Loại văn bằng
+    private const COL_FULL_NAME = 2;              // C - Họ và tên
+    private const COL_DATE_OF_BIRTH = 3;        // D - Ngày sinh
+    private const COL_PLACE_OF_BIRTH = 4;       // E - Nơi sinh
+    private const COL_HOMETOWN = 5;         // F - Quê quán
+    private const COL_PLACE_OF_ORIGIN = 6;      // G - Nguyên quán
+    private const COL_GENDER = 7;           // H - Giới tính
+    private const COL_NATION = 8;       // I - Dân tộc
+    private const COL_NATIONALITY = 9;     // J - Quốc tịch
+    private const COL_COURSE = 10;         // K - Khóa học
+    private const COL_CLASS_NAME = 11;       // L - Lớp học
+    private const COL_ACADEMIC_YEAR = 12;   // M - Niên khóa
+    private const COL_MAJOR_NAME = 13;     // N - Chuyên ngành
+    private const COL_TRAINING_TYPE = 14;  // O - Hình thức đào tạo
+    private const COL_COUNCIL_DECISION_NUMBER = 15;  // P - Số QĐ thành lập hội đồng
+    private const COL_COUNCIL_DECISION_DATE = 16; // Q - Ngày QĐ thành lập hội đồng
+    private const COL_DEFENSE_DATE = 17;     // R - Ngày bảo vệ
+    private const COL_GRADUATION_DECISION_NUMBER = 18; // S - Số QĐ tốt nghiệp
+    private const COL_GRADUATION_DECISION_DATE = 19; // T - Ngày QĐ tốt nghiệp
+    private const COL_GRADUATION_YEAR = 20;   // U - Năm tốt nghiệp
+    private const COL_RANKING = 21;         // V - Xếp loại
+    private const COL_DIPLOMA_NUMBER = 22;   // W - Số hiệu văn bằng
+    private const COL_NUMBER_IN_THE_BOOK = 23; // X - Số trong sổ
+    private const COL_GRANTING_DATE = 24;   // Y - Ngày cấp bằng
+    private const COL_ADJUSTMENT_CONTENT = 25; // Z - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_DECISION = 26; // AA - Số QĐ điều chỉnh
+    private const COL_ADJUSTMENT_DATE = 27;  // AB - Ngày QĐ điều chỉnh
+    private const COL_REISSUE_NUMBER = 28;   // AC - Số hiệu cấp lại
+    private const COL_REISSUE_CONTENT = 29;  // AD - Nội dung cấp lại
+    private const COL_REISSUE_DECISION = 30; // AE - Số QĐ cấp lại
+    private const COL_REISSUE_DATE = 31;   // AF - Ngày QĐ cấp lại
+    private const COL_NOTES = 32;          // AG - Ghi chú
 
     public function __construct(string $documentReference = null)
     {
@@ -200,7 +200,6 @@ class DegreeImport implements ToCollection, WithStartRow
     protected function parseRowData(array $row): array
     {
         return [
-            'student_code' => $this->cleanString($row[self::STUDENT_CODE] ?? ''),
             'full_name' => $this->cleanString($row[self::COL_FULL_NAME] ?? ''),
             'date_of_birth' => $this->parseDate($row[self::COL_DATE_OF_BIRTH] ?? ''),
             'place_of_birth' => $this->cleanString($row[self::COL_PLACE_OF_BIRTH] ?? ''),
@@ -296,36 +295,73 @@ class DegreeImport implements ToCollection, WithStartRow
      */
     protected function findOrCreateStudent(array $rowData): Student
     {
-        // 1. Chuẩn bị dữ liệu để map vào database
-        // Đây là những dữ liệu sẽ được dùng để tạo mới HOẶC cập nhật
-        $dataToSync = [
-            'full_name'          => $rowData['full_name'],
-            'date_of_birth'      => $rowData['date_of_birth'],
-            'place_of_birth'     => $rowData['place_of_birth'],
-            'hometown'           => $rowData['hometown'],
-            'place_of_origin'    => $rowData['place_of_origin'],
-            'gender'             => $rowData['gender'],
-            'nation'             => $rowData['nation'],
-            'nationality'        => $rowData['nationality'],
-            'course'             => $rowData['course'],
-            'class_name'         => $rowData['class_name'],
-            'academic_year'      => $rowData['academic_year'],
-        ];
+        // Tìm sinh viên theo họ tên + ngày sinh
+        $student = Student::where('full_name', $rowData['full_name'])
+            ->where('date_of_birth', $rowData['date_of_birth'])
+            ->first();
 
-        // 2. Sử dụng updateOrCreate
-        // Tham số 1: Điều kiện tìm kiếm (ở đây là student_code)
-        // Tham số 2: Dữ liệu cần lưu (sẽ update nếu tìm thấy, hoặc create merge với tham số 1 nếu không thấy)
+        if ($student) {
+            // Cập nhật thông tin nếu cần
+            $student->update([
+                'place_of_birth' => $rowData['place_of_birth'],
+                'hometown' => $rowData['hometown'],
+                'place_of_origin' => $rowData['place_of_origin'],
+                'gender' => $rowData['gender'],
+                'nation' => $rowData['nation'],
+                'nationality' => $rowData['nationality'],
+                'course' => $rowData['course'],
+                'class_name' => $rowData['class_name'],
+                'academic_year' => $rowData['academic_year'],
+            ]);
 
-        $student = Student::updateOrCreate(
-            ['student_code' => $rowData['student_code']], // Điều kiện duy nhất (unique key)
-            $dataToSync                                    // Dữ liệu cần cập nhật/tạo mới
-        );
+            Log::info('DegreeImport: Found existing student', ['id' => $student->student_id]);
+            return $student;
+        }
 
-        // Logic của Laravel:
-        // - Nếu tìm thấy: Nó sẽ fill $dataToSync và save(). (Chỉ chạy query update nếu dữ liệu thực sự thay đổi - isDirty)
-        // - Nếu không thấy: Nó sẽ tạo mới bản ghi với student_code + $dataToSync.
+        // Tạo mã sinh viên tự động không trùng
+        $studentCode = $this->generateUniqueStudentCode();
+
+        $student = Student::create([
+            'student_code' => $studentCode,
+            'full_name' => $rowData['full_name'],
+            'date_of_birth' => $rowData['date_of_birth'],
+            'place_of_birth' => $rowData['place_of_birth'],
+            'hometown' => $rowData['hometown'],
+            'place_of_origin' => $rowData['place_of_origin'],
+            'gender' => $rowData['gender'],
+            'nation' => $rowData['nation'],
+            'nationality' => $rowData['nationality'],
+            'course' => $rowData['course'],
+            'class_name' => $rowData['class_name'],
+            'academic_year' => $rowData['academic_year'],
+        ]);
+
+        Log::info('DegreeImport: Created new student', [
+            'id' => $student->student_id,
+            'student_code' => $studentCode
+        ]);
 
         return $student;
+    }
+
+    /**
+     * Generate unique student code
+     */
+    protected function generateUniqueStudentCode(): string
+    {
+        $prefix = 'DEG';
+        $year = date('Y');
+
+        do {
+            // Tạo mã theo format: DEG + Năm + 6 số ngẫu nhiên
+            $randomNumber = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $studentCode = $prefix . $year . $randomNumber;
+
+            // Kiểm tra xem mã đã tồn tại chưa
+            $exists = Student::where('student_code', $studentCode)->exists();
+        } while ($exists);
+
+        return $studentCode;
     }
 
     /**

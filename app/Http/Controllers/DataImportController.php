@@ -19,18 +19,12 @@ class DataImportController extends Controller
      */
     public function index()
     {
-        // Lấy danh sách template files
-        $templatesPath = resource_path('templates/Import');
-        $templates = [];
-
-        if (is_dir($templatesPath)) {
-            $files = scandir($templatesPath);
-            foreach ($files as $file) {
-                if ($file != '.' && $file != '..') {
-                    $templates[] = $file;
-                }
-            }
-        }
+        // Định nghĩa templates theo type
+        $templates = [
+            'degree' => 'Bằng Cử nhân, Thạc sĩ, Tiến sĩ',
+            'political_theory' => 'Lý luận chính trị',
+            'certificate' => 'Chứng chỉ',
+        ];
 
         return view('import.index', compact('templates'));
     }
@@ -104,7 +98,6 @@ class DataImportController extends Controller
             }
 
             return back()->with('success', "Import thành công {$stats['imported']} dòng dữ liệu!");
-
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -128,7 +121,6 @@ class DataImportController extends Controller
 
             return back()->with('error', 'Validation failed! Có ' . count($failures) . ' dòng không hợp lệ. Vui lòng kiểm tra lại file.')
                 ->withErrors(['import' => 'Xem chi tiết lỗi trong phần logs.']);
-
         } catch (\Exception $e) {
             // Update import log
             $importLog->update([
@@ -190,32 +182,26 @@ class DataImportController extends Controller
     /**
      * Download template file
      */
-    public function downloadTemplate($index)
+    public function downloadTemplate($type)
     {
-        // Lấy danh sách template files
-        $templatesPath = resource_path('templates/Import');
-        $templates = [];
+        // Map type to template file names
+        $templateFiles = [
+            'degree' => '[Mau TT01] Thong tin cap bang cu nhan, thac si, tien si.xlsx',
+            'political_theory' => '[Mau TT02] Thong tin cap bang LLCT.xlsx',
+            'certificate' => '[Mau TT03] Thong tin cap chung chi.xlsx',
+        ];
 
-        if (is_dir($templatesPath)) {
-            $files = scandir($templatesPath);
-            foreach ($files as $file) {
-                if ($file != '.' && $file != '..') {
-                    $templates[] = $file;
-                }
-            }
-        }
-
-        // Kiểm tra index hợp lệ
-        if (!isset($templates[$index])) {
+        // Kiểm tra type hợp lệ
+        if (!isset($templateFiles[$type])) {
             return back()->with('error', 'Template không tồn tại.');
         }
 
-        $filePath = resource_path('templates/Import/' . $templates[$index]);
+        $filePath = resource_path('templates/Import/' . $templateFiles[$type]);
 
         if (!file_exists($filePath)) {
-            return back()->with('error', 'File template không tồn tại.');
+            return back()->with('error', 'File template không tồn tại. Vui lòng liên hệ quản trị viên.');
         }
 
-        return response()->download($filePath);
+        return response()->download($filePath, $templateFiles[$type]);
     }
 }
