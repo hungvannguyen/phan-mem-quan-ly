@@ -835,7 +835,7 @@
                                         </div>
                                     @endif
                                     <div class="detail-item">
-                                        <span class="label">Mã phôi:</span>
+                                        <span class="label">Số hiệu văn bằng:</span>
                                         <span class="value">
                                             @if ($degree->diplomaBlank)
                                                 <code
@@ -846,7 +846,7 @@
                                         </span>
                                     </div>
                                     <div class="detail-item">
-                                        <span class="label">Loại phôi:</span>
+                                        <span class="label">Loại văn bằng:</span>
                                         <span class="value">
                                             @if ($degree->diplomaBlank && $degree->diplomaBlank->type)
                                                 <span
@@ -2209,41 +2209,41 @@
                                         <div class="mb-2 flex items-start justify-between">
                                             <div class="flex-1">
                                                 ${adj.changed_field ? `
-                                                                                                                                                            <p class="mb-1 text-xs font-semibold text-purple-700">
-                                                                                                                                                                <i class="fas fa-tag mr-1"></i>
-                                                                                                                                                                ${fieldLabels[adj.changed_field] || adj.changed_field}
-                                                                                                                                                            </p>
-                                                                                                                                                        ` : ''}
+                                                                                                                                                                <p class="mb-1 text-xs font-semibold text-purple-700">
+                                                                                                                                                                    <i class="fas fa-tag mr-1"></i>
+                                                                                                                                                                    ${fieldLabels[adj.changed_field] || adj.changed_field}
+                                                                                                                                                                </p>
+                                                                                                                                                            ` : ''}
                                                 ${adj.old_value && adj.new_value ? `
-                                                                                                                                                            <p class="mb-2 text-sm">
-                                                                                                                                                                <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
-                                                                                                                                                                <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
-                                                                                                                                                                <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
-                                                                                                                                                            </p>
-                                                                                                                                                        ` : ''}
+                                                                                                                                                                <p class="mb-2 text-sm">
+                                                                                                                                                                    <span class="rounded bg-red-100 px-2 py-0.5 text-red-700 line-through">${convertValue(adj.old_value)}</span>
+                                                                                                                                                                    <i class="fas fa-arrow-right mx-2 text-gray-400"></i>
+                                                                                                                                                                    <span class="rounded bg-green-100 px-2 py-0.5 text-green-700 font-medium">${convertValue(adj.new_value)}</span>
+                                                                                                                                                                </p>
+                                                                                                                                                            ` : ''}
                                                 <h4 class="font-semibold text-gray-900">${adj.change_description}</h4>
                                             </div>
                                             <span class="text-xs text-gray-500">#${data.adjustments.length - index}</span>
                                         </div>
                                         <div class="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
                                             ${adj.decision_number ? `
-                                                                                                                                                        <span class="flex items-center">
-                                                                                                                                                            <i class="fas fa-file-contract mr-1 text-purple-600"></i>
-                                                                                                                                                            <strong>QĐ:</strong>&nbsp;${adj.decision_number}
-                                                                                                                                                        </span>
-                                                                                                                                                    ` : ''}
+                                                                                                                                                            <span class="flex items-center">
+                                                                                                                                                                <i class="fas fa-file-contract mr-1 text-purple-600"></i>
+                                                                                                                                                                <strong>QĐ:</strong>&nbsp;${adj.decision_number}
+                                                                                                                                                            </span>
+                                                                                                                                                        ` : ''}
                                             ${adj.decision_date ? `
-                                                                                                                                                        <span class="flex items-center">
-                                                                                                                                                            <i class="fas fa-calendar mr-1 text-purple-600"></i>
-                                                                                                                                                            <strong>Ngày:</strong>&nbsp;${adj.decision_date}
-                                                                                                                                                        </span>
-                                                                                                                                                    ` : ''}
+                                                                                                                                                            <span class="flex items-center">
+                                                                                                                                                                <i class="fas fa-calendar mr-1 text-purple-600"></i>
+                                                                                                                                                                <strong>Ngày:</strong>&nbsp;${adj.decision_date}
+                                                                                                                                                            </span>
+                                                                                                                                                        ` : ''}
                                             ${adj.changed_by ? `
-                                                                                                                                                        <span class="flex items-center">
-                                                                                                                                                            <i class="fas fa-user mr-1 text-purple-600"></i>
-                                                                                                                                                            ${adj.changed_by.full_name || 'N/A'}
-                                                                                                                                                        </span>
-                                                                                                                                                    ` : ''}
+                                                                                                                                                            <span class="flex items-center">
+                                                                                                                                                                <i class="fas fa-user mr-1 text-purple-600"></i>
+                                                                                                                                                                ${adj.changed_by.full_name || 'N/A'}
+                                                                                                                                                            </span>
+                                                                                                                                                        ` : ''}
                                             <span class="flex items-center">
                                                 <i class="fas fa-clock mr-1 text-purple-600"></i>
                                                 ${new Date(adj.created_at).toLocaleString('vi-VN')}

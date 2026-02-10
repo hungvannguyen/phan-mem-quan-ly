@@ -4,7 +4,6 @@ namespace App\Exports;
 
 use App\Models\Student;
 use PhpOffice\PhpWord\TemplateProcessor;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BachelorConfirmationExport
 {
@@ -28,15 +27,15 @@ class BachelorConfirmationExport
         // Get the first degree
         $degree = $this->student->degrees->first();
 
-        if (!$degree) {
+        if (! $degree) {
             throw new \Exception('Sinh viên chưa được cấp văn bằng');
         }
 
         // Template path
         $templatePath = resource_path('templates/[Mau XN01] Giay xac nhan cu nhan.docx');
 
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
+        if (! file_exists($templatePath)) {
+            throw new \Exception('Template file not found: '.$templatePath);
         }
 
         // Load template
@@ -52,8 +51,8 @@ class BachelorConfirmationExport
         $decisionDate = $degree->granting_date ? $degree->granting_date->format('d/m/Y') : ''; // Using granting_date as decision_date
         $majorName = $degree->major->major_name ?? $this->student->major->major_name ?? '';
         $grantingDate = $degree->granting_date ? $degree->granting_date->format('d/m/Y') : '';
-        $registrationNumber = $degree->registration_number ?? '';
-        $numberInBook = $this->student->number_in_the_book ?? '';
+        $registrationNumber = $degree->diplomaBlank->serial_number ?? '';
+        $numberInBook = $degree->number_in_the_book ?? '';
         $ranking = $degree->ranking ?? '';
         $trainingType = $degree->training_type ?? 'Chính quy';
 
@@ -74,17 +73,17 @@ class BachelorConfirmationExport
 
         // Generate filename and output path
         $filename = $this->generateFilename();
-        $outputPath = storage_path('app/temp/' . $filename);
+        $outputPath = storage_path('app/temp/'.$filename);
 
         // Ensure temp directory exists
-        if (!file_exists(storage_path('app/temp'))) {
+        if (! file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
         // Save the document
         $templateProcessor->saveAs($outputPath);
 
-        if (!file_exists($outputPath) || filesize($outputPath) === 0) {
+        if (! file_exists($outputPath) || filesize($outputPath) === 0) {
             throw new \Exception('Không thể tạo file xuất');
         }
 

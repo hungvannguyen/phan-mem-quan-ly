@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class DiplomaVerificationExport
 {
     protected $student;
+
     protected $params = [];
 
     public function __construct(Student $student, array $params = [])
@@ -30,15 +31,15 @@ class DiplomaVerificationExport
         // Get the first degree
         $degree = $this->student->degrees->first();
 
-        if (!$degree) {
+        if (! $degree) {
             throw new \Exception('Sinh viên chưa được cấp văn bằng');
         }
 
         // Template path
         $templatePath = resource_path('templates/[Mau XM01] Cong van tra loi xac minh van bang.docx');
 
-        if (!file_exists($templatePath)) {
-            throw new \Exception('Template file not found: ' . $templatePath);
+        if (! file_exists($templatePath)) {
+            throw new \Exception('Template file not found: '.$templatePath);
         }
 
         // Load template
@@ -46,8 +47,8 @@ class DiplomaVerificationExport
 
         // Prepare data
         $majorName = $degree->major->major_name ?? $this->student->major->major_name ?? '';
-        $registrationNumber = $degree->registration_number ?? '';
-        $numberInBook = $this->student->number_in_the_book ?? '';
+        $registrationNumber = $degree->diplomaBlank->serial_number ?? '';
+        $numberInBook = $degree->number_in_the_book ?? '';
         $grantingDate = $degree->granting_date ? $degree->granting_date->format('d/m/Y') : '';
         $fullName = $this->student->full_name ?? '';
         $dateOfBirth = $this->student->date_of_birth ? $this->student->date_of_birth->format('d/m/Y') : '';
@@ -60,7 +61,7 @@ class DiplomaVerificationExport
         $ngayCv = $this->params['ngay_cv_den'] ?? '';
 
         // If date provided in ISO format, convert to dd/mm/YYYY for template
-        if (!empty($ngayCv)) {
+        if (! empty($ngayCv)) {
             try {
                 $d = new \DateTime($ngayCv);
                 $ngayCv = $d->format('d/m/Y');
@@ -84,17 +85,17 @@ class DiplomaVerificationExport
 
         // Generate filename and output path
         $filename = $this->generateFilename();
-        $outputPath = storage_path('app/temp/' . $filename);
+        $outputPath = storage_path('app/temp/'.$filename);
 
         // Ensure temp directory exists
-        if (!file_exists(storage_path('app/temp'))) {
+        if (! file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
         // Save the document
         $templateProcessor->saveAs($outputPath);
 
-        if (!file_exists($outputPath) || filesize($outputPath) === 0) {
+        if (! file_exists($outputPath) || filesize($outputPath) === 0) {
             throw new \Exception('Không thể tạo file xuất');
         }
 
