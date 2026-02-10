@@ -2,24 +2,25 @@
 
 namespace App\Imports;
 
-use App\Models\Student;
-use App\Models\Degree;
-use App\Models\Major;
-use App\Models\DiplomaBlankImport;
-use App\Models\DiplomaBlank;
-use App\Models\ChangeLog;
-use App\Models\DegreeReissue;
-use App\Models\DiplomaBlankType;
 use App\Enums\DegreeStatus;
-use App\Enums\ImportStatus;
 use App\Enums\DiplomaBlankStatus;
+use App\Enums\ImportStatus;
+use App\Enums\StudentStatus;
+use App\Models\ChangeLog;
+use App\Models\Degree;
+use App\Models\DegreeReissue;
+use App\Models\DiplomaBlank;
+use App\Models\DiplomaBlankImport;
+use App\Models\DiplomaBlankType;
+use App\Models\Major;
+use App\Models\Student;
 use App\Traits\ImportHelper;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithStartRow;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
 /**
  * Import cho thông tin chứng chỉ
@@ -30,42 +31,73 @@ class CertificateImport implements ToCollection, WithStartRow
     use ImportHelper;
 
     protected $importedCount = 0;
+
     protected $errorCount = 0;
+
     protected $errors = [];
+
     protected $documentReference;
+
     protected $diplomaBlankImportId;
+
     protected static $diplomaBlankTypes = null;
+
+    protected static $majorsByName = [];
+
+    protected static $majorsByCode = [];
 
     // --- ĐỊNH NGHĨA CỘT THEO YÊU CẦU ---
     // Index bắt đầu từ 0 (Cột A)
     // Mã sinh viên sẽ được tạo tự động, không lấy từ Excel
     private const COL_FULL_NAME = 1;                // B - Họ và tên
+
     private const COL_DATE_OF_BIRTH = 2;            // C - Ngày sinh
+
     private const COL_PLACE_OF_BIRTH = 3;           // D - Nơi sinh
+
     private const COL_GENDER = 4;                   // E - Giới tính
+
     private const COL_NATION = 5;                   // F - Dân tộc
+
     private const COL_TRAINING_PROGRAM = 6;         // G - Chương trình bồi dưỡng (Map vào major_name hoặc degree_type)
+
     private const COL_RANKING = 7;                  // H - Xếp Loại
+
     private const COL_DIPLOMA_NUMBER = 8;           // I - Số hiệu chứng chỉ
+
     private const COL_NUMBER_IN_THE_BOOK = 9;       // J - Số vào sổ gốc cấp chứng chỉ
+
     private const COL_TRAINING_START = 10;          // K - Thời gian đào tạo từ ngày
+
     private const COL_TRAINING_END = 11;            // L - Thời gian đài tạo đến ngày
+
     private const COL_GRADUATION_DECISION_NUMBER = 12; // M - Số QĐ (QĐ công nhận tốt nghiệp)
+
     private const COL_GRADUATION_DECISION_DATE = 13;   // N - Ngày Tháng (QĐ công nhận tốt nghiệp)
+
     private const COL_GRANTING_DATE = 14;           // O - Ngày cấp
+
     private const COL_STATUS_TEXT = 15;             // P - Tình trạng
+
     private const COL_ADJUSTMENT_CONTENT = 16;      // Q - Nội dung điều chỉnh
+
     private const COL_ADJUSTMENT_DECISION = 17;     // R - QĐ điều chỉnh thông tin
+
     private const COL_ADJUSTMENT_DATE = 18;         // S - Ngày QĐ (Điều chỉnh)
+
     private const COL_REISSUE_NUMBER = 19;          // T - Số hiệu văn bằng (Cấp lại)
+
     private const COL_REISSUE_CONTENT = 20;         // U - Nội dung chỉnh sửa (Cấp lại)
+
     private const COL_REISSUE_DECISION = 21;        // V - QĐ thu hồi, huỷ bỏ và cấp lại
+
     private const COL_REISSUE_DATE = 22;            // W - Ngày QĐ (Cấp lại)
+
     private const COL_NOTES = 23;                   // X - Ghi chú
 
-    public function __construct(string $documentReference = null)
+    public function __construct(?string $documentReference = null)
     {
-        $this->documentReference = $documentReference ?? 'CERT_IMPORT_' . date('YmdHis');
+        $this->documentReference = $documentReference ?? 'CERT_IMPORT_'.date('YmdHis');
     }
 
     /**
@@ -115,11 +147,11 @@ class CertificateImport implements ToCollection, WithStartRow
                     $this->errors[] = [
                         'row' => $index + $this->startRow(),
                         'error' => $e->getMessage(),
-                        'data' => $row->toArray()
+                        'data' => $row->toArray(),
                     ];
-                    Log::error('CertificateImport Error at row ' . ($index + $this->startRow()), [
+                    Log::error('CertificateImport Error at row '.($index + $this->startRow()), [
                         'error' => $e->getMessage(),
-                        'row' => $row->toArray()
+                        'row' => $row->toArray(),
                     ]);
                 }
             }
@@ -134,7 +166,7 @@ class CertificateImport implements ToCollection, WithStartRow
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('CertificateImport Fatal Error: ' . $e->getMessage());
+            Log::error('CertificateImport Fatal Error: '.$e->getMessage());
             throw $e;
         }
     }
@@ -152,25 +184,29 @@ class CertificateImport implements ToCollection, WithStartRow
             return;
         }
 
+        // Tìm hoặc tạo Major từ training_program
+        $major = $this->findOrCreateMajor($rowData['training_program']);
+
         // Kiểm tra degree đã tồn tại dựa trên số vào sổ
         $existingDegree = Degree::where('number_in_the_book', $rowData['number_in_the_book'])->first();
         if ($existingDegree) {
             Log::info('Certificate already exists, skipping', [
-                'number_in_the_book' => $rowData['number_in_the_book']
+                'number_in_the_book' => $rowData['number_in_the_book'],
             ]);
+
             return;
         }
 
         $student = $existingDegree?->student;
 
         // Tìm hoặc tạo Student
-        if (!$student) {
-            $student = $this->findOrCreateStudent($rowData);
+        if (! $student) {
+            $student = $this->findOrCreateStudent($rowData, $major);
         }
 
         // Tạo diploma blank (Phôi) và degree (Văn bằng/Chứng chỉ)
         $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
-        $degree = $this->createDegree($student, $diplomaBlank, $rowData);
+        $degree = $this->createDegree($student, $diplomaBlank, $major, $rowData);
 
         // Xử lý điều chỉnh và cấp lại
         $this->processAdjustment($degree, $rowData);
@@ -215,7 +251,7 @@ class CertificateImport implements ToCollection, WithStartRow
     /**
      * Find or create student
      */
-    protected function findOrCreateStudent(array $rowData): Student
+    protected function findOrCreateStudent(array $rowData, ?Major $major): Student
     {
         // Tìm sinh viên theo họ tên + ngày sinh
         $student = Student::where('full_name', $rowData['full_name'])
@@ -225,12 +261,15 @@ class CertificateImport implements ToCollection, WithStartRow
         if ($student) {
             // Cập nhật thông tin nếu cần
             $student->update([
+                'major_id' => $major?->major_id,
                 'place_of_birth' => $rowData['place_of_birth'],
                 'gender' => $rowData['gender'],
                 'nation' => $rowData['nation'],
+                'status' => StudentStatus::Graduate,
             ]);
 
             Log::info('CertificateImport: Found existing student', ['id' => $student->student_id]);
+
             return $student;
         }
 
@@ -239,16 +278,18 @@ class CertificateImport implements ToCollection, WithStartRow
 
         $student = Student::create([
             'student_code' => $studentCode,
+            'major_id' => $major?->major_id,
             'full_name' => $rowData['full_name'],
             'date_of_birth' => $rowData['date_of_birth'],
             'place_of_birth' => $rowData['place_of_birth'],
             'gender' => $rowData['gender'],
             'nation' => $rowData['nation'],
+            'status' => StudentStatus::Graduate,
         ]);
 
         Log::info('CertificateImport: Created new student', [
             'id' => $student->student_id,
-            'student_code' => $studentCode
+            'student_code' => $studentCode,
         ]);
 
         return $student;
@@ -265,7 +306,7 @@ class CertificateImport implements ToCollection, WithStartRow
         do {
             // Tạo mã theo format: CERT + Năm + 6 số ngẫu nhiên
             $randomNumber = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            $studentCode = $prefix . $year . $randomNumber;
+            $studentCode = $prefix.$year.$randomNumber;
 
             // Kiểm tra xem mã đã tồn tại chưa
             $exists = Student::where('student_code', $studentCode)->exists();
@@ -284,6 +325,7 @@ class CertificateImport implements ToCollection, WithStartRow
         }
 
         $typeId = $this->getTypeIdForCertificateType($degreeType);
+
         return DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
@@ -297,7 +339,7 @@ class CertificateImport implements ToCollection, WithStartRow
     /**
      * Create degree record for certificate
      */
-    protected function createDegree(Student $student, ?DiplomaBlank $diplomaBlank, array $rowData): Degree
+    protected function createDegree(Student $student, ?DiplomaBlank $diplomaBlank, ?Major $major, array $rowData): Degree
     {
 
         // Ensure log entry is written even if default channel isn't producing output
@@ -305,13 +347,13 @@ class CertificateImport implements ToCollection, WithStartRow
             Log::channel('single')->info('Creating degree', ['diploma_blank' => $diplomaBlank]);
         } catch (\Throwable $e) {
             // Fallback: append to import-jobs.log so scheduled runs also capture it
-            $msg = now()->toDateTimeString() . " Creating degree - diploma_blank: " . json_encode($diplomaBlank) . PHP_EOL;
+            $msg = now()->toDateTimeString().' Creating degree - diploma_blank: '.json_encode($diplomaBlank).PHP_EOL;
             @file_put_contents(storage_path('logs/import-jobs.log'), $msg, FILE_APPEND | LOCK_EX);
         }
 
         // Xác định ngày cấp và năm tốt nghiệp, dùng fallback nếu dữ liệu thiếu
         $grantingDate = $rowData['granting_date'] ?? $rowData['graduation_decision_date'] ?? $rowData['training_end'] ?? now();
-        $graduationYear = $grantingDate ? date('Y', strtotime($grantingDate)) : (int)date('Y');
+        $graduationYear = $grantingDate ? date('Y', strtotime($grantingDate)) : (int) date('Y');
 
         // Xử lý ghi chú: Nối thêm thông tin thời gian đào tạo vào ghi chú vì bảng Degree thường không có cột start/end date
         $trainingNote = '';
@@ -335,10 +377,10 @@ class CertificateImport implements ToCollection, WithStartRow
             'ranking' => $rowData['ranking'],
             'graduation_decision_number' => $rowData['graduation_decision_number'],
             'graduation_decision_date' => $rowData['graduation_decision_date'],
-            'major_id' => null,
+            'major_id' => $major?->major_id,
             'major_name' => $rowData['training_program'], // Lưu tên chương trình bồi dưỡng vào major_name
             'status' => $rowData['status'],
-            'notes' => trim($trainingNote . $rowData['notes']),
+            'notes' => trim($trainingNote.$rowData['notes']),
         ]);
     }
 
@@ -362,7 +404,7 @@ class CertificateImport implements ToCollection, WithStartRow
             'additional_data' => [
                 'source' => 'import',
                 'document_reference' => $this->documentReference,
-            ]
+            ],
         ]);
     }
 
@@ -376,7 +418,7 @@ class CertificateImport implements ToCollection, WithStartRow
         }
 
         $newDiplomaBlank = null;
-        if (!empty($rowData['reissue_number'])) {
+        if (! empty($rowData['reissue_number'])) {
             $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number'], $rowData['degree_type']);
         }
 
@@ -406,11 +448,92 @@ class CertificateImport implements ToCollection, WithStartRow
 
         $normalized = mb_strtolower($this->removeVietnameseTones(trim($statusText)));
 
-        if (str_contains($normalized, 'da cap')) return DegreeStatus::ISSUED;
-        if (str_contains($normalized, 'thu hoi')) return DegreeStatus::RECALLED;
-        if (str_contains($normalized, 'huy')) return DegreeStatus::CANCELLED;
+        if (str_contains($normalized, 'da cap')) {
+            return DegreeStatus::ISSUED;
+        }
+        if (str_contains($normalized, 'thu hoi')) {
+            return DegreeStatus::RECALLED;
+        }
+        if (str_contains($normalized, 'huy')) {
+            return DegreeStatus::CANCELLED;
+        }
 
         return DegreeStatus::NOT_ISSUED;
+    }
+
+    /**
+     * Find or create major with cache
+     */
+    protected function findOrCreateMajor(?string $majorName): ?Major
+    {
+        if (empty($majorName)) {
+            return null;
+        }
+
+        // Check cache by name
+        if (isset(self::$majorsByName[$majorName])) {
+            return self::$majorsByName[$majorName];
+        }
+
+        // Find in database
+        $major = Major::where('major_name', $majorName)->first();
+        if ($major) {
+            self::$majorsByName[$majorName] = $major;
+
+            return $major;
+        }
+
+        // Generate code and check cache/database
+        $majorCode = $this->generateMajorCode($majorName);
+        if (isset(self::$majorsByCode[$majorCode])) {
+            $major = self::$majorsByCode[$majorCode];
+            self::$majorsByName[$majorName] = $major;
+
+            return $major;
+        }
+
+        $major = Major::where('major_code', $majorCode)->first();
+        if ($major) {
+            self::$majorsByCode[$majorCode] = $major;
+            self::$majorsByName[$majorName] = $major;
+
+            return $major;
+        }
+
+        // Create new major
+        $major = Major::create([
+            'major_name' => $majorName,
+            'major_code' => $majorCode,
+        ]);
+
+        // Cache it
+        self::$majorsByName[$majorName] = $major;
+        self::$majorsByCode[$majorCode] = $major;
+
+        Log::info('Created new major from certificate import', [
+            'major_name' => $majorName,
+            'major_code' => $major->major_code,
+            'major_id' => $major->major_id,
+        ]);
+
+        return $major;
+    }
+
+    /**
+     * Generate major code from name
+     */
+    protected function generateMajorCode(string $majorName): string
+    {
+        $words = explode(' ', $this->removeVietnameseTones($majorName));
+        $code = '';
+
+        foreach ($words as $word) {
+            if (! empty($word)) {
+                $code .= strtoupper(substr($word, 0, 1));
+            }
+        }
+
+        return substr($code, 0, 10);
     }
 
     /**
@@ -420,6 +543,15 @@ class CertificateImport implements ToCollection, WithStartRow
     {
         if (self::$diplomaBlankTypes === null) {
             self::$diplomaBlankTypes = DiplomaBlankType::all()->keyBy('prefix');
+        }
+
+        // Load existing majors into cache
+        if (empty(self::$majorsByName)) {
+            $majors = Major::all();
+            foreach ($majors as $major) {
+                self::$majorsByName[$major->major_name] = $major;
+                self::$majorsByCode[$major->major_code] = $major;
+            }
         }
     }
 
@@ -447,7 +579,7 @@ class CertificateImport implements ToCollection, WithStartRow
             ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
             ->first();
 
-        if (!$type) {
+        if (! $type) {
             $type = DiplomaBlankType::create([
                 'prefix' => $searchPrefix,
                 'type_name' => $key,

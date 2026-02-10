@@ -2,24 +2,25 @@
 
 namespace App\Imports;
 
-use App\Models\Student;
-use App\Models\Degree;
-use App\Models\Major;
-use App\Models\DiplomaBlankImport;
-use App\Models\DiplomaBlank;
-use App\Models\ChangeLog;
-use App\Models\DegreeReissue;
-use App\Models\DiplomaBlankType;
 use App\Enums\DegreeStatus;
-use App\Enums\ImportStatus;
 use App\Enums\DiplomaBlankStatus;
+use App\Enums\ImportStatus;
+use App\Enums\StudentStatus;
+use App\Models\ChangeLog;
+use App\Models\Degree;
+use App\Models\DegreeReissue;
+use App\Models\DiplomaBlank;
+use App\Models\DiplomaBlankImport;
+use App\Models\DiplomaBlankType;
+use App\Models\Major;
+use App\Models\Student;
 use App\Traits\ImportHelper;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithStartRow;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
 /**
  * Import cho thông tin cấp bằng Lý luận chính trị
@@ -30,46 +31,77 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     use ImportHelper;
 
     protected $importedCount = 0;
+
     protected $errorCount = 0;
+
     protected $errors = [];
+
     protected $documentReference;
+
     protected $diplomaBlankImportId;
+
     protected static $diplomaBlankTypes = null;
+
     protected static $majorsByName = [];
+
     protected static $majorsByCode = [];
 
     // Column mapping constants (26 columns A-Z)
     // A - Số TT (index 0)
     // Mã sinh viên sẽ được tạo tự động, không lấy từ Excel
     private const COL_DEGREE_TYPE = 1;              // A - Loại Văn bằng
+
     private const COL_FULL_NAME = 2;                // B - Họ và tên
+
     private const COL_DATE_OF_BIRTH = 3;            // C - Ngày Sinh
+
     private const COL_PLACE_OF_BIRTH = 4;           // D - Nơi Sinh
+
     private const COL_HOMETOWN = 5;                 // E - Quê quán
+
     private const COL_GENDER = 6;                   // F - Giới tính
+
     private const COL_NATION = 7;                   // G - Dân tộc
+
     private const COL_TRAINING_TYPE = 8;            // H - Loại hình đào tạo
+
     private const COL_COURSE = 9;                   // I - Khoá
+
     private const COL_RANKING = 10;                 // J - Xếp loại tốt nghiệp
+
     private const COL_DIPLOMA_NUMBER = 11;          // K - Số hiệu văn bằng
+
     private const COL_NUMBER_IN_THE_BOOK = 12;     // L - Số vào sổ gốc cấp văn bằng
+
     private const COL_ACADEMIC_YEAR = 13;           // M - Khoá học
+
     private const COL_GRADUATION_DECISION_NUMBER = 14; // N - Số QĐ (QĐ công nhận tốt nghiệp)
+
     private const COL_GRADUATION_DECISION_DATE = 15;   // O - Ngày Tháng (QĐ công nhận tốt nghiệp)
+
     private const COL_GRANTING_DATE = 16;           // P - Ngày cấp
+
     private const COL_STATUS_TEXT = 17;             // Q - Tình trạng
+
     private const COL_ADJUSTMENT_CONTENT = 18;      // R - Nội dung điều chỉnh
+
     private const COL_ADJUSTMENT_DECISION = 19;     // S - QĐ điều chỉnh thông tin
+
     private const COL_ADJUSTMENT_DATE = 20;         // T - Ngày QĐ (Điều chỉnh thông tin)
+
     private const COL_REISSUE_NUMBER = 21;          // U - Số hiệu văn bằng (Cấp lại)
+
     private const COL_REISSUE_CONTENT = 22;         // V - Nội dung chỉnh sửa (Cấp lại)
+
     private const COL_REISSUE_DECISION = 23;        // W - QĐ thu hồi, huỷ bỏ và cấp lại
+
     private const COL_REISSUE_DATE = 24;            // X - Ngày QĐ (Cấp lại)
+
     private const COL_NOTES = 25;                   // Y - Ghi chú
 
-    public function __construct(string $documentReference = null)
+    public function __construct(?string $documentReference = null)
     {
-        $this->documentReference = $documentReference ?? 'CERT_IMPORT_' . date('YmdHis');
+        $this->documentReference = $documentReference ?? 'CERT_IMPORT_'.date('YmdHis');
     }
 
     /**
@@ -117,11 +149,11 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
                     $this->errors[] = [
                         'row' => $index + 5, // +5 vì start từ row 5
                         'error' => $e->getMessage(),
-                        'data' => $row->toArray()
+                        'data' => $row->toArray(),
                     ];
-                    Log::error('PoliticalTheoryImport Error at row ' . ($index + 5), [
+                    Log::error('PoliticalTheoryImport Error at row '.($index + 5), [
                         'error' => $e->getMessage(),
-                        'row' => $row->toArray()
+                        'row' => $row->toArray(),
                     ]);
                 }
             }
@@ -136,7 +168,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('PoliticalTheoryImport Fatal Error: ' . $e->getMessage());
+            Log::error('PoliticalTheoryImport Fatal Error: '.$e->getMessage());
             throw $e;
         }
     }
@@ -159,15 +191,16 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         if ($existingDegree) {
             Log::info('Certificate already exists, skipping', [
                 'number_in_the_book' => $rowData['number_in_the_book'],
-                'existing_degree_id' => $existingDegree->degree_id
+                'existing_degree_id' => $existingDegree->degree_id,
             ]);
+
             return;
         }
 
         $student = $existingDegree?->student;
 
         // Tìm hoặc tạo Student
-        if (!$student) {
+        if (! $student) {
             $student = $this->findOrCreateStudent($rowData, null);
         }
 
@@ -231,9 +264,11 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
                 'place_of_birth' => $rowData['place_of_birth'],
                 'gender' => $rowData['gender'],
                 'nation' => $rowData['nation'],
+                'status' => StudentStatus::Graduate,
             ]);
 
             Log::info('PoliticalTheoryImport: Found existing student', ['id' => $student->student_id]);
+
             return $student;
         }
 
@@ -247,11 +282,12 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'place_of_birth' => $rowData['place_of_birth'],
             'gender' => $rowData['gender'],
             'nation' => $rowData['nation'],
+            'status' => StudentStatus::Graduate,
         ]);
 
         Log::info('PoliticalTheoryImport: Created new student', [
             'id' => $student->student_id,
-            'student_code' => $studentCode
+            'student_code' => $studentCode,
         ]);
 
         return $student;
@@ -268,7 +304,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         do {
             // Tạo mã theo format: LLCT + Năm + 6 số ngẫu nhiên
             $randomNumber = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            $studentCode = $prefix . $year . $randomNumber;
+            $studentCode = $prefix.$year.$randomNumber;
 
             // Kiểm tra xem mã đã tồn tại chưa
             $exists = Student::where('student_code', $studentCode)->exists();
@@ -345,7 +381,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'additional_data' => [
                 'source' => 'import',
                 'document_reference' => $this->documentReference,
-            ]
+            ],
         ]);
     }
 
@@ -361,17 +397,17 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         Log::info('Certificate Reissue data check', [
             'number_in_the_book' => $rowData['number_in_the_book'],
             'reissueNumber' => $rowData['reissue_number'],
-            'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id
+            'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id,
         ]);
 
         $newDiplomaBlank = null;
-        if (!empty($rowData['reissue_number'])) {
+        if (! empty($rowData['reissue_number'])) {
             $newDiplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['reissue_number'], $rowData['degree_type']);
 
             if ($newDiplomaBlank) {
                 Log::info('Created new diploma blank for certificate reissue', [
                     'serial_number' => $rowData['reissue_number'],
-                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id,
                 ]);
             }
         }
@@ -389,19 +425,17 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         Log::info('Created certificate reissue', [
             'reissue_id' => $reissue->reissue_id,
             'old_blank_id' => $reissue->old_diploma_blank_id,
-            'new_blank_id' => $reissue->new_diploma_blank_id
+            'new_blank_id' => $reissue->new_diploma_blank_id,
         ]);
 
         if ($newDiplomaBlank) {
             $degree->update(['diploma_blank_id' => $newDiplomaBlank->diploma_blank_id]);
             Log::info('Updated degree diploma_blank_id to new blank', [
                 'degree_id' => $degree->degree_id,
-                'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id,
             ]);
         }
     }
-
-
 
     /**
      * Parse status from Vietnamese text to DegreeStatus enum
@@ -430,7 +464,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
         // Log warning nếu không map được
         Log::warning('PoliticalTheoryImport: Unknown status text, defaulting to NOT_ISSUED', [
             'status_text' => $statusText,
-            'normalized' => $normalized
+            'normalized' => $normalized,
         ]);
 
         return DegreeStatus::NOT_ISSUED;
@@ -508,7 +542,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
             ->first();
 
-        if (!$type) {
+        if (! $type) {
             $type = DiplomaBlankType::create([
                 'prefix' => $searchPrefix,
                 'type_name' => $key,

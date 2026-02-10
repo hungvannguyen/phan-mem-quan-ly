@@ -2,24 +2,25 @@
 
 namespace App\Imports;
 
-use App\Models\Student;
-use App\Models\Degree;
-use App\Models\Major;
-use App\Models\DiplomaBlankImport;
-use App\Models\DiplomaBlank;
-use App\Models\ChangeLog;
-use App\Models\DegreeReissue;
-use App\Models\DiplomaBlankType;
 use App\Enums\DegreeStatus;
-use App\Enums\ImportStatus;
 use App\Enums\DiplomaBlankStatus;
+use App\Enums\ImportStatus;
+use App\Enums\StudentStatus;
+use App\Models\ChangeLog;
+use App\Models\Degree;
+use App\Models\DegreeReissue;
+use App\Models\DiplomaBlank;
+use App\Models\DiplomaBlankImport;
+use App\Models\DiplomaBlankType;
+use App\Models\Major;
+use App\Models\Student;
 use App\Traits\ImportHelper;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithStartRow;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
 /**
  * Import cho thông tin bằng cử nhân, thạc sĩ, tiến sĩ
@@ -30,52 +31,90 @@ class DegreeImport implements ToCollection, WithStartRow
     use ImportHelper;
 
     protected $importedCount = 0;
+
     protected $errorCount = 0;
+
     protected $errors = [];
+
     protected $documentReference;
+
     protected $diplomaBlankImportId;
+
     protected static $diplomaBlankTypes = null;
+
     protected static $majorsByName = [];
+
     protected static $majorsByCode = [];
 
     // Column mapping constants
     // Mã sinh viên sẽ được tạo tự động, không lấy từ Excel
     private const COL_DEGREE_TYPE = 1;            // B - Loại văn bằng
+
     private const COL_FULL_NAME = 2;              // C - Họ và tên
+
     private const COL_DATE_OF_BIRTH = 3;        // D - Ngày sinh
+
     private const COL_PLACE_OF_BIRTH = 4;       // E - Nơi sinh
+
     private const COL_HOMETOWN = 5;         // F - Quê quán
+
     private const COL_PLACE_OF_ORIGIN = 6;      // G - Nguyên quán
+
     private const COL_GENDER = 7;           // H - Giới tính
+
     private const COL_NATION = 8;       // I - Dân tộc
+
     private const COL_NATIONALITY = 9;     // J - Quốc tịch
+
     private const COL_COURSE = 10;         // K - Khóa học
+
     private const COL_CLASS_NAME = 11;       // L - Lớp học
+
     private const COL_ACADEMIC_YEAR = 12;   // M - Niên khóa
+
     private const COL_MAJOR_NAME = 13;     // N - Chuyên ngành
+
     private const COL_TRAINING_TYPE = 14;  // O - Hình thức đào tạo
+
     private const COL_COUNCIL_DECISION_NUMBER = 15;  // P - Số QĐ thành lập hội đồng
+
     private const COL_COUNCIL_DECISION_DATE = 16; // Q - Ngày QĐ thành lập hội đồng
+
     private const COL_DEFENSE_DATE = 17;     // R - Ngày bảo vệ
+
     private const COL_GRADUATION_DECISION_NUMBER = 18; // S - Số QĐ tốt nghiệp
+
     private const COL_GRADUATION_DECISION_DATE = 19; // T - Ngày QĐ tốt nghiệp
+
     private const COL_GRADUATION_YEAR = 20;   // U - Năm tốt nghiệp
+
     private const COL_RANKING = 21;         // V - Xếp loại
+
     private const COL_DIPLOMA_NUMBER = 22;   // W - Số hiệu văn bằng
+
     private const COL_NUMBER_IN_THE_BOOK = 23; // X - Số trong sổ
+
     private const COL_GRANTING_DATE = 24;   // Y - Ngày cấp bằng
+
     private const COL_ADJUSTMENT_CONTENT = 25; // Z - Nội dung điều chỉnh
+
     private const COL_ADJUSTMENT_DECISION = 26; // AA - Số QĐ điều chỉnh
+
     private const COL_ADJUSTMENT_DATE = 27;  // AB - Ngày QĐ điều chỉnh
+
     private const COL_REISSUE_NUMBER = 28;   // AC - Số hiệu cấp lại
+
     private const COL_REISSUE_CONTENT = 29;  // AD - Nội dung cấp lại
+
     private const COL_REISSUE_DECISION = 30; // AE - Số QĐ cấp lại
+
     private const COL_REISSUE_DATE = 31;   // AF - Ngày QĐ cấp lại
+
     private const COL_NOTES = 32;          // AG - Ghi chú
 
-    public function __construct(string $documentReference = null)
+    public function __construct(?string $documentReference = null)
     {
-        $this->documentReference = $documentReference ?? 'IMPORT_' . date('YmdHis');
+        $this->documentReference = $documentReference ?? 'IMPORT_'.date('YmdHis');
     }
 
     /**
@@ -128,11 +167,11 @@ class DegreeImport implements ToCollection, WithStartRow
                     $this->errors[] = [
                         'row' => $index + 2, // +2 vì start từ row 2
                         'error' => $e->getMessage(),
-                        'data' => $row->toArray()
+                        'data' => $row->toArray(),
                     ];
-                    Log::error('DegreeImport Error at row ' . ($index + 2), [
+                    Log::error('DegreeImport Error at row '.($index + 2), [
                         'error' => $e->getMessage(),
-                        'row' => $row->toArray()
+                        'row' => $row->toArray(),
                     ]);
                 }
             }
@@ -147,7 +186,7 @@ class DegreeImport implements ToCollection, WithStartRow
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('DegreeImport Fatal Error: ' . $e->getMessage());
+            Log::error('DegreeImport Fatal Error: '.$e->getMessage());
             throw $e;
         }
     }
@@ -173,15 +212,16 @@ class DegreeImport implements ToCollection, WithStartRow
         if ($existingDegree) {
             Log::info('Degree already exists, skipping', [
                 'number_in_the_book' => $rowData['number_in_the_book'],
-                'existing_degree_id' => $existingDegree->degree_id
+                'existing_degree_id' => $existingDegree->degree_id,
             ]);
+
             return;
         }
 
         $student = $existingDegree?->student;
 
         // Tìm hoặc tạo Student
-        if (!$student) {
+        if (! $student) {
             $student = $this->findOrCreateStudent($rowData, $major);
         }
 
@@ -253,6 +293,7 @@ class DegreeImport implements ToCollection, WithStartRow
         $major = Major::where('major_name', $majorName)->first();
         if ($major) {
             self::$majorsByName[$majorName] = $major;
+
             return $major;
         }
 
@@ -261,6 +302,7 @@ class DegreeImport implements ToCollection, WithStartRow
         if (isset(self::$majorsByCode[$majorCode])) {
             $major = self::$majorsByCode[$majorCode];
             self::$majorsByName[$majorName] = $major;
+
             return $major;
         }
 
@@ -268,13 +310,14 @@ class DegreeImport implements ToCollection, WithStartRow
         if ($major) {
             self::$majorsByCode[$majorCode] = $major;
             self::$majorsByName[$majorName] = $major;
+
             return $major;
         }
 
         // Create new major
         $major = Major::create([
             'major_name' => $majorName,
-            'major_code' => $majorCode
+            'major_code' => $majorCode,
         ]);
 
         // Cache it
@@ -284,7 +327,7 @@ class DegreeImport implements ToCollection, WithStartRow
         Log::info('Created new major', [
             'major_name' => $majorName,
             'major_code' => $major->major_code,
-            'major_id' => $major->major_id
+            'major_id' => $major->major_id,
         ]);
 
         return $major;
@@ -293,7 +336,7 @@ class DegreeImport implements ToCollection, WithStartRow
     /**
      * Find or create student
      */
-    protected function findOrCreateStudent(array $rowData): Student
+    protected function findOrCreateStudent(array $rowData, ?Major $major): Student
     {
         // Tìm sinh viên theo họ tên + ngày sinh
         $student = Student::where('full_name', $rowData['full_name'])
@@ -303,6 +346,7 @@ class DegreeImport implements ToCollection, WithStartRow
         if ($student) {
             // Cập nhật thông tin nếu cần
             $student->update([
+                'major_id' => $major?->major_id,
                 'place_of_birth' => $rowData['place_of_birth'],
                 'hometown' => $rowData['hometown'],
                 'place_of_origin' => $rowData['place_of_origin'],
@@ -312,9 +356,11 @@ class DegreeImport implements ToCollection, WithStartRow
                 'course' => $rowData['course'],
                 'class_name' => $rowData['class_name'],
                 'academic_year' => $rowData['academic_year'],
+                'status' => StudentStatus::Graduate,
             ]);
 
             Log::info('DegreeImport: Found existing student', ['id' => $student->student_id]);
+
             return $student;
         }
 
@@ -323,6 +369,7 @@ class DegreeImport implements ToCollection, WithStartRow
 
         $student = Student::create([
             'student_code' => $studentCode,
+            'major_id' => $major?->major_id,
             'full_name' => $rowData['full_name'],
             'date_of_birth' => $rowData['date_of_birth'],
             'place_of_birth' => $rowData['place_of_birth'],
@@ -334,11 +381,12 @@ class DegreeImport implements ToCollection, WithStartRow
             'course' => $rowData['course'],
             'class_name' => $rowData['class_name'],
             'academic_year' => $rowData['academic_year'],
+            'status' => StudentStatus::Graduate,
         ]);
 
         Log::info('DegreeImport: Created new student', [
             'id' => $student->student_id,
-            'student_code' => $studentCode
+            'student_code' => $studentCode,
         ]);
 
         return $student;
@@ -355,7 +403,7 @@ class DegreeImport implements ToCollection, WithStartRow
         do {
             // Tạo mã theo format: DEG + Năm + 6 số ngẫu nhiên
             $randomNumber = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            $studentCode = $prefix . $year . $randomNumber;
+            $studentCode = $prefix.$year.$randomNumber;
 
             // Kiểm tra xem mã đã tồn tại chưa
             $exists = Student::where('student_code', $studentCode)->exists();
@@ -374,6 +422,7 @@ class DegreeImport implements ToCollection, WithStartRow
         }
 
         $typeId = $this->getTypeIdForDegreeType($degreeType);
+
         return DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
@@ -458,7 +507,7 @@ class DegreeImport implements ToCollection, WithStartRow
             'additional_data' => [
                 'source' => 'import',
                 'document_reference' => $this->documentReference,
-            ]
+            ],
         ]);
     }
 
@@ -474,11 +523,11 @@ class DegreeImport implements ToCollection, WithStartRow
         Log::info('Reissue data check', [
             'number_in_the_book' => $rowData['number_in_the_book'],
             'reissueNumber' => $rowData['reissue_number'],
-            'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id
+            'diplomaBlankId' => $oldDiplomaBlank?->diploma_blank_id,
         ]);
 
         $newDiplomaBlank = null;
-        if (!empty($rowData['reissue_number'])) {
+        if (! empty($rowData['reissue_number'])) {
             $newDiplomaBlank = $this->createDiplomaBlankIfNeeded(
                 $rowData['reissue_number'],
                 $rowData['degree_type']
@@ -487,7 +536,7 @@ class DegreeImport implements ToCollection, WithStartRow
             if ($newDiplomaBlank) {
                 Log::info('Created new diploma blank for reissue', [
                     'serial_number' => $rowData['reissue_number'],
-                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                    'diploma_blank_id' => $newDiplomaBlank->diploma_blank_id,
                 ]);
             }
         }
@@ -505,19 +554,17 @@ class DegreeImport implements ToCollection, WithStartRow
         Log::info('Created degree reissue', [
             'reissue_id' => $reissue->reissue_id,
             'old_blank_id' => $reissue->old_diploma_blank_id,
-            'new_blank_id' => $reissue->new_diploma_blank_id
+            'new_blank_id' => $reissue->new_diploma_blank_id,
         ]);
 
         if ($newDiplomaBlank) {
             $degree->update(['diploma_blank_id' => $newDiplomaBlank->diploma_blank_id]);
             Log::info('Updated degree diploma_blank_id to new blank', [
                 'degree_id' => $degree->degree_id,
-                'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id
+                'new_diploma_blank_id' => $newDiplomaBlank->diploma_blank_id,
             ]);
         }
     }
-
-
 
     /**
      * Normalize training type to match enum values
@@ -558,7 +605,7 @@ class DegreeImport implements ToCollection, WithStartRow
         $code = '';
 
         foreach ($words as $word) {
-            if (!empty($word)) {
+            if (! empty($word)) {
                 $code .= strtoupper(substr($word, 0, 1));
             }
         }
@@ -610,7 +657,7 @@ class DegreeImport implements ToCollection, WithStartRow
             ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
             ->first();
 
-        if (!$type) {
+        if (! $type) {
             $type = DiplomaBlankType::create([
                 'prefix' => $searchPrefix,
                 'type_name' => $key,
