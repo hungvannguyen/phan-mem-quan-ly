@@ -20,13 +20,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
 /**
  * Import cho thông tin bằng cử nhân, thạc sĩ, tiến sĩ
  * Cấu trúc file Excel theo template [Mau TT01]
  */
-class DegreeImport implements ToCollection, WithStartRow
+class DegreeImport implements ToCollection, WithChunkReading, WithStartRow
 {
     use ImportHelper;
 
@@ -130,64 +131,68 @@ class DegreeImport implements ToCollection, WithStartRow
     }
 
     /**
+     * Chunk size for processing large files
+     */
+    public function chunkSize(): int
+    {
+        return 500; // Process 500 rows at a time
+    }
+
+    /**
      * Process collection of rows
      */
     public function collection(Collection $rows)
     {
-        DB::beginTransaction();
+        // Load caches
+        $this->loadCaches();
 
-        try {
-            // Load caches
-            $this->loadCaches();
-
-            // Tạo DiplomaBlankImport record cho lần import này
-            // Sử dụng type_id mặc định là Bachelor (BCN) - sẽ được update sau nếu cần
+        // Tạo hoặc lấy DiplomaBlankImport record cho lần import này
+        if (! $this->diplomaBlankImportId) {
             $defaultTypeId = $this->getTypeIdForDegreeType('bachelor');
 
-            $diplomaBlankImport = DiplomaBlankImport::create([
-                'type_id' => $defaultTypeId,
-                'document_reference' => $this->documentReference,
-                'import_date' => now(),
-                'issue_date' => now(), // Ngày phát hành mặc định
-                'total_quantity' => $rows->count(),
-                'from_number' => '000001', // Import từ Excel không có dãy số liên tục
-                'to_number' => str_pad($rows->count(), 6, '0', STR_PAD_LEFT),
-                'status' => ImportStatus::PENDING,
-            ]);
+            $diplomaBlankImport = DiplomaBlankImport::firstOrCreate(
+                ['document_reference' => $this->documentReference],
+                [
+                    'type_id' => $defaultTypeId,
+                    'import_date' => now(),
+                    'issue_date' => now(),
+                    'total_quantity' => 0,
+                    'from_number' => '000001',
+                    'to_number' => '000000',
+                    'status' => ImportStatus::PENDING,
+                    'processed_count' => 0,
+                ]
+            );
 
             $this->diplomaBlankImportId = $diplomaBlankImport->id;
+        }
 
-            $successCount = 0;
-            foreach ($rows as $index => $row) {
-                try {
-                    $this->processRow($row, $index);
-                    $successCount++;
-                } catch (\Exception $e) {
-                    $this->errorCount++;
-                    $this->errors[] = [
-                        'row' => $index + 2, // +2 vì start từ row 2
-                        'error' => $e->getMessage(),
-                        'data' => $row->toArray(),
-                    ];
-                    Log::error('DegreeImport Error at row '.($index + 2), [
-                        'error' => $e->getMessage(),
-                        'row' => $row->toArray(),
-                    ]);
-                }
+        // Process rows in chunks
+        $successCount = 0;
+        foreach ($rows as $index => $row) {
+            try {
+                $this->processRow($row, $index);
+                $successCount++;
+                $this->importedCount++;
+            } catch (\Exception $e) {
+                $this->errorCount++;
+                $this->errors[] = [
+                    'row' => $index + 3, // +3 vì start từ row 3
+                    'error' => $e->getMessage(),
+                    'data' => $row->toArray(),
+                ];
+                Log::error('DegreeImport Error at row '.($index + 3), [
+                    'error' => $e->getMessage(),
+                    'row' => $row->toArray(),
+                ]);
             }
+        }
 
-            // Update DiplomaBlankImport status
-            $diplomaBlankImport->update([
-                'processed_count' => $successCount,
-                'status' => $this->errorCount > 0 ? ImportStatus::COMPLETED : ImportStatus::COMPLETED,
-                'completed_at' => now(),
-            ]);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('DegreeImport Fatal Error: '.$e->getMessage());
-            throw $e;
+        // Update DiplomaBlankImport progress after each chunk
+        $diplomaBlankImport = DiplomaBlankImport::find($this->diplomaBlankImportId);
+        if ($diplomaBlankImport) {
+            $diplomaBlankImport->increment('processed_count', $successCount);
+            $diplomaBlankImport->increment('total_quantity', $rows->count());
         }
     }
 
@@ -218,12 +223,8 @@ class DegreeImport implements ToCollection, WithStartRow
             return;
         }
 
-        $student = $existingDegree?->student;
-
         // Tìm hoặc tạo Student
-        if (! $student) {
-            $student = $this->findOrCreateStudent($rowData, $major);
-        }
+        $student = $this->findOrCreateStudent($rowData, $major);
 
         // Tạo diploma blank và degree
         $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
@@ -652,17 +653,24 @@ class DegreeImport implements ToCollection, WithStartRow
             return self::$diplomaBlankTypes[$searchPrefix]->type_id;
         }
 
-        // Tìm theo prefix hoặc theo tên (case-insensitive). Nếu không có thì tạo mới.
+        // Tìm theo prefix hoặc theo tên (case-insensitive)
         $type = DiplomaBlankType::whereRaw('upper(prefix) = ?', [$searchPrefix])
             ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
             ->first();
 
+        // If not found, create new with dedicated transaction
         if (! $type) {
-            $type = DiplomaBlankType::create([
-                'prefix' => $searchPrefix,
-                'type_name' => $key,
-                'description' => 'Tự động tạo từ tiến trình Import',
-            ]);
+            // Use DB transaction to ensure type is created immediately
+            $type = DB::transaction(function () use ($searchPrefix, $key) {
+                return DiplomaBlankType::create([
+                    'prefix' => $searchPrefix,
+                    'type_name' => $key,
+                    'description' => 'Tự động tạo từ tiến trình Import',
+                ]);
+            });
+
+            // Reload to ensure we have type_id
+            $type = DiplomaBlankType::find($type->type_id);
         }
 
         // Cập nhật cache
@@ -681,5 +689,13 @@ class DegreeImport implements ToCollection, WithStartRow
             'errors' => $this->errorCount,
             'error_details' => $this->errors,
         ];
+    }
+
+    /**
+     * Get diploma blank import ID
+     */
+    public function getDiplomaBlankImportId(): ?int
+    {
+        return $this->diplomaBlankImportId;
     }
 }

@@ -20,13 +20,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
 /**
  * Import cho thông tin cấp bằng Lý luận chính trị
  * Cấu trúc file Excel: Có thể khác với DegreeImport
  */
-class PoliticalTheoryImport implements ToCollection, WithStartRow
+class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStartRow
 {
     use ImportHelper;
 
@@ -49,55 +50,55 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     // Column mapping constants (26 columns A-Z)
     // A - Số TT (index 0)
     // Mã sinh viên sẽ được tạo tự động, không lấy từ Excel
-    private const COL_DEGREE_TYPE = 1;              // A - Loại Văn bằng
+    private const COL_DEGREE_TYPE = 1;              // B - Loại Văn bằng
 
-    private const COL_FULL_NAME = 2;                // B - Họ và tên
+    private const COL_FULL_NAME = 2;                // C - Họ và tên
 
-    private const COL_DATE_OF_BIRTH = 3;            // C - Ngày Sinh
+    private const COL_DATE_OF_BIRTH = 3;            // D - Ngày Sinh
 
-    private const COL_PLACE_OF_BIRTH = 4;           // D - Nơi Sinh
+    private const COL_PLACE_OF_BIRTH = 4;           // E - Nơi Sinh
 
-    private const COL_HOMETOWN = 5;                 // E - Quê quán
+    private const COL_HOMETOWN = 5;                 // F - Quê quán
 
-    private const COL_GENDER = 6;                   // F - Giới tính
+    private const COL_GENDER = 6;                   // G - Giới tính
 
-    private const COL_NATION = 7;                   // G - Dân tộc
+    private const COL_NATION = 7;                   // H - Dân tộc
 
-    private const COL_TRAINING_TYPE = 8;            // H - Loại hình đào tạo
+    private const COL_TRAINING_TYPE = 8;            // I - Loại hình đào tạo
 
-    private const COL_COURSE = 9;                   // I - Khoá
+    private const COL_COURSE = 9;                   // J - Khoá
 
-    private const COL_RANKING = 10;                 // J - Xếp loại tốt nghiệp
+    private const COL_RANKING = 10;                 // K - Xếp loại tốt nghiệp
 
-    private const COL_DIPLOMA_NUMBER = 11;          // K - Số hiệu văn bằng
+    private const COL_DIPLOMA_NUMBER = 11;          // L - Số hiệu văn bằng
 
-    private const COL_NUMBER_IN_THE_BOOK = 12;     // L - Số vào sổ gốc cấp văn bằng
+    private const COL_NUMBER_IN_THE_BOOK = 12;     // M - Số vào sổ gốc cấp văn bằng
 
-    private const COL_ACADEMIC_YEAR = 13;           // M - Khoá học
+    private const COL_ACADEMIC_YEAR = 13;           // N - Khoá học
 
-    private const COL_GRADUATION_DECISION_NUMBER = 14; // N - Số QĐ (QĐ công nhận tốt nghiệp)
+    private const COL_GRADUATION_DECISION_NUMBER = 14; // O - Số QĐ (QĐ công nhận tốt nghiệp)
 
-    private const COL_GRADUATION_DECISION_DATE = 15;   // O - Ngày Tháng (QĐ công nhận tốt nghiệp)
+    private const COL_GRADUATION_DECISION_DATE = 15;   // P - Ngày Tháng (QĐ công nhận tốt nghiệp)
 
-    private const COL_GRANTING_DATE = 16;           // P - Ngày cấp
+    private const COL_GRANTING_DATE = 16;           // Q - Ngày cấp
 
-    private const COL_STATUS_TEXT = 17;             // Q - Tình trạng
+    private const COL_STATUS_TEXT = 17;             // R - Tình trạng
 
-    private const COL_ADJUSTMENT_CONTENT = 18;      // R - Nội dung điều chỉnh
+    private const COL_ADJUSTMENT_CONTENT = 18;      // S - Nội dung điều chỉnh
 
-    private const COL_ADJUSTMENT_DECISION = 19;     // S - QĐ điều chỉnh thông tin
+    private const COL_ADJUSTMENT_DECISION = 19;     // T - QĐ điều chỉnh thông tin
 
-    private const COL_ADJUSTMENT_DATE = 20;         // T - Ngày QĐ (Điều chỉnh thông tin)
+    private const COL_ADJUSTMENT_DATE = 20;         // U - Ngày QĐ (Điều chỉnh thông tin)
 
-    private const COL_REISSUE_NUMBER = 21;          // U - Số hiệu văn bằng (Cấp lại)
+    private const COL_REISSUE_NUMBER = 21;          // V - Số hiệu văn bằng (Cấp lại)
 
-    private const COL_REISSUE_CONTENT = 22;         // V - Nội dung chỉnh sửa (Cấp lại)
+    private const COL_REISSUE_CONTENT = 22;         // W - Nội dung chỉnh sửa (Cấp lại)
 
-    private const COL_REISSUE_DECISION = 23;        // W - QĐ thu hồi, huỷ bỏ và cấp lại
+    private const COL_REISSUE_DECISION = 23;        // X - QĐ thu hồi, huỷ bỏ và cấp lại
 
-    private const COL_REISSUE_DATE = 24;            // X - Ngày QĐ (Cấp lại)
+    private const COL_REISSUE_DATE = 24;            // Y - Ngày QĐ (Cấp lại)
 
-    private const COL_NOTES = 25;                   // Y - Ghi chú
+    private const COL_NOTES = 25;                   // Z - Ghi chú
 
     public function __construct(?string $documentReference = null)
     {
@@ -113,63 +114,68 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     }
 
     /**
+     * Chunk size for processing large files
+     */
+    public function chunkSize(): int
+    {
+        return 500; // Process 500 rows at a time
+    }
+
+    /**
      * Process collection of rows
      */
     public function collection(Collection $rows)
     {
-        DB::beginTransaction();
+        // Load caches
+        $this->loadCaches();
 
-        try {
-            // Load caches
-            $this->loadCaches();
-
-            // Tạo DiplomaBlankImport record cho lần import này
+        // Tạo hoặc lấy DiplomaBlankImport record cho lần import này
+        if (! $this->diplomaBlankImportId) {
             $defaultTypeId = $this->getTypeIdForCertificateType('cao_cap');
 
-            $diplomaBlankImport = DiplomaBlankImport::create([
-                'type_id' => $defaultTypeId,
-                'document_reference' => $this->documentReference,
-                'import_date' => now(),
-                'issue_date' => now(),
-                'total_quantity' => $rows->count(),
-                'from_number' => '000001',
-                'to_number' => str_pad($rows->count(), 6, '0', STR_PAD_LEFT),
-                'status' => ImportStatus::PENDING,
-            ]);
+            $diplomaBlankImport = DiplomaBlankImport::firstOrCreate(
+                ['document_reference' => $this->documentReference],
+                [
+                    'type_id' => $defaultTypeId,
+                    'import_date' => now(),
+                    'issue_date' => now(),
+                    'total_quantity' => 0,
+                    'from_number' => '000001',
+                    'to_number' => '000000',
+                    'status' => ImportStatus::PENDING,
+                    'processed_count' => 0,
+                ]
+            );
 
             $this->diplomaBlankImportId = $diplomaBlankImport->id;
+        }
 
-            $successCount = 0;
-            foreach ($rows as $index => $row) {
-                try {
-                    $this->processRow($row, $index);
-                    $successCount++;
-                } catch (\Exception $e) {
-                    $this->errorCount++;
-                    $this->errors[] = [
-                        'row' => $index + 5, // +5 vì start từ row 5
-                        'error' => $e->getMessage(),
-                        'data' => $row->toArray(),
-                    ];
-                    Log::error('PoliticalTheoryImport Error at row '.($index + 5), [
-                        'error' => $e->getMessage(),
-                        'row' => $row->toArray(),
-                    ]);
-                }
+        // Process rows in chunks
+        $successCount = 0;
+        foreach ($rows as $index => $row) {
+            try {
+                $this->processRow($row, $index);
+                $successCount++;
+                $this->importedCount++;
+            } catch (\Exception $e) {
+                $this->errorCount++;
+                $this->errors[] = [
+                    'row' => $index + 5, // +5 vì start từ row 5
+                    'error' => $e->getMessage(),
+                    'data' => $row->toArray(),
+                ];
+                Log::error('PoliticalTheoryImport Error at row '.($index + 5), [
+                    'error' => $e->getMessage(),
+                    'row' => $row->toArray(),
+                ]);
             }
+        }
 
-            // Update DiplomaBlankImport status
-            $diplomaBlankImport->update([
-                'processed_count' => $successCount,
-                'status' => $this->errorCount > 0 ? ImportStatus::COMPLETED : ImportStatus::COMPLETED,
-                'completed_at' => now(),
-            ]);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('PoliticalTheoryImport Fatal Error: '.$e->getMessage());
-            throw $e;
+        // Update DiplomaBlankImport progress after each chunk
+        $diplomaBlankImport = DiplomaBlankImport::find($this->diplomaBlankImportId);
+        if ($diplomaBlankImport) {
+            $diplomaBlankImport->increment('processed_count', $successCount);
+            $diplomaBlankImport->increment('total_quantity', $rows->count());
         }
     }
 
@@ -197,20 +203,61 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             return;
         }
 
-        $student = $existingDegree?->student;
-
         // Tìm hoặc tạo Student
-        if (! $student) {
-            $student = $this->findOrCreateStudent($rowData, null);
-        }
+        $student = $this->findOrCreateStudent($rowData);
+        
+        Log::info('PoliticalTheoryImport: Student ready for degree creation', [
+            'student_id' => $student->student_id,
+            'student_code' => $student->student_code,
+            'full_name' => $student->full_name,
+            'existing_degrees_count' => $student->degrees()->count(),
+        ]);
 
         // Tạo diploma blank và degree
         $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
+        
+        Log::info('PoliticalTheoryImport: Creating degree for student', [
+            'student_id' => $student->student_id,
+            'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
+            'diploma_number' => $rowData['diploma_number'],
+            'degree_type' => $rowData['degree_type'],
+            'number_in_the_book' => $rowData['number_in_the_book'],
+        ]);
+        
         $degree = $this->createDegree($student, $diplomaBlank, $rowData);
+        
+        // Refresh student to get updated relationships
+        $student->refresh();
+        
+        Log::info('PoliticalTheoryImport: Degree created successfully', [
+            'degree_id' => $degree->degree_id,
+            'student_id' => $degree->student_id,
+            'diploma_blank_id' => $degree->diploma_blank_id,
+            'major_name' => $degree->major_name,
+            'student_degrees_count_after' => $student->degrees()->count(),
+            'degree_exists_in_db' => Degree::where('degree_id', $degree->degree_id)->exists(),
+            'relationship_check' => $student->degrees()->where('degree_id', $degree->degree_id)->exists(),
+        ]);
 
         // Xử lý adjustment và reissue
         $this->processAdjustment($degree, $rowData);
         $this->processReissue($degree, $diplomaBlank, $rowData);
+        
+        // Final verification log
+        $student->refresh();
+        $degree->refresh();
+        
+        Log::info('PoliticalTheoryImport: Row processing completed', [
+            'student_id' => $student->student_id,
+            'student_code' => $student->student_code,
+            'degree_id' => $degree->degree_id,
+            'number_in_the_book' => $degree->number_in_the_book,
+            'final_student_degrees_count' => $student->degrees()->count(),
+            'degree_student_relationship' => [
+                'degree_has_student_id' => $degree->student_id == $student->student_id,
+                'student_has_degree' => $student->degrees()->where('degree_id', $degree->degree_id)->exists(),
+            ],
+        ]);
     }
 
     /**
@@ -264,10 +311,17 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
                 'place_of_birth' => $rowData['place_of_birth'],
                 'gender' => $rowData['gender'],
                 'nation' => $rowData['nation'],
+                'course' => $rowData['course'],
+                'academic_year' => $rowData['academic_year'],
                 'status' => StudentStatus::Graduate,
             ]);
 
-            Log::info('PoliticalTheoryImport: Found existing student', ['id' => $student->student_id]);
+            Log::info('PoliticalTheoryImport: Found existing student', [
+                'id' => $student->student_id,
+                'student_code' => $student->student_code,
+                'full_name' => $student->full_name,
+                'degrees_count' => $student->degrees()->count(),
+            ]);
 
             return $student;
         }
@@ -282,12 +336,16 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'place_of_birth' => $rowData['place_of_birth'],
             'gender' => $rowData['gender'],
             'nation' => $rowData['nation'],
+            'course' => $rowData['course'],
+            'academic_year' => $rowData['academic_year'],
             'status' => StudentStatus::Graduate,
         ]);
 
         Log::info('PoliticalTheoryImport: Created new student', [
             'id' => $student->student_id,
             'student_code' => $studentCode,
+            'full_name' => $student->full_name,
+            'date_of_birth' => $student->date_of_birth,
         ]);
 
         return $student;
@@ -324,8 +382,14 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
 
         // Lấy hoặc tạo mới DiplomaBlankType trước
         $typeId = $this->getTypeIdForCertificateType($degreeType);
+        
+        Log::info('PoliticalTheoryImport: Creating/finding diploma blank', [
+            'serial_number' => $diplomaNumber,
+            'type_id' => $typeId,
+            'import_id' => $this->diplomaBlankImportId,
+        ]);
 
-        return DiplomaBlank::firstOrCreate(
+        $diplomaBlank = DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
                 'import_id' => $this->diplomaBlankImportId,
@@ -333,6 +397,14 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
                 'status' => DiplomaBlankStatus::ISSUED,
             ]
         );
+        
+        Log::info('PoliticalTheoryImport: Diploma blank ready', [
+            'diploma_blank_id' => $diplomaBlank->diploma_blank_id,
+            'serial_number' => $diplomaBlank->serial_number,
+            'was_recently_created' => $diplomaBlank->wasRecentlyCreated,
+        ]);
+        
+        return $diplomaBlank;
     }
 
     /**
@@ -342,8 +414,8 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     {
         // Parse graduation year from granting_date
         $graduationYear = $rowData['granting_date'] ? date('Y', strtotime($rowData['granting_date'])) : null;
-
-        return Degree::create([
+        
+        $degreeData = [
             'student_id' => $student->student_id,
             'degree_type' => 'certificate', // Luôn là certificate
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
@@ -358,7 +430,23 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'training_type' => $rowData['training_type'], // Lưu hình thức đào tạo vào degree
             'status' => $rowData['status'], // Parse từ cột R
             'notes' => $rowData['notes'],
+        ];
+        
+        Log::info('PoliticalTheoryImport: About to create degree with data', [
+            'degree_data' => $degreeData,
         ]);
+        
+        $degree = Degree::create($degreeData);
+        
+        Log::info('PoliticalTheoryImport: Degree created in database', [
+            'degree_id' => $degree->degree_id,
+            'student_id' => $degree->student_id,
+            'diploma_blank_id' => $degree->diploma_blank_id,
+            'number_in_the_book' => $degree->number_in_the_book,
+            'fresh_from_db' => Degree::find($degree->degree_id)?->toArray(),
+        ]);
+        
+        return $degree;
     }
 
     /**
@@ -521,7 +609,7 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
     /**
      * Get type_id for certificate type
      */
-    protected function getTypeIdForCertificateType(string $degreeType): ?int
+    protected function getTypeIdForCertificateType(string $degreeType = 'cao_cap'): ?int
     {
         // Sử dụng trực tiếp giá trị degreeType từ hàng Excel để tìm/ tạo DiplomaBlankType
         $key = trim((string) $degreeType);
@@ -529,31 +617,80 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             $key = 'cao_cap';
         }
 
-        // Chuẩn hóa prefix để lưu/so sánh (ví dụ: 'cao_cap' -> 'CAO_CAP')
-        $searchPrefix = mb_strtoupper(str_replace(' ', '_', $key));
+        // Tạo prefix ngắn (tối đa 20 ký tự) từ degreeType
+        $searchPrefix = $this->generateShortPrefix($key);
 
         // Kiểm tra cache trước
         if (isset(self::$diplomaBlankTypes[$searchPrefix])) {
             return self::$diplomaBlankTypes[$searchPrefix]->type_id;
         }
 
-        // Tìm theo prefix hoặc theo tên (case-insensitive). Nếu không có thì tạo mới.
-        $type = DiplomaBlankType::whereRaw('upper(prefix) = ?', [$searchPrefix])
+        // Tìm theo prefix hoặc theo tên (case-insensitive)
+        $type = DiplomaBlankType::where('prefix', $searchPrefix)
             ->orWhereRaw('upper(type_name) = ?', [mb_strtoupper($key)])
             ->first();
 
+        // Nếu không tìm thấy, tạo mới
         if (! $type) {
-            $type = DiplomaBlankType::create([
+            // Dùng DB transaction riêng để đảm bảo type được tạo ngay lập tức
+            $type = DB::transaction(function () use ($searchPrefix, $key) {
+                return DiplomaBlankType::create([
+                    'prefix' => $searchPrefix,
+                    'type_name' => $key,
+                    'description' => 'Tự động tạo từ tiến trình Import Lý luận chính trị',
+                ]);
+            });
+
+            // Reload để đảm bảo có type_id
+            $type = DiplomaBlankType::find($type->type_id);
+            
+            Log::info('PoliticalTheoryImport: Created new DiplomaBlankType', [
+                'type_id' => $type->type_id,
                 'prefix' => $searchPrefix,
                 'type_name' => $key,
-                'description' => 'Tự động tạo từ tiến trình Import Lý luận chính trị',
             ]);
         }
 
         // Cập nhật cache
-        self::$diplomaBlankTypes[$type->prefix] = $type;
+        self::$diplomaBlankTypes[$searchPrefix] = $type;
 
         return $type->type_id;
+    }
+
+    /**
+     * Generate short prefix (max 20 chars) from degree type name
+     */
+    protected function generateShortPrefix(string $degreeType): string
+    {
+        // Map các loại văn bằng phổ biến sang prefix ngắn
+        $mapping = [
+            'Bằng tốt nghiệp cao cấp lý luận chính trị' => 'LLCT_CC',
+            'Bằng tốt nghiệp trung cấp lý luận chính trị' => 'LLCT_TC',
+            'Bằng tốt nghiệp sơ cấp lý luận chính trị' => 'LLCT_SC',
+            'cao_cap' => 'LLCT_CC',
+            'trung_cap' => 'LLCT_TC',
+            'so_cap' => 'LLCT_SC',
+        ];
+
+        // Kiểm tra mapping
+        $normalized = mb_strtolower(trim($degreeType));
+        foreach ($mapping as $pattern => $prefix) {
+            if (mb_strtolower($pattern) === $normalized) {
+                return $prefix;
+            }
+        }
+
+        // Nếu không match, tạo prefix từ chữ cái đầu của mỗi từ
+        $words = preg_split('/[\s_]+/u', mb_strtoupper($degreeType));
+        $prefix = '';
+        foreach ($words as $word) {
+            if (mb_strlen($word) > 0) {
+                $prefix .= mb_substr($word, 0, 1);
+            }
+        }
+
+        // Đảm bảo không vượt quá 20 ký tự
+        return mb_substr($prefix, 0, 20);
     }
 
     /**
@@ -566,5 +703,13 @@ class PoliticalTheoryImport implements ToCollection, WithStartRow
             'errors' => $this->errorCount,
             'error_details' => $this->errors,
         ];
+    }
+
+    /**
+     * Get diploma blank import ID
+     */
+    public function getDiplomaBlankImportId(): ?int
+    {
+        return $this->diplomaBlankImportId;
     }
 }

@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\CertificateImport;
 use App\Imports\DegreeImport;
 use App\Imports\PoliticalTheoryImport;
-use App\Imports\CertificateImport;
-use App\Models\ImportLog;
 use App\Jobs\ProcessImportJob;
+use App\Models\ImportLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DataImportController extends Controller
@@ -37,14 +36,13 @@ class DataImportController extends Controller
         // Validate request
         $request->validate([
             'import_type' => 'required|in:degree,political_theory,certificate',
-            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // Max 10MB
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv',
             'use_queue' => 'boolean',
         ], [
             'import_type.required' => 'Vui lòng chọn loại dữ liệu cần import',
             'import_type.in' => 'Loại dữ liệu không hợp lệ',
             'excel_file.required' => 'Vui lòng chọn file Excel',
             'excel_file.mimes' => 'File phải có định dạng xlsx, xls hoặc csv',
-            'excel_file.max' => 'File không được vượt quá 10MB',
         ]);
 
         $type = $request->input('import_type');
@@ -74,7 +72,10 @@ class DataImportController extends Controller
             }
 
             // Xử lý ngay lập tức (không dùng queue)
-            $documentReference = 'IMPORT_' . $importLog->id . '_' . date('YmdHis');
+            // Increase memory limit for large imports
+            ini_set('memory_limit', '1G');
+
+            $documentReference = 'IMPORT_'.$importLog->id.'_'.date('YmdHis');
             $import = $this->getImportInstance($type, $documentReference);
 
             Excel::import($import, $file);
@@ -119,7 +120,7 @@ class DataImportController extends Controller
                 'completed_at' => now(),
             ]);
 
-            return back()->with('error', 'Validation failed! Có ' . count($failures) . ' dòng không hợp lệ. Vui lòng kiểm tra lại file.')
+            return back()->with('error', 'Validation failed! Có '.count($failures).' dòng không hợp lệ. Vui lòng kiểm tra lại file.')
                 ->withErrors(['import' => 'Xem chi tiết lỗi trong phần logs.']);
         } catch (\Exception $e) {
             // Update import log
@@ -129,24 +130,24 @@ class DataImportController extends Controller
                 'completed_at' => now(),
             ]);
 
-            return back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
+            return back()->with('error', 'Đã xảy ra lỗi: '.$e->getMessage());
         }
     }
 
     /**
      * Get import instance theo type
      */
-    private function getImportInstance(string $type, string $documentReference = null)
+    private function getImportInstance(string $type, ?string $documentReference = null)
     {
-        $documentReference = $documentReference ?? 'IMPORT_' . date('YmdHis');
+        $documentReference = $documentReference ?? 'IMPORT_'.date('YmdHis');
 
         switch ($type) {
             case 'degree':
                 return new DegreeImport($documentReference);
             case 'political_theory':
-                return new PoliticalTheoryImport();
+                return new PoliticalTheoryImport;
             case 'certificate':
-                return new CertificateImport();
+                return new CertificateImport;
             default:
                 throw new \InvalidArgumentException('Loại dữ liệu không hợp lệ anh Hùng ơi!');
         }
@@ -192,13 +193,13 @@ class DataImportController extends Controller
         ];
 
         // Kiểm tra type hợp lệ
-        if (!isset($templateFiles[$type])) {
+        if (! isset($templateFiles[$type])) {
             return back()->with('error', 'Template không tồn tại.');
         }
 
-        $filePath = resource_path('templates/Import/' . $templateFiles[$type]);
+        $filePath = resource_path('templates/Import/'.$templateFiles[$type]);
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return back()->with('error', 'File template không tồn tại. Vui lòng liên hệ quản trị viên.');
         }
 

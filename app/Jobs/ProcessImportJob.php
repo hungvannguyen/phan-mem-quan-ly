@@ -2,26 +2,30 @@
 
 namespace App\Jobs;
 
+use App\Imports\CertificateImport;
 use App\Imports\DegreeImport;
 use App\Imports\PoliticalTheoryImport;
-use App\Imports\CertificateImport;
 use App\Models\ImportLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Log;
 
 class ProcessImportJob implements ShouldQueue
 {
     use Queueable;
 
     public $timeout = 3600; // 1 hour
+
     public $tries = 3;
+
     public $backoff = 300; // 5 minutes
 
     protected $importLogId;
+
     protected $filePath;
+
     protected $importType;
 
     /**
@@ -39,10 +43,14 @@ class ProcessImportJob implements ShouldQueue
      */
     public function handle(): void
     {
+        // Increase memory limit for large imports
+        ini_set('memory_limit', '1G');
+
         $importLog = ImportLog::find($this->importLogId);
 
-        if (!$importLog) {
+        if (! $importLog) {
             Log::error('ImportLog not found', ['id' => $this->importLogId]);
+
             return;
         }
 
@@ -55,7 +63,7 @@ class ProcessImportJob implements ShouldQueue
 
             // Create temp file with proper extension
             $extension = pathinfo($this->filePath, PATHINFO_EXTENSION);
-            $tempFile = tempnam(sys_get_temp_dir(), 'import_') . '.' . $extension;
+            $tempFile = tempnam(sys_get_temp_dir(), 'import_').'.'.$extension;
             file_put_contents($tempFile, $fileContent);
 
             // Execute import
@@ -63,6 +71,18 @@ class ProcessImportJob implements ShouldQueue
 
             // Get statistics
             $stats = $import->getStatistics();
+            
+            // Update DiplomaBlankImport status to COMPLETED if exists
+            if (method_exists($import, 'getDiplomaBlankImportId')) {
+                $diplomaBlankImportId = $import->getDiplomaBlankImportId();
+                if ($diplomaBlankImportId) {
+                    \App\Models\DiplomaBlankImport::where('id', $diplomaBlankImportId)
+                        ->update([
+                            'status' => \App\Enums\ImportStatus::COMPLETED,
+                            'completed_at' => now(),
+                        ]);
+                }
+            }
 
             // Update import log
             $importLog->update([
@@ -139,12 +159,12 @@ class ProcessImportJob implements ShouldQueue
      */
     private function getImportInstance()
     {
-        $documentReference = 'IMPORT_' . $this->importLogId . '_' . date('YmdHis');
+        $documentReference = 'IMPORT_'.$this->importLogId.'_'.date('YmdHis');
 
-        return match($this->importType) {
+        return match ($this->importType) {
             'degree' => new DegreeImport($documentReference),
-            'political_theory' => new PoliticalTheoryImport(),
-            'certificate' => new CertificateImport(),
+            'political_theory' => new PoliticalTheoryImport,
+            'certificate' => new CertificateImport,
             default => throw new \InvalidArgumentException('Invalid import type'),
         };
     }
