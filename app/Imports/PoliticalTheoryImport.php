@@ -206,58 +206,13 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
         // Tìm hoặc tạo Student
         $student = $this->findOrCreateStudent($rowData);
 
-        Log::info('PoliticalTheoryImport: Student ready for degree creation', [
-            'student_id' => $student->student_id,
-            'student_code' => $student->student_code,
-            'full_name' => $student->full_name,
-            'existing_degrees_count' => $student->degrees()->count(),
-        ]);
-
         // Tạo diploma blank và degree
         $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
-
-        Log::info('PoliticalTheoryImport: Creating degree for student', [
-            'student_id' => $student->student_id,
-            'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
-            'diploma_number' => $rowData['diploma_number'],
-            'degree_type' => $rowData['degree_type'],
-            'number_in_the_book' => $rowData['number_in_the_book'],
-        ]);
-
         $degree = $this->createDegree($student, $diplomaBlank, $rowData);
-
-        // Refresh student to get updated relationships
-        $student->refresh();
-
-        Log::info('PoliticalTheoryImport: Degree created successfully', [
-            'degree_id' => $degree->degree_id,
-            'student_id' => $degree->student_id,
-            'diploma_blank_id' => $degree->diploma_blank_id,
-            'major_name' => $degree->major_name,
-            'student_degrees_count_after' => $student->degrees()->count(),
-            'degree_exists_in_db' => Degree::where('degree_id', $degree->degree_id)->exists(),
-            'relationship_check' => $student->degrees()->where('degree_id', $degree->degree_id)->exists(),
-        ]);
 
         // Xử lý adjustment và reissue
         $this->processAdjustment($degree, $rowData);
         $this->processReissue($degree, $diplomaBlank, $rowData);
-
-        // Final verification log
-        $student->refresh();
-        $degree->refresh();
-
-        Log::info('PoliticalTheoryImport: Row processing completed', [
-            'student_id' => $student->student_id,
-            'student_code' => $student->student_code,
-            'degree_id' => $degree->degree_id,
-            'number_in_the_book' => $degree->number_in_the_book,
-            'final_student_degrees_count' => $student->degrees()->count(),
-            'degree_student_relationship' => [
-                'degree_has_student_id' => $degree->student_id == $student->student_id,
-                'student_has_degree' => $student->degrees()->where('degree_id', $degree->degree_id)->exists(),
-            ],
-        ]);
     }
 
     /**
@@ -316,13 +271,6 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
                 'status' => StudentStatus::Graduate,
             ]);
 
-            Log::info('PoliticalTheoryImport: Found existing student', [
-                'id' => $student->student_id,
-                'student_code' => $student->student_code,
-                'full_name' => $student->full_name,
-                'degrees_count' => $student->degrees()->count(),
-            ]);
-
             return $student;
         }
 
@@ -339,13 +287,6 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
             'course' => $rowData['course'],
             'academic_year' => $rowData['academic_year'],
             'status' => StudentStatus::Graduate,
-        ]);
-
-        Log::info('PoliticalTheoryImport: Created new student', [
-            'id' => $student->student_id,
-            'student_code' => $studentCode,
-            'full_name' => $student->full_name,
-            'date_of_birth' => $student->date_of_birth,
         ]);
 
         return $student;
@@ -383,13 +324,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
         // Lấy hoặc tạo mới DiplomaBlankType trước
         $typeId = $this->getTypeIdForCertificateType($degreeType);
 
-        Log::info('PoliticalTheoryImport: Creating/finding diploma blank', [
-            'serial_number' => $diplomaNumber,
-            'type_id' => $typeId,
-            'import_id' => $this->diplomaBlankImportId,
-        ]);
-
-        $diplomaBlank = DiplomaBlank::firstOrCreate(
+        return DiplomaBlank::firstOrCreate(
             ['serial_number' => $diplomaNumber],
             [
                 'import_id' => $this->diplomaBlankImportId,
@@ -397,14 +332,6 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
                 'status' => DiplomaBlankStatus::ISSUED,
             ]
         );
-
-        Log::info('PoliticalTheoryImport: Diploma blank ready', [
-            'diploma_blank_id' => $diplomaBlank->diploma_blank_id,
-            'serial_number' => $diplomaBlank->serial_number,
-            'was_recently_created' => $diplomaBlank->wasRecentlyCreated,
-        ]);
-
-        return $diplomaBlank;
     }
 
     /**
@@ -432,21 +359,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
             'notes' => $rowData['notes'],
         ];
 
-        Log::info('PoliticalTheoryImport: About to create degree with data', [
-            'degree_data' => $degreeData,
-        ]);
-
-        $degree = Degree::create($degreeData);
-
-        Log::info('PoliticalTheoryImport: Degree created in database', [
-            'degree_id' => $degree->degree_id,
-            'student_id' => $degree->student_id,
-            'diploma_blank_id' => $degree->diploma_blank_id,
-            'number_in_the_book' => $degree->number_in_the_book,
-            'fresh_from_db' => Degree::find($degree->degree_id)?->toArray(),
-        ]);
-
-        return $degree;
+        return Degree::create($degreeData);
     }
 
     /**
@@ -643,12 +556,6 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
 
             // Reload để đảm bảo có type_id
             $type = DiplomaBlankType::find($type->type_id);
-
-            Log::info('PoliticalTheoryImport: Created new DiplomaBlankType', [
-                'type_id' => $type->type_id,
-                'prefix' => $searchPrefix,
-                'type_name' => $key,
-            ]);
         }
 
         // Cập nhật cache
