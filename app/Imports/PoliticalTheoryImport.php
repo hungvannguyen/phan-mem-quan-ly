@@ -205,7 +205,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
 
         // Tìm hoặc tạo Student
         $student = $this->findOrCreateStudent($rowData);
-        
+
         Log::info('PoliticalTheoryImport: Student ready for degree creation', [
             'student_id' => $student->student_id,
             'student_code' => $student->student_code,
@@ -215,7 +215,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
 
         // Tạo diploma blank và degree
         $diplomaBlank = $this->createDiplomaBlankIfNeeded($rowData['diploma_number'], $rowData['degree_type']);
-        
+
         Log::info('PoliticalTheoryImport: Creating degree for student', [
             'student_id' => $student->student_id,
             'diploma_blank_id' => $diplomaBlank?->diploma_blank_id,
@@ -223,12 +223,12 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
             'degree_type' => $rowData['degree_type'],
             'number_in_the_book' => $rowData['number_in_the_book'],
         ]);
-        
+
         $degree = $this->createDegree($student, $diplomaBlank, $rowData);
-        
+
         // Refresh student to get updated relationships
         $student->refresh();
-        
+
         Log::info('PoliticalTheoryImport: Degree created successfully', [
             'degree_id' => $degree->degree_id,
             'student_id' => $degree->student_id,
@@ -242,11 +242,11 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
         // Xử lý adjustment và reissue
         $this->processAdjustment($degree, $rowData);
         $this->processReissue($degree, $diplomaBlank, $rowData);
-        
+
         // Final verification log
         $student->refresh();
         $degree->refresh();
-        
+
         Log::info('PoliticalTheoryImport: Row processing completed', [
             'student_id' => $student->student_id,
             'student_code' => $student->student_code,
@@ -382,7 +382,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
 
         // Lấy hoặc tạo mới DiplomaBlankType trước
         $typeId = $this->getTypeIdForCertificateType($degreeType);
-        
+
         Log::info('PoliticalTheoryImport: Creating/finding diploma blank', [
             'serial_number' => $diplomaNumber,
             'type_id' => $typeId,
@@ -397,13 +397,13 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
                 'status' => DiplomaBlankStatus::ISSUED,
             ]
         );
-        
+
         Log::info('PoliticalTheoryImport: Diploma blank ready', [
             'diploma_blank_id' => $diplomaBlank->diploma_blank_id,
             'serial_number' => $diplomaBlank->serial_number,
             'was_recently_created' => $diplomaBlank->wasRecentlyCreated,
         ]);
-        
+
         return $diplomaBlank;
     }
 
@@ -414,7 +414,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
     {
         // Parse graduation year from granting_date
         $graduationYear = $rowData['granting_date'] ? date('Y', strtotime($rowData['granting_date'])) : null;
-        
+
         $degreeData = [
             'student_id' => $student->student_id,
             'degree_type' => 'certificate', // Luôn là certificate
@@ -431,13 +431,13 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
             'status' => $rowData['status'], // Parse từ cột R
             'notes' => $rowData['notes'],
         ];
-        
+
         Log::info('PoliticalTheoryImport: About to create degree with data', [
             'degree_data' => $degreeData,
         ]);
-        
+
         $degree = Degree::create($degreeData);
-        
+
         Log::info('PoliticalTheoryImport: Degree created in database', [
             'degree_id' => $degree->degree_id,
             'student_id' => $degree->student_id,
@@ -445,7 +445,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
             'number_in_the_book' => $degree->number_in_the_book,
             'fresh_from_db' => Degree::find($degree->degree_id)?->toArray(),
         ]);
-        
+
         return $degree;
     }
 
@@ -643,7 +643,7 @@ class PoliticalTheoryImport implements ToCollection, WithChunkReading, WithStart
 
             // Reload để đảm bảo có type_id
             $type = DiplomaBlankType::find($type->type_id);
-            
+
             Log::info('PoliticalTheoryImport: Created new DiplomaBlankType', [
                 'type_id' => $type->type_id,
                 'prefix' => $searchPrefix,
